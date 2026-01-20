@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ site_config.site_name|default:"Corporate Games Hub" }}{% endblock %}</title>
+    
+    <!-- Favicon -->
+    {% if site_config.favicon %}
+    <link rel="icon" type="image/x-icon" href="{{ site_config.favicon.url }}">
+    {% endif %}
+    
+    <!-- Local CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Flowbite -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- CSRF for AJAX -->
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+    </script>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+    
+    <!-- Custom theme variables -->
+    <link rel="stylesheet" href="{% static 'css/theme-variables.css' %}">
+    
+    <!-- Custom styles -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <!-- Dark mode overrides -->
+    <link rel="stylesheet" href="{% static 'css/dark-mode-overrides.css' %}">
+    
+    <!-- Dark Theme Styles -->
+    <style>
+        /* Header text colors using theme variables - most specific selector to override Tailwind classes */
+        header.header-glass-pane a,
+        header.header-glass-pane span,
+        header.header-glass-pane div,
+        header a,
+        header span,
+        header div {
+            color: var(--text-primary) !important;
+        }
+        
+        .dark header.header-glass-pane a,
+        .dark header.header-glass-pane span,
+        .dark header.header-glass-pane div,
+        .dark header a,
+        .dark header span,
+        .dark header div {
+            color: var(--text-primary) !important;
+        }
+        
+        .dark .bg-gradient-to-r {
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        /* Zoom in animation for hero slider background only - text stays normal */
+        .slide-content {
+            /* Remove zoom animation from content to keep text normal */
+            transform: scale(1);
+        }
+        
+        /* Header-specific styles */
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+        
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+        
+        .animation-delay-500 {
+            animation-delay: 0.5s;
+        }
+        
+        .animation-delay-1000 {
+            animation-delay: 1s;
+        }
+        
+        /* Enhanced animations for hero section */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.7); }
+            100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        }
+        
+        .animate-pulse-glow {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        
+        .transform-gpu {
+            transform: translateZ(0);
+        }
+        
+        /* Enhanced fade-in animations */
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Glow effect for header elements */
+        .glow {
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .dark .glow {
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.1);
+        }
+        
+        /* Full-width layout */
+        .full-width-container {
+            max-width: 100vw;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Full screen height for hero slider */
+        .hero-slider-container {
+            height: 100vh;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            max-width: 100vw;
+        }
+        
+        /* Ensure main content area accommodates the full-height hero */
+        main {
+            width: 100vw;
+        }
+        
+        /* Body styles - consolidated to remove duplication */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            padding-top: 4.5rem; /* Account for fixed header height */
+        }
+        
+        @media (min-width: 768px) {
+            body {
+                padding-top: 5rem; /* Adjust for larger header on medium screens */
+            }
+        }
+        
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Consistent background image styling for all slides */
+        .slide-bg-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            object-fit: cover;
+        }
+        
+        /* Alternative approach for image containers to maintain aspect ratio */
+        .slide-image-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .slide-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        /* Ensure content is properly positioned in larger slider */
+        .slide-content {
+            width: 100%;
+            max-width: 80%; /* Allow content to take more space */
+            margin: 0 auto;
+        }
+        
+        /* Upcoming event overlay container styling */
+        .upcoming-event-overlay {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 20rem;
+            z-index: 30;
+            transition: all 0.5s ease;
+        }
+        
+        /* Montserrat font for hero slider text */
+        .hero-slider-container h1,
+        .hero-slider-container h2,
+        .hero-slider-container p,
+        .hero-slider-container a {
+            font-family: 'Montserrat', system-ui, sans-serif;
+        }
+        
+        /* Specific styling for hero slider headings */
+        .hero-slider-container h1,
+        .hero-slider-container h2 {
+            font-weight: 700;
+        }
+        
+        /* Specific styling for hero slider paragraphs */
+        .hero-slider-container p {
+            font-weight: 400;
+        }
+        
+        /* Specific styling for hero slider buttons */
+        .hero-slider-container a {
+            font-weight: 600;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col p-0 m-0">
+    <!-- Mobile menu backdrop -->
+    <div id="mobile-menu-backdrop" class="hidden fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm z-40"></div>
+    
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-white/10 dark:border-gray-700/20 shadow-lg header-glass-pane">
+        <!-- Responsive header with mobile dropdown menu -->
+        <nav class="relative px-4 md:px-6 py-3 z-10">
+            <div class="flex items-center justify-between">
+                <a href="{% url 'gms:homepage' %}" class="flex items-center space-x-2 md:space-x-3">
+                    {% if site_config.logo %}
+                        <div class="p-0.5 md:p-1 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500">
+                            <img src="{{ site_config.logo.url }}" class="h-6 md:h-8 rounded-full" alt="{{ site_config.site_name }}" />
+                        </div>
+                        <span class="self-center text-base md:text-xl font-bold text-white">{{ site_config.site_name|default:"Corporate Games Hub" }}</span>
+                    {% else %}
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 md:w-3 md:h-3 bg-yellow-400 rounded-full mr-1 animate-pulse"></div>
+                            <div class="w-2 h-2 md:w-3 md:h-3 bg-green-400 rounded-full mr-1 animate-pulse animation-delay-500"></div>
+                            <div class="w-2 h-2 md:w-3 md:h-3 bg-red-400 rounded-full mr-1 animate-pulse animation-delay-1000"></div>
+                            <span class="self-center text-base md:text-xl font-bold text-white ml-1 md:ml-2">{{ site_config.site_name|default:"Corporate Games Hub" }}</span>
+                        </div>
+                    {% endif %}
+                </a>
+                
+                <!-- Mobile menu button -->
+                <div class="flex items-center space-x-2">
+                    <div class="hidden md:flex items-center space-x-1">
+                        <a href="{% url 'gms:homepage' %}" class="px-3 py-2 text-white hover:text-yellow-300 transition-colors duration-300 rounded-lg text-sm md:text-base">Home</a>
+                        <a href="{% url 'gms:events' %}" class="px-3 py-2 text-white hover:text-yellow-300 transition-colors duration-300 rounded-lg text-sm md:text-base">Events</a>
+                        <a href="{% url 'gms:competitions' %}" class="px-3 py-2 text-white hover:text-yellow-300 transition-colors duration-300 rounded-lg text-sm md:text-base">Competition</a>
+                        <a href="{% url 'gms:announcements' %}" class="px-3 py-2 text-white hover:text-yellow-300 transition-colors duration-300 rounded-lg text-sm md:text-base">Announcement</a>
+                        <a href="{% url 'gms:clubs' %}" class="px-3 py-2 text-white hover:text-yellow-300 transition-colors duration-300 rounded-lg text-sm md:text-base">Club</a>
+                        <a href="{% url 'gms:contact' %}" class="px-3 py-2 text-white hover:text-yellow-300 transition-colors duration-300 rounded-lg text-sm md:text-base">Contact</a>
+                        <!-- Theme toggle button for desktop -->
+                        <button id="theme-toggle" class="p-2 text-gray-700 dark:text-gray-300 rounded-full hover:bg-white/20 dark:hover:bg-gray-700/50 backdrop-blur-sm border border-white/30 shadow-lg transition-all duration-300 transform hover:scale-110 bg-white/50 dark:bg-gray-700/50">
+                            <svg id="theme-toggle-dark-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                            </svg>
+                            <svg id="theme-toggle-light-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Mobile menu button -->
+                    <button data-collapse-toggle="navbar-dropdown" type="button" class="md:hidden text-gray-700 dark:text-gray-300 rounded-full hover:bg-white/20 dark:hover:bg-gray-700/50 backdrop-blur-sm border border-white/30 shadow-lg p-2 transition-all duration-300 bg-white/50 dark:bg-gray-700/50">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile dropdown menu as separate popup -->
+            <div class="hidden md:hidden absolute left-1/2 transform -translate-x-1/2 mt-2 w-[calc(100%-2rem)] max-w-md lg:max-w-lg z-50" id="navbar-dropdown">
+                <div class="flex flex-col items-center space-y-2 p-4 rounded-xl bg-white/60 dark:bg-gray-900/70 backdrop-blur-xl border border-white/40 dark:border-gray-700/50 shadow-xl">
+                    <a href="{% url 'gms:homepage' %}" class="w-full text-center px-3 py-2 text-gray-900 dark:text-white hover:text-yellow-600 dark:hover:text-yellow-300 transition-colors duration-300 rounded-lg">Home</a>
+                    <a href="{% url 'gms:events' %}" class="w-full text-center px-3 py-2 text-gray-900 dark:text-white hover:text-yellow-600 dark:hover:text-yellow-300 transition-colors duration-300 rounded-lg">Events</a>
+                    <a href="{% url 'gms:competitions' %}" class="w-full text-center px-3 py-2 text-gray-900 dark:text-white hover:text-yellow-600 dark:hover:text-yellow-300 transition-colors duration-300 rounded-lg">Competition</a>
+                    <a href="{% url 'gms:announcements' %}" class="w-full text-center px-3 py-2 text-gray-900 dark:text-white hover:text-yellow-600 dark:hover:text-yellow-300 transition-colors duration-300 rounded-lg">Announcement</a>
+                    <a href="{% url 'gms:clubs' %}" class="w-full text-center px-3 py-2 text-gray-900 dark:text-white hover:text-yellow-600 dark:hover:text-yellow-300 transition-colors duration-300 rounded-lg">Club</a>
+                    <a href="{% url 'gms:contact' %}" class="w-full text-center px-3 py-2 text-gray-900 dark:text-white hover:text-yellow-600 dark:hover:text-yellow-300 transition-colors duration-300 rounded-lg">Contact</a>
+                    <button id="theme-toggle-mobile" class="w-full text-center px-3 py-2 text-gray-900 dark:text-white hover:text-yellow-600 dark:hover:text-yellow-300 transition-colors duration-300 rounded-lg flex items-center justify-center">
+                        <svg id="theme-toggle-mobile-dark-icon" class="w-5 h-5 mx-auto" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                        <svg id="theme-toggle-mobile-light-icon" class="w-5 h-5 mx-auto hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+
+
+    <!-- Main Content -->
+    <main class="flex-grow w-full p-0 m-0 pt-16"> <!-- Added pt-16 to account for fixed header -->
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
+        <div class="max-w-full mx-auto px-4">
+            <div class="md:flex md:items-center md:justify-between">
+                <div class="flex justify-center md:justify-start">
+                    <p class="text-sm text-gray-500">
+                        {{ site_config.footer_text|default:"© 2025 GMS" }}
+                    </p>
+                </div>
+                <div class="mt-4 md:mt-0 flex justify-center md:justify-end space-x-6">
+                    {% if site_config.contact_email %}
+                    <a href="mailto:{{ site_config.contact_email }}" class="text-gray-400 hover:text-gray-500">
+                        <span class="sr-only">Email</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 4.5v15c0 .85-.65 1.5-1.5 1.5H21V9.75L12 3 3 9.75v11.25H1.5c-.85 0-1.5-.65-1.5-1.5v-15c0-.65.35-1.25.85-1.5L12 3l11.15-1.5c.5.25.85.85.85 1.5z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    {% if site_config.contact_phone %}
+                    <a href="tel:{{ site_config.contact_phone }}" class="text-gray-400 hover:text-gray-500">
+                        <span class="sr-only">Phone</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    
+    <script>
+        // Theme Toggle Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+            const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+            
+            // Check for saved theme preference or respect OS preference
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+            
+            // Function to set theme
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    themeToggleDarkIcon.classList.add('hidden');
+                    themeToggleLightIcon.classList.remove('hidden');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    themeToggleLightIcon.classList.add('hidden');
+                    themeToggleDarkIcon.classList.remove('hidden');
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+            
+            // Initialize theme based on saved preference or system preference
+            if (savedTheme === 'dark' || (!savedTheme && prefersDarkScheme.matches)) {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+            
+            // Toggle theme when button is clicked
+            themeToggleBtn.addEventListener('click', function() {
+                if (document.documentElement.classList.contains('dark')) {
+                    setTheme('light');
+                } else {
+                    setTheme('dark');
+                }
+            });
+            
+            // Mobile menu toggle functionality
+            const mobileMenuButton = document.querySelector('[data-collapse-toggle="navbar-dropdown"]');
+            const mobileMenu = document.getElementById('navbar-dropdown');
+            const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
+            
+            if (mobileMenuButton && mobileMenu && mobileMenuBackdrop) {
+                mobileMenuButton.addEventListener('click', function() {
+                    const isHidden = mobileMenu.classList.contains('hidden');
+                    mobileMenu.classList.toggle('hidden');
+                    mobileMenuBackdrop.classList.toggle('hidden');
+                    
+                    // Toggle backdrop based on theme
+                    const isDark = document.documentElement.classList.contains('dark');
+                    if (isHidden) {
+                        // Menu is being opened
+                        mobileMenuBackdrop.classList.remove('bg-black/30', 'dark:bg-black/50');
+                        if (isDark) {
+                            mobileMenuBackdrop.classList.add('bg-black/50');
+                        } else {
+                            mobileMenuBackdrop.classList.add('bg-black/30');
+                        }
+                    }
+                });
+            }
+            
+            // Mobile theme toggle functionality
+            const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+            const themeToggleMobileDarkIcon = document.getElementById('theme-toggle-mobile-dark-icon');
+            const themeToggleMobileLightIcon = document.getElementById('theme-toggle-mobile-light-icon');
+            
+            if (themeToggleMobile) {
+                themeToggleMobile.addEventListener('click', function() {
+                    // Find the main theme toggle button and click it
+                    const mainThemeToggle = document.getElementById('theme-toggle');
+                    if (mainThemeToggle) {
+                        mainThemeToggle.click();
+                    }
+                });
+            }
+            
+            // Update mobile theme icons based on current theme
+            function updateMobileThemeIcons(theme) {
+                if (themeToggleMobileDarkIcon && themeToggleMobileLightIcon) {
+                    if (theme === 'dark') {
+                        themeToggleMobileDarkIcon.classList.add('hidden');
+                        themeToggleMobileLightIcon.classList.remove('hidden');
+                    } else {
+                        themeToggleMobileDarkIcon.classList.remove('hidden');
+                        themeToggleMobileLightIcon.classList.add('hidden');
+                    }
+                }
+            }
+            
+            // Update mobile icons when main theme toggles
+            const mainThemeToggle = document.getElementById('theme-toggle');
+            if (mainThemeToggle) {
+                // Initial update based on saved theme
+                const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                updateMobileThemeIcons(savedTheme);
+                
+                // Add event listener to update mobile icons when theme changes
+                mainThemeToggle.addEventListener('click', function() {
+                    setTimeout(() => {
+                        const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+                        updateMobileThemeIcons(currentTheme);
+                    }, 10); // Small delay to ensure theme has updated
+                });
+            }
+
+            // Add active class to selected tab
+            document.addEventListener('htmx:beforeRequest', function(evt) {
+                // Remove active class from all tab buttons
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('border-blue-500', 'text-blue-600');
+                    btn.classList.add('border-transparent', 'text-gray-500');
+                });
+                
+                // Add active class to the clicked tab button
+                const clickedBtn = evt.detail.elt;
+                clickedBtn.classList.remove('border-transparent', 'text-gray-500');
+                clickedBtn.classList.add('border-blue-500', 'text-blue-600');
+            });
+            
+            // Handle anchor links to account for fixed header
+            window.addEventListener('DOMContentLoaded', function() {
+                if (window.location.hash) {
+                    setTimeout(function() {
+                        const element = document.querySelector(window.location.hash);
+                        if (element) {
+                            const offsetTop = element.getBoundingClientRect().top;
+                            const headerHeight = document.querySelector('header').offsetHeight;
+                            
+                            // Scroll to element with offset for header
+                            window.scrollTo({
+                                top: window.pageYOffset + offsetTop - headerHeight - 20,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }, 100);
+                }
+            });
+            
+            // Handle clicks on anchor links
+            document.addEventListener('click', function(e) {
+                if (e.target.matches('a[href^="#"]')) {
+                    e.preventDefault();
+                    const targetId = e.target.getAttribute('href');
+                    if (targetId !== '#') {
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            const headerHeight = document.querySelector('header').offsetHeight;
+                            const offsetTop = targetElement.offsetTop - headerHeight - 20;
+                            
+                            window.scrollTo({
+                                top: offsetTop,
+                                behavior: 'smooth'
+                            });
+                            
+                            // Update URL hash
+                            history.pushState(null, null, targetId);
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</</html>

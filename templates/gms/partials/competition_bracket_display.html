@@ -1,0 +1,119 @@
+{% load static %}
+
+<link rel="stylesheet" href="https://unpkg.com/gracket/dist/style.css" />
+<style>
+    .bracket-container {
+        overflow-x: auto; /* Enable horizontal scrolling for responsiveness */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    }
+</style>
+
+<div class="bracket-container bg-white rounded-xl shadow-md p-6 dark:bg-gray-800" data-competition-id="{{ competition.id }}">
+    <div id="bracket-{{ competition.id }}" class="gracket"></div>
+</div>
+
+<!-- Hidden script tag to safely pass data from Django to JavaScript -->
+<script id="teams-data-{{ competition.id }}" type="application/json">{{ teams_data_json|safe }}</script>
+
+<script type="module">
+    import { Gracket, generateTournamentWithByes } from 'https://unpkg.com/gracket';
+
+    const competitionId = "{{ competition.id }}";
+    const bracketElement = document.getElementById(`bracket-${competitionId}`);
+    const teamsDataElement = document.getElementById(`teams-data-${competitionId}`);
+
+    function getRoundLabels(tournamentData) {
+        const numRounds = tournamentData.length;
+        const standardLabels = {
+            1: 'Final',
+            2: 'Semifinals',
+            4: 'Quarterfinals',
+            8: 'Round of 16',
+            16: 'Round of 32',
+        };
+        const labels = [];
+        if (numRounds > 0) {
+            for (let i = 0; i < numRounds; i++) {
+                const matchesInRound = tournamentData[i].length;
+                labels.push(standardLabels[matchesInRound] || `Round ${i + 1}`);
+            }
+            labels.push('Champion');
+        }
+        return labels;
+    }
+
+    function drawBracket() {
+        if (!bracketElement || !teamsDataElement) return;
+
+        bracketElement.innerHTML = ''; // Clear before drawing
+
+        try {
+            const teams = JSON.parse(teamsDataElement.textContent);
+            
+            if (!teams || teams.length === 0) {
+                bracketElement.innerHTML = `<div class="text-center py-8 text-gray-500 dark:text-gray-400">No teams enrolled yet. The bracket will be generated once teams are added.</div>`;
+                return;
+            }
+
+            if (teams.length < 2) {
+                bracketElement.innerHTML = `<div class="text-center py-8 text-gray-500 dark:text-gray-400">Not enough teams to generate a bracket. You need at least 2 teams enrolled in this competition.</div>`;
+                return;
+            }
+
+            const tournamentData = generateTournamentWithByes(teams, 'top-seeds');
+            const dynamicLabels = getRoundLabels(tournamentData);
+            const containerWidth = bracketElement.offsetWidth;
+            let gracketOptions;
+
+            // Adjust options based on container width for responsiveness
+            if (containerWidth < 768) { // Mobile/Tablet view
+                gracketOptions = {
+                    src: tournamentData,
+                    byeLabel: 'BYE',
+                    roundLabels: dynamicLabels.map(l => l.replace('Round of', 'R').replace('Quarterfinals', 'QF').replace('Semifinals', 'SF')), // Abbreviate labels
+                    cornerRadius: 10,
+                    canvasLineColor: '#667eea',
+                    teamWidth: 125,
+                    matchPadding: 15,
+                    fontSize: 12,
+                };
+            } else { // Desktop view
+                gracketOptions = {
+                    src: tournamentData,
+                    byeLabel: 'BYE',
+                    roundLabels: dynamicLabels,
+                    cornerRadius: 15,
+                    canvasLineColor: '#667eea',
+                    teamWidth: 160,
+                    matchPadding: 20,
+                    fontSize: 14,
+                };
+            }
+
+            new Gracket(bracketElement, gracketOptions);
+
+        } catch (e) {
+            console.error("Failed to parse bracket data or initialize Gracket:", e);
+            bracketElement.innerHTML = `<div class="text-center py-8 text-red-500">Error loading bracket.</div>`;
+        }
+    }
+
+    // Initial draw
+    drawBracket();
+
+    // Redraw on window resize, with a debounce to prevent excessive re-renders
+    let resizeTimer;
+    const debouncedRedraw = () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(drawBracket, 250);
+    };
+    
+    const listener = () => debouncedRedraw();
+    window.addEventListener('resize', listener);
+
+    // Clean up event listener when the partial is swapped out by HTMX to prevent memory leaks
+    bracketElement.addEventListener('htmx:beforeSwap', () => {
+        window.removeEventListener('resize', listener);
+    }, { once: true });
+
+</script>

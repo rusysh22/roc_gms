@@ -1,0 +1,30 @@
+[project]
+name = "django-gms"
+version = "0.1.0"
+description = "Corporate Games Management System"
+authors = [
+    {name = "Rusydani",email = "rusydani.sh@gmail.com"}
+]
+license = {text = "n"}
+readme = "README.md"
+requires-python = "^3.10"
+dependencies = [
+    "django (>=5.2.7,<6.0.0)",
+    "psycopg2-binary (>=2.9.11,<3.0.0)",
+    "django-environ (>=0.12.0,<0.13.0)",
+    "django-solo (>=2.4.0,<3.0.0)",
+    "django-extensions (>=4.1,<5.0)",
+    "django-htmx (>=1.26.0,<2.0.0)",
+    "pillow (>=12.0.0,<13.0.0)",
+    "django-admin-interface (>=0.30.1,<0.31.0)",
+    "django-jazzmin==3.0.1",
+    "pytz (>=2024.1)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false

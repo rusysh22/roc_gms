@@ -1,0 +1,1458 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Round Robin Schedule - {{ competition.name }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-4">{{ competition.name }} - Competition Setup</h1>
+
+    <!-- Step Navigation -->
+    <div class="mb-6">
+        <div class="flex border-b border-gray-200">
+            <button class="step-tab px-4 py-2 font-medium text-sm border-b-2 border-blue-500 text-blue-600" 
+                    data-step="seeding">
+                Step 1: Seeding
+            </button>
+            <button class="step-tab px-4 py-2 font-medium text-sm text-gray-500 hover:text-gray-700 ml-2" 
+                    data-step="schedule">
+                Step 2: Schedule
+            </button>
+        </div>
+    </div>
+
+    <!-- Seeding Step -->
+    <div class="step-content mb-6" id="seeding-step">
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Team Seeding</h2>
+            <p class="text-gray-600 mb-4">Drag and drop teams to set their seeding order for the competition.</p>
+            
+            <div class="seeding-container">
+                <h3 class="text-lg font-medium mb-3">Teams List</h3>
+                <div id="seeding-teams-list" class="seeding-teams-list bg-gray-50 rounded-lg p-4 min-h-40">
+                    {% for team in teams_data %}
+                    <div class="seeding-team-item p-3 mb-2 bg-white border rounded cursor-move flex items-center" 
+                         data-team-id="{{ team.id }}" draggable="true">
+                        <span class="drag-handle mr-3">☰</span>
+                        <span class="team-name">{{ team.name }}</span>
+                    </div>
+                    {% endfor %}
+                    {% if not teams_data %}
+                    <div class="text-center py-8 text-gray-500 border-2 border-dashed rounded-lg">
+                        No teams enrolled yet. Teams will appear here after being added to the competition.
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mt-4">
+                    <button id="save-seeding-btn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        Save Seeding Order
+                    </button>
+                    <button id="randomize-seeding-btn" class="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Randomize Seeding
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Step -->
+    <div class="step-content hidden mb-6" id="schedule-step">
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Round Robin Schedule</h2>
+            <p class="text-gray-600 mb-4">View and manage the round robin tournament schedule.</p>
+
+    {% if groups_data %}
+        <!-- Mini Standings Overview for all groups -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {% for group in groups_data %}
+            <div class="bg-white shadow-sm rounded-lg p-3 border border-gray-200 mini-standings {% if forloop.first %}mini-standings-active{% endif %} mini-standings-clickable" data-group-id="{{ group.id }}" style="cursor: pointer;" title="Click to view {{ group.name }}">
+                <h4 class="font-semibold text-sm mb-2 text-center text-gray-700">{{ group.name }}</h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-xs">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-1 py-1 text-left">Team</th>
+                                <th class="px-1 py-1 text-center">Pts</th>
+                                <th class="px-1 py-1 text-center">W</th>
+                                <th class="px-1 py-1 text-center">L</th>
+                                <th class="px-1 py-1 text-center">D</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for team in group.teams|slice:":3" %} <!-- Show only top 3 teams in mini view -->
+                            <tr>
+                                <td class="px-1 py-1 border-b font-medium truncate max-w-[60px]">{{ team.name|truncatechars:8 }}</td>
+                                <td class="px-1 py-1 border-b text-center">0</td>
+                                <td class="px-1 py-1 border-b text-center">0</td>
+                                <td class="px-1 py-1 border-b text-center">0</td>
+                                <td class="px-1 py-1 border-b text-center">0</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="px-1 py-1 text-center text-gray-500 text-xs">No teams</td>
+                            </tr>
+                            {% endfor %}
+                            {% if group.teams|length > 3 %}
+                            <tr>
+                                <td colspan="5" class="px-1 py-1 text-center text-[0.6rem] text-gray-500">+{{ group.teams|length|add:"-3" }} more</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Multi-Group Tabs -->
+        <div class="mb-6">
+            <div class="flex border-b border-gray-200">
+                {% for group in groups_data %}
+                    <button class="group-tab px-4 py-2 font-medium text-sm {% if forloop.first %}border-b-2 border-blue-500 text-blue-600{% else %}text-gray-500 hover:text-gray-700{% endif %}" 
+                            data-group-id="{{ group.id }}">
+                        {{ group.name }}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% for group in groups_data %}
+        <!-- Group Standings for each group - Based on StarCraft 2 tournament demo from jquery-group documentation -->
+        <div class="group-standings-section {% if not forloop.first %}hidden{% endif %}" data-group-id="{{ group.id }}">
+            <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+                <h3 class="text-lg font-semibold mb-3">{{ group.name }} Standings</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-lg standings-table">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="py-2 px-4 border-b text-left">Rank</th>
+                                <th class="py-2 px-4 border-b text-left">Team</th>
+                                <th class="py-2 px-4 border-b text-center">Points</th>
+                                <th class="py-2 px-4 border-b text-center">Wins</th>
+                                <th class="py-2 px-4 border-b text-center">Losses</th>
+                                <th class="py-2 px-4 border-b text-center">Draws</th>
+                                <th class="py-2 px-4 border-b text-center">
+                                    {% if competition.sport_type == 'VOLLEYBALL' %}
+                                        SF
+                                    {% elif competition.sport_type == 'BASKETBALL' %}
+                                        PF
+                                    {% elif competition.sport_type == 'TENNIS' %}
+                                        GS
+                                    {% elif competition.sport_type == 'BADMINTON' %}
+                                        GS
+                                    {% elif competition.sport_type == 'PETANQUE' %}
+                                        PO
+                                    {% else %}
+                                        GF
+                                    {% endif %}
+                                </th>
+                                <th class="py-2 px-4 border-b text-center">
+                                    {% if competition.sport_type == 'VOLLEYBALL' %}
+                                        SA
+                                    {% elif competition.sport_type == 'BASKETBALL' %}
+                                        PA
+                                    {% elif competition.sport_type == 'TENNIS' %}
+                                        GA
+                                    {% elif competition.sport_type == 'BADMINTON' %}
+                                        GA
+                                    {% elif competition.sport_type == 'PETANQUE' %}
+                                        PA
+                                    {% else %}
+                                        GA
+                                    {% endif %}
+                                </th>
+                                <th class="py-2 px-4 border-b text-center">
+                                    {% if competition.sport_type == 'VOLLEYBALL' %}
+                                        SD
+                                    {% elif competition.sport_type == 'BASKETBALL' %}
+                                        PD
+                                    {% elif competition.sport_type == 'TENNIS' %}
+                                        GD
+                                    {% elif competition.sport_type == 'BADMINTON' %}
+                                        GD
+                                    {% elif competition.sport_type == 'PETANQUE' %}
+                                        PD
+                                    {% else %}
+                                        GD
+                                    {% endif %}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="standings-body-{{ group.id }}" class="standings-body">
+                            <!-- Standings will be populated dynamically from match results for this group -->
+                            {% for team in group.teams %}
+                            <tr class="team-standing" data-team-id="{{ team.id }}" data-group-id="{{ group.id }}">
+                                <td class="py-2 px-4 border-b text-center">-</td>
+                                <td class="py-2 px-4 border-b font-medium">{{ team.name }}</td>
+                                <td class="py-2 px-4 border-b text-center">0</td>
+                                <td class="py-2 px-4 border-b text-center">0</td>
+                                <td class="py-2 px-4 border-b text-center">0</td>
+                                <td class="py-2 px-4 border-b text-center">0</td>
+                                <td class="py-2 px-4 border-b text-center">0</td>
+                                <td class="py-2 px-4 border-b text-center">0</td>
+                                <td class="py-2 px-4 border-b text-center">0</td>
+                            </tr>
+                            {% endfor %}
+                            {% if not group.teams %}
+                            <tr>
+                                <td colspan="9" class="py-4 px-4 text-center text-gray-500">No teams in this group yet.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% for group in groups_data %}
+        <!-- Group content section -->
+        <div class="group-section {% if not forloop.first %}hidden{% endif %}" data-group-id="{{ group.id }}">
+            <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+                <div class="editor-interface">
+                    <!-- Team management section for this group -->
+                    <div class="team-management mb-6 p-4 bg-gray-50 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-3">Group {{ group.name }} Editor</h3>
+                        <div class="flex gap-2 mb-3">
+                            <input type="text" id="new-team-name-{{ group.id }}" placeholder="Enter team name" class="flex-1 px-3 py-2 border border-gray-300 rounded">
+                            <button id="add-team-btn-{{ group.id }}" data-group="{{ group.id }}" class="add-team-btn bg-green-500 text-white px-4 py-2 rounded">Add Team</button>
+                        </div>
+                        <div id="teams-list-{{ group.id }}" class="mt-2">
+                            {% for team in group.teams %}
+                                <div class="team-item flex items-center justify-between p-2 bg-white border rounded mb-1" data-team-id="{{ team.id }}" data-group-id="{{ group.id }}">
+                                    <span class="team-name editable">{{ team.name }}</span>
+                                    <button class="delete-team-btn text-red-500 ml-2">×</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">Add at least two teams to create matches automatically</p>
+                    </div>
+
+                    <!-- Group visualization and round management for this group -->
+                    <div id="group-visualization-{{ group.id }}">
+                        <h3 class="text-lg font-semibold mb-3">Matches for {{ group.name }}</h3>
+                        
+                        <!-- Draggable matches for this group -->
+                        <div id="matches-container-{{ group.id }}" class="matches-container mb-6">
+                            {% for match in group.matches %}
+                                <div class="match-item p-3 bg-white border rounded mb-2 shadow-sm cursor-move" 
+                                     data-id="{{ match.id }}" 
+                                     data-home-team="{{ match.home_team.id }}" 
+                                     data-away-team="{{ match.away_team.id }}"
+                                     data-group-id="{{ group.id }}"
+                                     draggable="true">
+                                    <div class="flex justify-between items-center">
+                                        <div class="match-teams font-medium">{{ match.home_team.name }} vs {{ match.away_team.name }}</div>
+                                        <div class="match-info text-sm text-gray-600">
+                                            <div>{{ match.scheduled_time|date:"M d, H:i" }}</div>
+                                            <div class="status-badge px-2 py-1 rounded text-xs">{{ match.get_status_display }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="match-scores mt-2 flex items-center gap-2">
+                                        <input type="number" class="score-input w-16 p-1 border rounded text-center" 
+                                               data-team="{{ match.home_team.id }}" 
+                                               data-group="{{ group.id }}"
+                                               placeholder="Score" value="{{ match.home_score|default:"" }}">
+                                        <span class="font-bold">-</span>
+                                        <input type="number" class="score-input w-16 p-1 border rounded text-center" 
+                                               data-team="{{ match.away_team.id }}" 
+                                               data-group="{{ group.id }}"
+                                               placeholder="Score" value="{{ match.away_score|default:"" }}">
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            {% if not group.matches %}
+                                <div class="text-center py-8 text-gray-500 border-2 border-dashed rounded-lg">
+                                    No matches created yet for {{ group.name }}. Add teams to generate matches.
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Round arrangement section for this group -->
+                        <div class="rounds-section">
+                            <h3 class="text-lg font-semibold mb-3">Round Arrangement for {{ group.name }}</h3>
+                            <p class="text-sm text-gray-600 mb-3">Drag matches to arrange them into rounds</p>
+                            
+                            <div class="rounds-container flex flex-wrap gap-4">
+                                <div class="round-container w-64 bg-gray-100 p-3 rounded border-2 border-dashed" data-round="1" data-group-id="{{ group.id }}">
+                                    <h4 class="font-medium mb-2 flex justify-between items-center">
+                                        <span>Round 1</span>
+                                        <span class="bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center" id="round1-count-{{ group.id }}">0</span>
+                                    </h4>
+                                    <div class="round-matches-container min-h-32">
+                                        <!-- Matches will be dropped here for Round 1 -->
+                                    </div>
+                                </div>
+                                
+                                <div class="round-container w-64 bg-gray-100 p-3 rounded border-2 border-dashed" data-round="2" data-group-id="{{ group.id }}">
+                                    <h4 class="font-medium mb-2 flex justify-between items-center">
+                                        <span>Round 2</span>
+                                        <span class="bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center" id="round2-count-{{ group.id }}">0</span>
+                                    </h4>
+                                    <div class="round-matches-container min-h-32">
+                                        <!-- Matches will be dropped here for Round 2 -->
+                                    </div>
+                                </div>
+                                
+                                <div class="round-container w-64 bg-gray-100 p-3 rounded border-2 border-dashed" data-round="3" data-group-id="{{ group.id }}">
+                                    <h4 class="font-medium mb-2 flex justify-between items-center">
+                                        <span>Round 3</span>
+                                        <span class="bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center" id="round3-count-{{ group.id }}">0</span>
+                                    </h4>
+                                    <div class="round-matches-container min-h-32">
+                                        <!-- Matches will be dropped here for Round 3 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <!-- Fallback for single group -->
+        <!-- Standings Table - Based on StarCraft 2 tournament demo from jquery-group documentation -->
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h3 class="text-lg font-semibold mb-3">Group Standings</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg standings-table">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="py-2 px-4 border-b text-left">Rank</th>
+                            <th class="py-2 px-4 border-b text-left">Team</th>
+                            <th class="py-2 px-4 border-b text-center">Points</th>
+                            <th class="py-2 px-4 border-b text-center">Wins</th>
+                            <th class="py-2 px-4 border-b text-center">Losses</th>
+                            <th class="py-2 px-4 border-b text-center">Draws</th>
+                            <th class="py-2 px-4 border-b text-center">
+                                {% if competition.sport_type == 'VOLLEYBALL' %}
+                                    SF
+                                {% elif competition.sport_type == 'BASKETBALL' %}
+                                    PF
+                                {% elif competition.sport_type == 'TENNIS' %}
+                                    GS
+                                {% elif competition.sport_type == 'BADMINTON' %}
+                                    GS
+                                {% elif competition.sport_type == 'PETANQUE' %}
+                                    PO
+                                {% else %}
+                                    GF
+                                {% endif %}
+                            </th>
+                            <th class="py-2 px-4 border-b text-center">
+                                {% if competition.sport_type == 'VOLLEYBALL' %}
+                                    SA
+                                {% elif competition.sport_type == 'BASKETBALL' %}
+                                    PA
+                                {% elif competition.sport_type == 'TENNIS' %}
+                                    GA
+                                {% elif competition.sport_type == 'BADMINTON' %}
+                                    GA
+                                {% elif competition.sport_type == 'PETANQUE' %}
+                                    PA
+                                {% else %}
+                                    GA
+                                {% endif %}
+                            </th>
+                            <th class="py-2 px-4 border-b text-center">
+                                {% if competition.sport_type == 'VOLLEYBALL' %}
+                                    SD
+                                {% elif competition.sport_type == 'BASKETBALL' %}
+                                    PD
+                                {% elif competition.sport_type == 'TENNIS' %}
+                                    GD
+                                {% elif competition.sport_type == 'BADMINTON' %}
+                                    GD
+                                {% elif competition.sport_type == 'PETANQUE' %}
+                                    PD
+                                {% else %}
+                                    GD
+                                {% endif %}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="standings-body">
+                        <!-- Standings will be populated dynamically from match results -->
+                        {% for team in teams_data %}
+                        <tr class="team-standing" data-team-id="{{ team.id }}">
+                            <td class="py-2 px-4 border-b text-center">-</td>
+                            <td class="py-2 px-4 border-b font-medium">{{ team.name }}</td>
+                            <td class="py-2 px-4 border-b text-center">0</td>
+                            <td class="py-2 px-4 border-b text-center">0</td>
+                            <td class="py-2 px-4 border-b text-center">0</td>
+                            <td class="py-2 px-4 border-b text-center">0</td>
+                            <td class="py-2 px-4 border-b text-center">0</td>
+                            <td class="py-2 px-4 border-b text-center">0</td>
+                            <td class="py-2 px-4 border-b text-center">0</td>
+                        </tr>
+                        {% endfor %}
+                        {% if not teams_data %}
+                        <tr>
+                            <td colspan="9" class="py-4 px-4 text-center text-gray-500">No teams added yet. Add teams to see standings.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Round-robin editor interface as per jquery-group documentation -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <div class="editor-interface">
+                <!-- Team management section -->
+                <div class="team-management mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-3">Group Editor</h3>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="new-team-name" placeholder="Enter team name" class="flex-1 px-3 py-2 border border-gray-300 rounded">
+                        <button id="add-team-btn" class="bg-green-500 text-white px-4 py-2 rounded">Add Team</button>
+                    </div>
+                    <div id="teams-list" class="mt-2">
+                        {% for team in teams_data %}
+                            <div class="team-item flex items-center justify-between p-2 bg-white border rounded mb-1" data-team-id="{{ team.id }}">
+                                <span class="team-name editable">{{ team.name }}</span>
+                                <button class="delete-team-btn text-red-500 ml-2">×</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <p class="text-sm text-gray-600 mt-2">Add at least two teams to create matches automatically</p>
+                </div>
+
+                <!-- Group visualization and round management -->
+                <div id="group-visualization">
+                    <h3 class="text-lg font-semibold mb-3">Matches</h3>
+                    
+                    <!-- Draggable matches -->
+                    <div id="matches-container" class="matches-container mb-6">
+                        {% for match in matches %}
+                            <div class="match-item p-3 bg-white border rounded mb-2 shadow-sm cursor-move" 
+                                 data-id="{{ match.id }}" 
+                                 data-home-team="{{ match.home_team.id }}" 
+                                 data-away-team="{{ match.away_team.id }}"
+                                 draggable="true">
+                                <div class="flex justify-between items-center">
+                                    <div class="match-teams font-medium">{{ match.home_team.name }} vs {{ match.away_team.name }}</div>
+                                    <div class="match-info text-sm text-gray-600">
+                                        <div>{{ match.scheduled_time|date:"M d, H:i" }}</div>
+                                        <div class="status-badge px-2 py-1 rounded text-xs">{{ match.get_status_display }}</div>
+                                    </div>
+                                </div>
+                                <div class="match-scores mt-2 flex items-center gap-2">
+                                    <input type="number" class="score-input w-16 p-1 border rounded text-center" 
+                                           data-team="{{ match.home_team.id }}" 
+                                           placeholder="Score" value="{{ match.home_score|default:"" }}">
+                                    <span class="font-bold">-</span>
+                                    <input type="number" class="score-input w-16 p-1 border rounded text-center" 
+                                           data-team="{{ match.away_team.id }}" 
+                                           placeholder="Score" value="{{ match.away_score|default:"" }}">
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% if not matches %}
+                            <div class="text-center py-8 text-gray-500 border-2 border-dashed rounded-lg">
+                                No matches created yet. Add teams to generate matches.
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Round arrangement section -->
+                    <div class="rounds-section">
+                        <h3 class="text-lg font-semibold mb-3">Round Arrangement</h3>
+                        <p class="text-sm text-gray-600 mb-3">Drag matches to arrange them into rounds</p>
+                        
+                        <div class="rounds-container flex flex-wrap gap-4">
+                            <div class="round-container w-64 bg-gray-100 p-3 rounded border-2 border-dashed" data-round="1">
+                                <h4 class="font-medium mb-2 flex justify-between items-center">
+                                    <span>Round 1</span>
+                                    <span class="bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center" id="round1-count">0</span>
+                                </h4>
+                                <div class="round-matches-container min-h-32">
+                                    <!-- Matches will be dropped here for Round 1 -->
+                                </div>
+                            </div>
+                            
+                            <div class="round-container w-64 bg-gray-100 p-3 rounded border-2 border-dashed" data-round="2">
+                                <h4 class="font-medium mb-2 flex justify-between items-center">
+                                    <span>Round 2</span>
+                                    <span class="bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center" id="round2-count">0</span>
+                                </h4>
+                                <div class="round-matches-container min-h-32">
+                                    <!-- Matches will be dropped here for Round 2 -->
+                                </div>
+                            </div>
+                            
+                            <div class="round-container w-64 bg-gray-100 p-3 rounded border-2 border-dashed" data-round="3">
+                                <h4 class="font-medium mb-2 flex justify-between items-center">
+                                    <span>Round 3</span>
+                                    <span class="bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center" id="round3-count">0</span>
+                                </h4>
+                                <div class="round-matches-container min-h-32">
+                                    <!-- Matches will be dropped here for Round 3 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Core dependencies as required by jquery-group documentation -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/baconjs@0.7.89/dist/bacon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Define sport type labels globally
+    var sportType = '{{ competition.sport_type }}';
+    
+    // Define appropriate labels based on sport type
+    var scoreLabels = {
+        'VOLLEYBALL': { for: 'SF', against: 'SA', difference: 'SD' },  // Sets For, Sets Against, Set Difference
+        'BASKETBALL': { for: 'PF', against: 'PA', difference: 'PD' },  // Points For, Points Against, Point Difference  
+        'TENNIS': { for: 'GS', against: 'GA', difference: 'GD' },      // Games For/Win, Games Against, Game Difference
+        'BADMINTON': { for: 'GS', against: 'GA', difference: 'GD' },   // Games For/Win, Games Against, Game Difference
+        'PETANQUE': { for: 'PO', against: 'PA', difference: 'PD' },     // Points For, Points Against, Point Difference
+        'default': { for: 'GF', against: 'GA', difference: 'GD' }      // Goals For, Goals Against, Goal Difference
+    };
+    
+    var currentLabels = scoreLabels[sportType] || scoreLabels['default'];
+    // Initialize group state as per jquery-group documentation
+    var groupState = {
+        teams: {{ teams_data_json|safe }},
+        matches: [
+            {% for match in matches %}
+            {
+                id: {{ match.id }},
+                homeTeamId: "{{ match.home_team.id }}",
+                awayTeamId: "{{ match.away_team.id }}",
+                date: "{{ match.scheduled_time|date:'Y-m-d H:i' }}",
+                status: "{{ match.get_status_display }}",
+                homeScore: {{ match.home_score|default:"null" }},
+                awayScore: {{ match.away_score|default:"null" }},
+                round: 1  // Default to round 1 initially
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        rounds: [
+            { id: 1, name: "Round 1", matches: [] },
+            { id: 2, name: "Round 2", matches: [] },
+            { id: 3, name: "Round 3", matches: [] }
+        ]
+    };
+
+    // Initialize all required functionality as per jquery-group documentation
+    initDragAndDrop();
+    initTeamManagement();
+    initScoreInputs();
+    initSaveCallbacks();
+    
+    // Count matches in each round initially
+    updateRoundCounts();
+
+    // Initialize drag and drop functionality
+    function initDragAndDrop() {
+        // Make match items draggable
+        $('.match-item').each(function() {
+            this.setAttribute('draggable', true);
+            this.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', $(this).data('id'));
+                $(this).addClass('opacity-50');
+            });
+            
+            this.addEventListener('dragend', function(e) {
+                $(this).removeClass('opacity-50');
+            });
+        });
+        
+        // Make round containers accept drops
+        $('.round-container').each(function() {
+            this.addEventListener('dragover', function(e) {
+                e.preventDefault(); // Necessary to allow drop
+                $(this).addClass('border-blue-400 bg-blue-50');
+            });
+            
+            this.addEventListener('dragleave', function(e) {
+                $(this).removeClass('border-blue-400 bg-blue-50');
+            });
+            
+            this.addEventListener('drop', function(e) {
+                e.preventDefault();
+                $(this).removeClass('border-blue-400 bg-blue-50');
+                
+                var matchId = e.dataTransfer.getData('text/plain');
+                var matchElement = $('.match-item[data-id="' + matchId + '"]');
+                var roundId = $(this).data('round');
+                
+                // Move the match to the round container
+                $(this).find('.round-matches-container').append(matchElement);
+                
+                // Update the match's round in our state
+                var match = groupState.matches.find(m => m.id == matchId);
+                if (match) {
+                    match.round = roundId;
+                    
+                    // Add to round
+                    var round = groupState.rounds.find(r => r.id == roundId);
+                    if (round && !round.matches.includes(matchId)) {
+                        round.matches.push(matchId);
+                    }
+                }
+                
+                // Update counts and save
+                updateRoundCounts();
+                triggerSaveCallback();
+            });
+        });
+    }
+    
+    // Initialize team management functionality
+    function initTeamManagement() {
+        // Add team functionality
+        $('#add-team-btn').on('click', function() {
+            var teamName = $('#new-team-name').val().trim();
+            if (teamName) {
+                var newTeamId = 'team_' + Date.now();
+                var newTeam = {
+                    id: newTeamId,
+                    name: teamName
+                };
+                
+                groupState.teams.push(newTeam);
+                
+                // Add to UI
+                var teamHtml = '<div class="team-item flex items-center justify-between p-2 bg-white border rounded mb-1" data-team-id="' + newTeamId + '">' +
+                              '<span class="team-name editable">' + teamName + '</span>' +
+                              '<button class="delete-team-btn text-red-500 ml-2">×</button>' +
+                              '</div>';
+                $('#teams-list').append(teamHtml);
+                
+                // Clear input
+                $('#new-team-name').val('');
+                
+                // Generate new matches for this team against all other teams
+                generateNewMatchesForTeam(newTeam);
+                
+                // Trigger save callback
+                triggerSaveCallback();
+            }
+        });
+        
+        // Handle Enter key in team input
+        $('#new-team-name').on('keypress', function(e) {
+            if (e.which === 13) { // Enter key
+                $('#add-team-btn').click();
+            }
+        });
+        
+        // Delete team functionality 
+        $(document).on('click', '.delete-team-btn', function() {
+            var teamItem = $(this).closest('.team-item');
+            var teamId = teamItem.data('team-id');
+            
+            // Confirm deletion
+            if (confirm('Are you sure you want to delete this team? All matches involving this team will also be deleted.')) {
+                // Remove from state
+                groupState.teams = groupState.teams.filter(team => team.id != teamId);
+                
+                // Remove from UI
+                teamItem.remove();
+                
+                // Remove all matches involving this team
+                var deletedMatchIds = [];
+                groupState.matches = groupState.matches.filter(function(match) {
+                    var shouldRemove = (match.homeTeamId == teamId || match.awayTeamId == teamId);
+                    if (shouldRemove) {
+                        deletedMatchIds.push(match.id);
+                        // Also remove from DOM
+                        $('.match-item[data-id="' + match.id + '"]').remove();
+                    }
+                    return !shouldRemove;
+                });
+                
+                // Remove from rounds
+                groupState.rounds.forEach(function(round) {
+                    round.matches = round.matches.filter(function(matchId) {
+                        return !deletedMatchIds.includes(parseInt(matchId));
+                    });
+                });
+                
+                // Update round counts
+                updateRoundCounts();
+                
+                // Trigger save callback
+                triggerSaveCallback();
+            }
+        });
+        
+        // Make team names editable
+        $(document).on('click', '.team-name.editable', function() {
+            var currentElement = $(this);
+            var currentValue = currentElement.text();
+            
+            var input = $('<input type="text" class="edit-input w-32 p-1 border rounded" value="' + currentValue + '">');
+            currentElement.replaceWith(input);
+            
+            input.focus().select();
+            
+            input.on('blur keypress', function(e) {
+                if (e.type === 'keypress' && e.which !== 13) return; // Only on Enter key
+                
+                var newValue = $(this).val().trim();
+                if (newValue && newValue !== currentValue) {
+                    // Update state
+                    var teamId = currentElement.closest('.team-item').data('team-id');
+                    var team = groupState.teams.find(t => t.id == teamId);
+                    if (team) {
+                        team.name = newValue;
+                    }
+                    
+                    // Update UI
+                    var newElement = $('<span class="team-name editable">' + newValue + '</span>');
+                    $(this).replaceWith(newElement);
+                    
+                    // Update match displays with new name
+                    $('.match-teams').each(function() {
+                        if ($(this).text().includes(currentValue)) {
+                            var updatedText = $(this).text().replace(currentValue, newValue);
+                            $(this).text(updatedText);
+                        }
+                    });
+                    
+                    // Trigger save callback
+                    triggerSaveCallback();
+                } else {
+                    // Revert to span if no change or empty
+                    var newElement = $('<span class="team-name editable">' + currentValue + '</span>');
+                    $(this).replaceWith(newElement);
+                }
+            });
+        });
+    }
+    
+    // Generate matches for a new team
+    function generateNewMatchesForTeam(newTeam) {
+        // Create matches between the new team and all existing teams
+        var existingMatches = groupState.matches.map(m => m.id);
+        var newMatchCount = 0;
+        
+        groupState.teams.forEach(function(team) {
+            if (team.id !== newTeam.id) {
+                // Create match: newTeam vs existing team
+                var newMatchId = 'match_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+                
+                // Add match: newTeam is home, existing team is away
+                var newMatch = {
+                    id: parseInt(newMatchId.replace('match_', '')) || newMatchId,
+                    homeTeamId: newTeam.id,
+                    awayTeamId: team.id,
+                    date: 'TBD',
+                    status: 'SCHEDULED',
+                    homeScore: null,
+                    awayScore: null,
+                    round: 1
+                };
+                
+                groupState.matches.push(newMatch);
+                
+                // Add to UI
+                var homeTeam = groupState.teams.find(t => t.id == newTeam.id);
+                var awayTeam = groupState.teams.find(t => t.id == team.id);
+                
+                var matchHtml = '<div class="match-item p-3 bg-white border rounded mb-2 shadow-sm cursor-move" ' +
+                               'data-id="' + newMatch.id + '" ' +
+                               'data-home-team="' + newMatch.homeTeamId + '" ' + 
+                               'data-away-team="' + newMatch.awayTeamId + '" ' +
+                               'draggable="true">' +
+                               '<div class="flex justify-between items-center">' +
+                               '<div class="match-teams font-medium">' + homeTeam.name + ' vs ' + awayTeam.name + '</div>' +
+                               '<div class="match-info text-sm text-gray-600">' +
+                               '<div>TBD</div>' +
+                               '<div class="status-badge px-2 py-1 rounded text-xs">SCHEDULED</div>' +
+                               '</div>' +
+                               '</div>' +
+                               '<div class="match-scores mt-2 flex items-center gap-2">' +
+                               '<input type="number" class="score-input w-16 p-1 border rounded text-center" ' +
+                               'data-team="' + newMatch.homeTeamId + '" ' +
+                               'placeholder="Score" value="">' +
+                               '<span class="font-bold">-</span>' +
+                               '<input type="number" class="score-input w-16 p-1 border rounded text-center" ' +
+                               'data-team="' + newMatch.awayTeamId + '" ' +
+                               'placeholder="Score" value="">' +
+                               '</div>' +
+                               '</div>';
+                
+                $('#matches-container').append(matchHtml);
+                newMatchCount++;
+            }
+        });
+        
+        // Reinitialize drag and drop for new matches
+        initDragAndDrop();
+    }
+    
+    // Initialize score input functionality
+    function initScoreInputs() {
+        $(document).on('input', '.score-input', function() {
+            var matchElement = $(this).closest('.match-item');
+            var matchId = matchElement.data('id');
+            var teamId = $(this).data('team');
+            var score = this.value ? parseInt(this.value) : null;
+            
+            var match = groupState.matches.find(m => m.id == matchId);
+            if (match) {
+                if (match.homeTeamId == teamId) {
+                    match.homeScore = score;
+                } else if (match.awayTeamId == teamId) {
+                    match.awayScore = score;
+                }
+            }
+            
+            // Trigger save callback
+            triggerSaveCallback();
+        });
+    }
+    
+    // Initialize save callbacks as per jquery-group documentation
+    function initSaveCallbacks() {
+        // This is the save callback that gets triggered when group state changes
+        // As mentioned in the jquery-group documentation
+        window.saveGroupState = triggerSaveCallback;
+    }
+    
+    // Trigger save callback with current state
+    function triggerSaveCallback() {
+        // This callback is called when state changes, as per jquery-group documentation
+        console.log('Group state changed:', groupState);
+        
+        // Update standings based on current match results
+        updateStandings();
+        
+        // In a real implementation, you would save this state to the server
+        // and potentially call an update function for the read-only version
+        updateReadOnlyView();
+    }
+    
+    // Update standings table based on match results for all groups
+    function updateStandings() {
+        {% if groups_data %}
+            // Process each group separately for standings
+            $('.group-standings-section').each(function() {
+                var groupId = $(this).data('group-id');
+                
+                // Initialize standings for teams in this group
+                var groupStandings = {};
+                
+                // Get teams for this group from the UI 
+                $(this).find('.team-standing').each(function() {
+                    var teamId = $(this).data('team-id');
+                    var teamName = $(this).find('td:eq(1)').text(); // Second column is team name
+                    groupStandings[teamId] = {
+                        id: teamId,
+                        name: teamName,
+                        points: 0,
+                        wins: 0,
+                        losses: 0,
+                        draws: 0,
+                        goalsFor: 0,
+                        goalsAgainst: 0
+                    };
+                });
+                
+                // Process matches for this specific group to update standings
+                $('.match-item[data-group-id="' + groupId + '"]').each(function() {
+                    var homeTeamId = $(this).data('home-team');
+                    var awayTeamId = $(this).data('away-team');
+                    
+                    // Find the score inputs for home and away teams in this match
+                    var homeScoreInput = $(this).find('.score-input[data-team="' + homeTeamId + '"]');
+                    var awayScoreInput = $(this).find('.score-input[data-team="' + awayTeamId + '"]');
+                    
+                    var homeScore = parseInt(homeScoreInput.val()) || 0;
+                    var awayScore = parseInt(awayScoreInput.val()) || 0;
+                    
+                    var homeTeam = groupStandings[homeTeamId];
+                    var awayTeam = groupStandings[awayTeamId];
+                    
+                    if (homeTeam && awayTeam) {
+                        // Update goals
+                        homeTeam.goalsFor += homeScore;
+                        homeTeam.goalsAgainst += awayScore;
+                        awayTeam.goalsFor += awayScore;
+                        awayTeam.goalsAgainst += homeScore;
+                        
+                        // Update wins/losses/draws and points (3 for win, 1 for draw, 0 for loss)
+                        if (homeScore > awayScore) {
+                            homeTeam.wins++;
+                            homeTeam.points += 3;
+                            awayTeam.losses++;
+                        } else if (awayScore > homeScore) {
+                            awayTeam.wins++;
+                            awayTeam.points += 3;
+                            homeTeam.losses++;
+                        } else {
+                            // Draw
+                            homeTeam.draws++;
+                            homeTeam.points += 1;
+                            awayTeam.draws++;
+                            awayTeam.points += 1;
+                        }
+                    }
+                });
+                
+                // Convert standings to array and sort by points (descending), then goal difference
+                var groupStandingsArray = Object.values(groupStandings);
+                groupStandingsArray.sort(function(a, b) {
+                    if (b.points !== a.points) {
+                        return b.points - a.points; // Sort by points descending
+                    }
+                    var aGD = a.goalsFor - a.goalsAgainst;
+                    var bGD = b.goalsFor - b.goalsAgainst;
+                    if (bGD !== aGD) {
+                        return bGD - aGD; // Sort by goal difference descending
+                    }
+                    return b.goalsFor - a.goalsFor; // Sort by goals for descending
+                });
+                
+                // Update the UI with sorted standings for this group
+                var standingsBodySelector = '#standings-body-' + groupId.replace(':', '\\:');
+                $(standingsBodySelector).empty();
+                groupStandingsArray.forEach(function(team, index) {
+                    var goalDiff = team.goalsFor - team.goalsAgainst;
+                    var row = '<tr class="team-standing" data-team-id="' + team.id + '" data-group-id="' + groupId + '">' +
+                              '<td class="py-2 px-4 border-b text-center">' + (index + 1) + '</td>' +
+                              '<td class="py-2 px-4 border-b font-medium">' + team.name + '</td>' +
+                              '<td class="py-2 px-4 border-b text-center">' + team.points + '</td>' +
+                              '<td class="py-2 px-4 border-b text-center">' + team.wins + '</td>' +
+                              '<td class="py-2 px-4 border-b text-center">' + team.losses + '</td>' +
+                              '<td class="py-2 px-4 border-b text-center">' + team.draws + '</td>' +
+                              '<td class="py-2 px-4 border-b text-center">' + team.goalsFor + '</td>' +
+                              '<td class="py-2 px-4 border-b text-center">' + team.goalsAgainst + '</td>' +
+                              '<td class="py-2 px-4 border-b text-center">' + goalDiff + '</td>' +
+                              '</tr>';
+                    $(standingsBodySelector).append(row);
+                });
+                
+                // Update the corresponding mini standings
+                updateMiniStandingsForGroup(groupId, groupStandingsArray);
+            });
+        {% else %}
+            // Single group standings (original logic)
+            var standings = {};
+            groupState.teams.forEach(function(team) {
+                standings[team.id] = {
+                    id: team.id,
+                    name: team.name,
+                    points: 0,
+                    wins: 0,
+                    losses: 0,
+                    draws: 0,
+                    goalsFor: 0,
+                    goalsAgainst: 0
+                };
+            });
+            
+            // Process all matches to update standings
+            groupState.matches.forEach(function(match) {
+                if (match.homeScore !== null && match.awayScore !== null) {
+                    var homeTeam = standings[match.homeTeamId];
+                    var awayTeam = standings[match.awayTeamId];
+                    
+                    if (homeTeam && awayTeam) {
+                        // Update goals
+                        homeTeam.goalsFor += match.homeScore;
+                        homeTeam.goalsAgainst += match.awayScore;
+                        awayTeam.goalsFor += match.awayScore;
+                        awayTeam.goalsAgainst += match.homeScore;
+                        
+                        // Update wins/losses/draws and points (3 for win, 1 for draw, 0 for loss)
+                        if (match.homeScore > match.awayScore) {
+                            homeTeam.wins++;
+                            homeTeam.points += 3;
+                            awayTeam.losses++;
+                        } else if (match.awayScore > match.homeScore) {
+                            awayTeam.wins++;
+                            awayTeam.points += 3;
+                            homeTeam.losses++;
+                        } else {
+                            // Draw
+                            homeTeam.draws++;
+                            homeTeam.points += 1;
+                            awayTeam.draws++;
+                            awayTeam.points += 1;
+                        }
+                    }
+                }
+            });
+            
+            // Convert standings to array and sort by points (descending), then goal difference
+            var standingsArray = Object.values(standings);
+            standingsArray.sort(function(a, b) {
+                if (b.points !== a.points) {
+                    return b.points - a.points; // Sort by points descending
+                }
+                var aGD = a.goalsFor - a.goalsAgainst;
+                var bGD = b.goalsFor - b.goalsAgainst;
+                if (bGD !== aGD) {
+                    return bGD - aGD; // Sort by goal difference descending
+                }
+                return b.goalsFor - a.goalsFor; // Sort by goals for descending
+            });
+            
+            // Update the UI with sorted standings
+            $('#standings-body').empty();
+            standingsArray.forEach(function(team, index) {
+                var goalDiff = team.goalsFor - team.goalsAgainst;
+                var row = '<tr class="team-standing" data-team-id="' + team.id + '">' +
+                          '<td class="py-2 px-4 border-b text-center">' + (index + 1) + '</td>' +
+                          '<td class="py-2 px-4 border-b font-medium">' + team.name + '</td>' +
+                          '<td class="py-2 px-4 border-b text-center">' + team.points + '</td>' +
+                          '<td class="py-2 px-4 border-b text-center">' + team.wins + '</td>' +
+                          '<td class="py-2 px-4 border-b text-center">' + team.losses + '</td>' +
+                          '<td class="py-2 px-4 border-b text-center">' + team.draws + '</td>' +
+                          '<td class="py-2 px-4 border-b text-center">' + team.goalsFor + '</td>' +
+                          '<td class="py-2 px-4 border-b text-center">' + team.goalsAgainst + '</td>' +
+                          '<td class="py-2 px-4 border-b text-center">' + goalDiff + '</td>' +
+                          '</tr>';
+                $('#standings-body').append(row);
+            });
+        {% endif %}
+    }
+    
+    // Update mini standings for a specific group
+    function updateMiniStandingsForGroup(groupId, groupStandingsArray) {
+        // Find the mini standings table for this group
+        var miniStandingsTable = $('.mini-standings').has('h4:contains("' + groupId.split('_')[1] + '")').find('tbody');
+        if (miniStandingsTable.length === 0) {
+            // Alternative: look by group name containing the number
+            miniStandingsTable = $('.mini-standings').has('h4:contains("Group ' + groupId.split('_')[1] + '")').find('tbody');
+        }
+        
+        if (miniStandingsTable.length === 0) {
+            // If not found, try matching by the actual group ID directly
+            // This approach looks for the mini standings that has the same group name
+            $('.mini-standings').each(function() {
+                if ($(this).find('h4').text().indexOf('Group ' + groupId.split('_')[1]) !== -1 ||
+                    $(this).find('h4').text().indexOf(groupId) !== -1) {
+                    miniStandingsTable = $(this).find('tbody');
+                }
+            });
+        }
+        
+        if (miniStandingsTable.length > 0) {
+            miniStandingsTable.empty();
+            
+            // Show only top 3 teams in mini view
+            var topTeams = groupStandingsArray.slice(0, 3);
+            topTeams.forEach(function(team, index) {
+                var goalDiff = team.goalsFor - team.goalsAgainst;
+                var row = '<tr>' +
+                          '<td class="px-2 py-1 border-b">' + (index + 1) + '</td>' +
+                          '<td class="px-2 py-1 border-b font-medium truncate max-w-[80px]">' + team.name.substring(0, 10) + (team.name.length > 10 ? '...' : '') + '</td>' +
+                          '<td class="px-2 py-1 border-b text-center">' + team.points + '</td>' +
+                          '<td class="px-2 py-1 border-b text-center">' + team.goalsFor + '</td>' +
+                          '<td class="px-2 py-1 border-b text-center">' + team.goalsAgainst + '</td>' +
+                          '</tr>';
+                miniStandingsTable.append(row);
+            });
+            
+            if (groupStandingsArray.length > 3) {
+                var moreRow = '<tr>' +
+                              '<td colspan="5" class="px-2 py-1 text-center text-xs text-gray-500">+' + (groupStandingsArray.length - 3) + ' more</td>' +
+                              '</tr>';
+                miniStandingsTable.append(moreRow);
+            }
+        }
+    }
+    
+    // Alternative update function for mini standings that works more reliably
+    function updateAllMiniStandings() {
+        $('.mini-standings').each(function() {
+            var miniStandingsContainer = $(this);
+            var groupName = miniStandingsContainer.find('h4').text();
+            
+            // Extract group number from the name (e.g., "Group 1" -> "1")
+            var groupNumberMatch = groupName.match(/Group (\d+)/);
+            var groupNumber = groupNumberMatch ? groupNumberMatch[1] : null;
+            
+            if (groupNumber) {
+                var groupId = 'group_' + groupNumber;
+                
+                // Get the full standings data for this group from the full standings section
+                var fullStandingsRows = $('#standings-body-' + groupId.replace(':', '\\:')).find('tr');
+                
+                var miniStandingsTable = miniStandingsContainer.find('tbody');
+                miniStandingsTable.empty();
+                
+                // Get top 3 teams from the full standings
+                fullStandingsRows.slice(0, 3).each(function(index) {
+                    var teamName = $(this).find('td').eq(1).text();
+                    var points = $(this).find('td').eq(2).text();
+                    var wins = $(this).find('td').eq(3).text(); // Wins is 3rd column (index 3)
+                    var losses = $(this).find('td').eq(4).text(); // Losses is 4th column (index 4)
+                    var draws = $(this).find('td').eq(5).text(); // Draws is 5th column (index 5)
+                    
+                    var row = '<tr>' +
+                              '<td class="px-1 py-1 border-b font-medium truncate max-w-[60px]">' + teamName.substring(0, 8) + (teamName.length > 8 ? '...' : '') + '</td>' +
+                              '<td class="px-1 py-1 border-b text-center">' + points + '</td>' +
+                              '<td class="px-1 py-1 border-b text-center">' + wins + '</td>' +
+                              '<td class="px-1 py-1 border-b text-center">' + losses + '</td>' +
+                              '<td class="px-1 py-1 border-b text-center">' + draws + '</td>' +
+                              '</tr>';
+                    miniStandingsTable.append(row);
+                });
+                
+                // Add "more" row if there are more than 3 teams
+                if (fullStandingsRows.length > 3) {
+                    var moreRow = '<tr>' +
+                                  '<td colspan="5" class="px-1 py-1 text-center text-[0.6rem] text-gray-500">+' + (fullStandingsRows.length - 3) + ' more</td>' +
+                                  '</tr>';
+                    miniStandingsTable.append(moreRow);
+                }
+            }
+        });
+    }
+    
+    // Function to handle active group highlighting in mini standings
+    function updateMiniStandingsHighlight(activeGroupId) {
+        $('.mini-standings').removeClass('mini-standings-active');
+        $('.mini-standings[data-group-id="' + activeGroupId + '"]').addClass('mini-standings-active');
+    }
+    
+    // Update read-only view (placeholder as per jquery-group documentation)
+    function updateReadOnlyView() {
+        // This function would update a read-only version of the group
+        // As mentioned in the jquery-group documentation
+        console.log('Updating read-only view based on current state');
+        
+        // In a full implementation, this would render a read-only version using Handlebars
+        // based on the current state and send it to the server if needed
+    }
+    
+    // Update round counts
+    function updateRoundCounts() {
+        groupState.rounds.forEach(function(round) {
+            round.matches = [];
+        });
+        
+        // Count matches in each round
+        groupState.matches.forEach(function(match) {
+            if (match.round) {
+                var round = groupState.rounds.find(r => r.id == match.round);
+                if (round && !round.matches.includes(match.id)) {
+                    round.matches.push(match.id);
+                }
+            }
+        });
+        
+        // Update UI counts
+        $('#round1-count').text(groupState.rounds[0].matches.length);
+        $('#round2-count').text(groupState.rounds[1].matches.length);
+        $('#round3-count').text(groupState.rounds[2].matches.length);
+    }
+    
+    // Group tab switching functionality
+    $('.group-tab').on('click', function() {
+        var groupId = $(this).data('group-id');
+        
+        // Hide all group sections
+        $('.group-section, .group-standings-section').addClass('hidden');
+        
+        // Show the selected group content section
+        $('.group-section[data-group-id="' + groupId + '"]').removeClass('hidden');
+        $('.group-standings-section[data-group-id="' + groupId + '"]').removeClass('hidden');
+        
+        // Update active tab
+        $('.group-tab').removeClass('border-b-2 border-blue-500 text-blue-600')
+                       .addClass('text-gray-500');
+        $(this).addClass('border-b-2 border-blue-500 text-blue-600')
+               .removeClass('text-gray-500');
+        
+        // Update mini standings highlight
+        updateMiniStandingsHighlight(groupId);
+    });
+    
+    // Update round counts (for multiple groups)
+    function updateRoundCounts() {
+        {% if groups_data %}
+            // Update counts for each group
+            $('.round-container').each(function() {
+                var groupId = $(this).data('group-id');
+                var roundNum = $(this).data('round');
+                
+                if (groupId && roundNum) {
+                    var groupMatchCount = $('.round-container[data-group-id="' + groupId + '"][data-round="' + roundNum + '"] .match-item').length;
+                    $('#round' + roundNum + '-count-' + groupId.replace(':', '\\:')).text(groupMatchCount);
+                }
+            });
+        {% else %}
+            // Single group counts (original logic) - fallback for safety
+            var round1Count = $('.round-container[data-round="1"] .match-item').length;
+            var round2Count = $('.round-container[data-round="2"] .match-item').length;
+            var round3Count = $('.round-container[data-round="3"] .match-item').length;
+            
+            // Update UI counts
+            $('#round1-count').text(round1Count);
+            $('#round2-count').text(round2Count);
+            $('#round3-count').text(round3Count);
+        {% endif %}
+    }
+    
+    // Initialize Bacon.js reactive streams if available
+    if (typeof Bacon !== 'undefined') {
+        console.log('Bacon.js available - ready for reactive programming patterns');
+    }
+    
+    // Initialize standings on page load
+    updateStandings();
+    
+    // Also update mini standings after a short delay to ensure DOM is fully loaded
+    setTimeout(function() {
+        updateAllMiniStandings();
+    }, 100);
+    
+    // On initial load, set the first group as active in mini standings
+    setTimeout(function() {
+        if ($('.group-tab').length > 0) {
+            var firstGroupId = $('.group-tab').first().data('group-id');
+            updateMiniStandingsHighlight(firstGroupId);
+        }
+    }, 150);
+    
+    // Add click handler for mini standings to switch tabs
+    $('.mini-standings-clickable').on('click', function() {
+        var groupId = $(this).data('group-id');
+        
+        // Simulate clicking the corresponding group tab
+        $('.group-tab[data-group-id="' + groupId + '"]').click();
+    });
+    
+    // Add CSS for mini standings highlight
+    $('head').append('<style>' +
+        '.mini-standings {' +
+            'transition: all 0.3s ease;' +
+        '}' +
+        '.mini-standings.mini-standings-active {' +
+            'border: 2px solid #3b82f6 !important;' +  // blue-500
+            'box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2), 0 2px 4px -1px rgba(59, 130, 246, 0.06);' +
+            'transform: translateY(-2px);' +
+            'background-color: #dbeafe !important;' +  // light blue background
+        '}' +
+        '.mini-standings.mini-standings-active h4 {' +
+            'color: #1d4ed8 !important;' +  // blue-700
+            'font-weight: 600;' +
+        '}' +
+        '.mini-standings-clickable {' +
+            'cursor: pointer;' +
+        '}' +
+        '.mini-standings-clickable:hover {' +
+            'background-color: #f3f4f6;' +
+        '}' +
+    '</style>');
+    
+    // Step switching functionality
+    $('.step-tab').on('click', function() {
+        var step = $(this).data('step');
+        
+        // Update active tab
+        $('.step-tab').removeClass('border-b-2 border-blue-500 text-blue-600')
+                      .addClass('text-gray-500')
+                      .not(this).removeClass('text-blue-600');
+        
+        $(this).addClass('border-b-2 border-blue-500 text-blue-600')
+               .removeClass('text-gray-500');
+        
+        // Show selected step content
+        $('.step-content').addClass('hidden');
+        $('#' + step + '-step').removeClass('hidden');
+    });
+    
+    // Initialize drag and drop for seeding
+    var dragSrcEl = null;
+
+    function handleDragStart(e) {
+        dragSrcEl = this;
+        e.dataTransfer.effectAllowed = 'move';
+        this.classList.add('bg-blue-100');
+    }
+
+    function handleDragEnd(e) {
+        this.classList.remove('bg-blue-100');
+    }
+
+    function handleDragOver(e) {
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    function handleDragEnter(e) {
+        this.classList.add('border-2', 'border-blue-500');
+    }
+
+    function handleDragLeave(e) {
+        this.classList.remove('border-2', 'border-blue-500');
+    }
+
+    function handleDrop(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
+
+        if (dragSrcEl != this) {
+            // Swap the dragged element with the drop target
+            var parent = this.parentNode;
+            var dragSrcIndex = Array.prototype.indexOf.call(parent.children, dragSrcEl);
+            var dropTargetIndex = Array.prototype.indexOf.call(parent.children, this);
+
+            // Reorder the elements in the DOM
+            if (dragSrcIndex < dropTargetIndex) {
+                parent.insertBefore(dragSrcEl, this.nextSibling);
+            } else {
+                parent.insertBefore(dragSrcEl, this);
+            }
+        }
+
+        return false;
+    }
+
+    // Add event listeners to seeding team items
+    $('.seeding-team-item').each(function() {
+        this.addEventListener('dragstart', handleDragStart);
+        this.addEventListener('dragend', handleDragEnd);
+        this.addEventListener('dragover', handleDragOver);
+        this.addEventListener('dragenter', handleDragEnter);
+        this.addEventListener('dragleave', handleDragLeave);
+        this.addEventListener('drop', handleDrop);
+    });
+    
+    // Save seeding functionality
+    $('#save-seeding-btn').on('click', function() {
+        var seedingOrder = [];
+        $('#seeding-teams-list .seeding-team-item').each(function(index) {
+            seedingOrder.push({
+                id: $(this).data('team-id'),
+                name: $(this).find('.team-name').text(),
+                order: index + 1
+            });
+        });
+        
+        console.log('Seeding saved:', seedingOrder);
+        // In a real implementation, you would save this to the server
+        
+        // Show success indicator
+        $('#seeding-saved-indicator').removeClass('hidden');
+        
+        // Optionally, you could enable the schedule tab after seeding is saved
+        // For now, we'll just show a message
+    });
+    
+    // Randomize seeding functionality
+    $('#randomize-seeding-btn').on('click', function() {
+        var items = $('#seeding-teams-list .seeding-team-item').toArray();
+        
+        // Fisher-Yates shuffle algorithm
+        for (var i = items.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = items[i];
+            items[i] = items[j];
+            items[j] = temp;
+        }
+        
+        // Reattach shuffled items to container
+        var container = $('#seeding-teams-list');
+        container.empty();
+        for (var i = 0; i < items.length; i++) {
+            container.append(items[i]);
+        }
+    });
+});
+
+// Initialize visualizations for round-robin matches
+$(document).ready(function() {
+    const seedingListEl = document.getElementById('seeding-teams-list');
+    const visualMatchesContainer = $('#visual-matches-list');
+
+    if (seedingListEl) {
+        function updateVisualMatches() {
+            const items = Array.from(seedingListEl.querySelectorAll('.seeding-team-item'));
+            const teams = items.map((item, index) => ({
+                id: item.dataset.teamId,
+                name: item.querySelector('.team-name').textContent,
+                originalIndex: index + 1
+            }));
+
+            if (teams.length === 0) {
+                visualMatchesContainer.html('<div class="text-center py-8 text-gray-500 border-2 border-dashed rounded-lg">Urutkan tim untuk melihat visualisasi pertandingan.</div>');
+                return;
+            }
+
+            // Generate all possible matches for round-robin (every team vs every other team)
+            let matchesHtml = '';
+            let matchNumber = 1;
+            
+            for (let i = 0; i < teams.length; i++) {
+                for (let j = i + 1; j < teams.length; j++) {
+                    const team1 = teams[i];
+                    const team2 = teams[j];
+                    
+                    const matchHtml = `
+                        <div class="match-pairing-box border border-gray-200 rounded-lg p-3 mb-2">
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-gray-600">Match ${matchNumber}</div>
+                            </div>
+                            <div class="flex justify-between items-center mt-1">
+                                <div class="font-medium">${team1.name}</div>
+                                <div class="text-gray-500 font-bold">vs</div>
+                                <div class="font-medium">${team2.name}</div>
+                            </div>
+                        </div>
+                    `;
+                    matchesHtml += matchHtml;
+                    matchNumber++;
+                }
+            }
+
+            if (matchesHtml) {
+                visualMatchesContainer.html(matchesHtml);
+            } else {
+                visualMatchesContainer.html('<div class="text-center py-4 text-gray-500">Tambahkan minimal 2 tim untuk melihat pertandingan.</div>');
+            }
+        }
+
+        // Set up mutation observer to detect when items are reordered
+        const observer = new MutationObserver(function(mutations) {
+            for (let mutation of mutations) {
+                if (mutation.type === 'childList') {
+                    updateVisualMatches();
+                    break;
+                }
+            }
+        });
+
+        observer.observe(seedingListEl, {
+            childList: true,
+            subtree: true
+        });
+
+        // Initial render
+        updateVisualMatches();
+    }
+});
+
+// Make sure the global save function is available
+if (typeof window.saveGroupState === 'undefined') {
+    window.saveGroupState = function() {
+        console.log('Save callback triggered');
+    };
+}
+</script>
+{% endblock %}

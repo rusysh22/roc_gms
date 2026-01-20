@@ -1,0 +1,88 @@
+<div id="playoff-bracket-container" class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-800">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Single Elimination Draft</h2>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+            {{ draft_matches_by_round|length }} rounds
+        </span>
+    </div>
+    
+    <!-- Tournament Bracket with Lines -->
+    <div id="bracket-viewer-container" class="theme theme-dark">
+        <div class="bracket disable-image">
+            {% if draft_matches_by_round %}
+                {% for round_number, matches_in_round in draft_matches_by_round.items %}
+                    <div class="column {% if round_number == 1 %}one{% elif round_number == 2 %}two{% elif round_number == 3 %}three{% elif round_number == 4 %}four{% elif round_number == 5 %}five{% endif %}">
+                        <div class="round-title">Round {{ round_number }}</div>
+                        {% for match in matches_in_round %}
+                            <div class="match" data-match-id="{{ match.id }}">
+                                <!-- Team 1 -->
+                                <div class="match-top team">
+                                    <span class="seed-outside">#{{ match.home_team_seed|default:"-" }}</span>
+                                    <span class="name">
+                                        {% if match.home_team %}
+                                            {% if participant_type == 'CLUBS' %}{{ match.home_team.name|truncatechars:25 }}{% else %}{{ match.home_team.full_name|default:match.home_team.employee_id|default:"No Name"|truncatechars:25 }}{% endif %}
+                                        {% else %}
+                                            TBD
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                
+                                <!-- Team 2 -->
+                                {% if match.away_team %}
+                                    <div class="match-bottom team">
+                                        <span class="seed-outside">#{{ match.away_team_seed|default:"-" }}</span>
+                                        <span class="name">
+                                            {% if participant_type == 'CLUBS' %}{{ match.away_team.name|truncatechars:25 }}{% else %}{{ match.away_team.full_name|default:match.away_team.employee_id|default:"No Name"|truncatechars:25 }}{% endif %}
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <div class="match-bottom team">
+                                        <span class="seed-outside">#-</span>
+                                        <span class="name">TBD</span>
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Match lines for connection -->
+                                <div class="match-lines">
+                                    <div class="line one"></div>
+                                    <div class="line two"></div>
+                                </div>
+                                <div class="match-lines alt">
+                                    <div class="line one"></div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-12 w-full">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No bracket structure generated yet</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Generate the bracket structure in the Match Setup panel to see the playoff format.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Bracket Legend -->
+    <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex flex-wrap gap-4 text-sm">
+            <div class="flex items-center">
+                <div class="w-3 h-3 rounded bg-gray-400 mr-2"></div>
+                <span class="text-gray-700 dark:text-gray-300">Team</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 rounded bg-purple-500 mr-2"></div>
+                <span class="text-gray-700 dark:text-gray-300">Seed Number</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                <span class="text-gray-700 dark:text-gray-300">Draft Mode</span>
+            </div>
+        </div>
+    </div>
+</div>

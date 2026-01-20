@@ -1,0 +1,1425 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bracket: {{ competition.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/gracket/dist/style.css" />
+<style>
+    .bracket-container {
+        overflow-x: auto;
+        /* Enable horizontal scrolling */
+        background-color: #1f2937;
+        /* gray-800 */
+        padding: 2rem;
+        border-radius: 0.75rem;
+    }
+
+    .gracket-game-wrapper {
+        background-color: #374151;
+        /* gray-700 */
+        color: #d1d5db;
+        /* gray-300 */
+    }
+
+    .gracket-round-label {
+        color: #9ca3af;
+        /* gray-400 */
+        font-weight: 600;
+    }
+
+    .generate-btn {
+        transition: all 0.3s ease;
+    }
+
+    .generate-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .generate-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Notification styles for dark mode */
+    #generation-status {
+        transition: all 0.3s ease;
+    }
+
+    .bg-yellow-100 {
+        --tw-bg-opacity: 1;
+        background-color: rgba(254, 249, 195, var(--tw-bg-opacity));
+    }
+
+    .dark .bg-yellow-100 {
+        background-color: #4b5563;
+        /* gray-600 */
+    }
+
+    .text-yellow-800 {
+        --tw-text-opacity: 1;
+        color: rgba(133, 77, 14, var(--tw-text-opacity));
+    }
+
+    .dark .text-yellow-800 {
+        color: #fbbf24;
+        /* yellow-400 */
+    }
+
+    .bg-red-100 {
+        --tw-bg-opacity: 1;
+        background-color: rgba(254, 226, 226, var(--tw-bg-opacity));
+    }
+
+    .dark .bg-red-100 {
+        background-color: #dc2626;
+        /* red-600 */
+    }
+
+    .text-red-800 {
+        --tw-text-opacity: 1;
+        color: rgba(153, 27, 27, var(--tw-text-opacity));
+    }
+
+    .dark .text-red-800 {
+        color: #fca5a5;
+        /* red-300 */
+    }
+
+    .bg-green-100 {
+        --tw-bg-opacity: 1;
+        background-color: rgba(220, 252, 231, var(--tw-bg-opacity));
+    }
+
+    .dark .bg-green-100 {
+        background-color: #166534;
+        /* green-700 */
+    }
+
+    .text-green-800 {
+        --tw-text-opacity: 1;
+        color: rgba(21, 128, 61, var(--tw-text-opacity));
+    }
+
+    .dark .text-green-800 {
+        color: #86efac;
+        /* green-300 */
+    }
+
+    .bg-blue-100 {
+        --tw-bg-opacity: 1;
+        background-color: rgba(219, 234, 254, var(--tw-bg-opacity));
+    }
+
+    .dark .bg-blue-100 {
+        background-color: #1e40af;
+        /* blue-800 */
+    }
+
+    .text-blue-800 {
+        --tw-text-opacity: 1;
+        color: rgba(30, 66, 159, var(--tw-text-opacity));
+    }
+
+    .dark .text-blue-800 {
+        color: #93c5fd;
+        /* blue-300 */
+    }
+
+    /* Seeding section theme styling */
+    .available-teams-container {
+        background-color: white;
+    }
+
+    .dark .available-teams-container {
+        background-color: #1f2937;
+        /* gray-800 */
+    }
+
+    .seeded-teams-container {
+        background-color: #f5f3ff;
+        /* purple-50 */
+    }
+
+    .dark .seeded-teams-container {
+        background-color: #5b21b6;
+        /* purple-900/30 equivalent */
+    }
+
+    .team-item {
+        background-color: white;
+        border-color: #c7d2fe;
+        /* indigo-200 */
+    }
+
+    .dark .team-item {
+        background-color: #374151;
+        /* gray-700 */
+        border-color: #5b21b6;
+        /* indigo-600 */
+    }
+
+    .team-item:hover {
+        background-color: #eef2ff;
+        /* indigo-50 */
+    }
+
+    .dark .team-item:hover {
+        background-color: #4b5563;
+        /* indigo-900/50 equivalent */
+    }
+
+    .seeded-team-item {
+        background: linear-gradient(to right, #f3f4f6, #e5e7eb);
+        /* light theme gradient */
+        border-color: #cbc8eb;
+        /* purple-300 */
+    }
+
+    .dark .seeded-team-item {
+        background: linear-gradient(to right, #4b5563, #374151);
+        /* gray-700 to gray-800 */
+        border-color: #7e22ce;
+        /* purple-600 */
+    }
+
+    .seeded-team-item:hover {
+        background: linear-gradient(to right, #e0e7ff, #c7d2fe);
+        /* indigo-100 to indigo-200 */
+    }
+
+    .dark .seeded-team-item:hover {
+        background: linear-gradient(to right, #5b21b6, #4b5563);
+        /* purple-900/60 to gray-700 */
+    }
+
+    /* Compact team item styling */
+    .team-item,
+    .seeded-team-item {
+        padding: 0.5rem !important;
+        /* reduce to 8px */
+        margin-bottom: 0.5rem;
+        /* reduce to 8px */
+    }
+
+    .team-item span,
+    .seeded-team-item span {
+        font-size: 0.875rem;
+        /* text-sm equivalent */
+    }
+
+    /* About bracket section theme styling */
+    .about-bracket-section {
+        background: linear-gradient(to bottom right, #eff6ff, #e0e7ff);
+        /* blue-50 to indigo-50 */
+        border-color: #bfdbfe;
+        /* blue-200 */
+    }
+
+    .dark .about-bracket-section {
+        background: linear-gradient(to bottom right, #1e3a8a, #1e40af);
+        /* blue-900/20 to indigo-900/20 */
+        border-color: #3730a3;
+        /* blue-700 */
+    }
+
+    .about-bracket-title {
+        color: #1e3799;
+        /* blue-800 */
+    }
+
+    .dark .about-bracket-title {
+        color: #93c5fd;
+        /* blue-300 */
+    }
+
+    .about-bracket-content {
+        color: #4b5563;
+        /* gray-600 */
+    }
+
+    .dark .about-bracket-content {
+        color: #d1d5db;
+        /* gray-300 */
+    }
+
+    .about-bracket-header {
+        color: #111827;
+        /* gray-900 */
+    }
+
+    .dark .about-bracket-header {
+        color: #f9fafb;
+        /* white */
+    }
+
+    /* Match scheduling section styling */
+    .match-scheduling-section {
+        background: linear-gradient(to bottom right, #ecfdf5, #d1fae5);
+        /* emerald-50 to emerald-100 */
+        border-color: #a7f3d0;
+        /* emerald-200 */
+    }
+
+    .dark .match-scheduling-section {
+        background: linear-gradient(to bottom right, #065f46, #047857);
+        /* emerald-800/20 to emerald-700/20 */
+        border-color: #047857;
+        /* emerald-700 */
+    }
+
+    .match-scheduling-title {
+        color: #065f46;
+        /* emerald-800 */
+    }
+
+    .dark .match-scheduling-title {
+        color: #6ee7b7;
+        /* emerald-300 */
+    }
+
+    .match-scheduling-content {
+        color: #6b7280;
+        /* gray-600 */
+    }
+
+    .dark .match-scheduling-content {
+        color: #d1d5db;
+        /* gray-300 */
+    }
+
+    /* Match card styling */
+    .match-card {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dark .match-card {
+        background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    }
+
+    .match-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
+        opacity: 0.7;
+    }
+
+    .match-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Input styling */
+    .date-time-input {
+        transition: all 0.3s ease;
+        background-color: #f9fafb !important;
+    }
+
+    .dark .date-time-input {
+        background-color: #1f2937 !important;
+    }
+
+    .date-time-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.4) !important;
+        /* emerald-500/40 */
+        border-color: #10b981 !important;
+        /* emerald-500 */
+        background-color: #ffffff !important;
+    }
+
+    .dark .date-time-input:focus {
+        background-color: #374151 !important;
+    }
+
+    /* Match title styling */
+    .match-title {
+        position: relative;
+        padding-left: 1.5rem;
+    }
+
+    .match-title::before {
+        content: '⚔️';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    /* Button styling */
+    .assign-dates-btn {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .assign-dates-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .assign-dates-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Bracket container styling */
+    .bracket-container {
+        transition: all 0.3s ease;
+    }
+
+    .bracket-container:hover {
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Generate button styling */
+    .generate-btn {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .generate-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .generate-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Shuffle button styling */
+    .shuffle-btn {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .shuffle-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8 dark:bg-gray-800">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ competition.name }}</h1>
+                <p class="text-lg text-gray-600 dark:text-gray-300">
+                    Single Elimination Bracket ({{ competition.format.name }}) -
+                    {% if competition.participant_type == 'CLUBS' %}
+                    {{ competition.enrolled_clubs.count }} clubs enrolled
+                    {% else %}
+                    {{ competition.enrolled_participants.count }} participants enrolled
+                    {% endif %}
+                </p>
+                {% if competition.start_date or competition.end_date %}
+                <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    {% if competition.start_date %}Starts: {{ competition.start_date|date:"M d, Y" }}{% endif %}
+                    {% if competition.start_date and competition.end_date %} | {% endif %}
+                    {% if competition.end_date %}Ends: {{ competition.end_date|date:"M d, Y" }}{% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Status Info - Added for better user awareness -->
+                <div id="bracket-status-info"
+                    class="mt-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700">
+                    <div class="flex items-center">
+                        <span class="mr-2 text-blue-500 dark:text-blue-400">ℹ️</span>
+                        <span id="status-message" class="text-blue-700 dark:text-blue-300 text-sm font-medium">
+                            {% if competition.matches.count > 0 %}
+                            Status: Bracket matches have been generated. You can now schedule match dates and times.
+                            {% else %}
+                            Status: Bracket not generated yet. Click "Generate Matches" to create the bracket structure.
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <!-- Shuffle Teams Button -->
+                <button id="shuffle-btn"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-5 rounded-lg shadow-md">
+                    🔄 Shuffle
+                </button>
+                <!-- Generate Match Button -->
+                <button id="generate-match-btn"
+                    class="generate-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md">
+                    🏆 Generate Matches
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Generation Status -->
+    <div id="generation-status" class="hidden mb-6 p-4 rounded-lg"></div>
+
+    <!-- Bracket Container -->
+    <div class="bracket-container">
+        <div id="bracket-content" class="gracket"></div>
+        <div class="mt-4 p-4 bg-gray-100 dark:bg-gray-800 rounded overflow-auto max-h-60 text-xs font-mono hidden"
+            id="debug-data">
+            <p class="font-bold">Debug Data:</p>
+            <pre>{{ teams_data_json }}</pre>
+        </div>
+    </div>
+
+    <!-- Information Section -->
+
+
+    <!-- Information Section -->
+    <div
+        class="about-bracket-section mt-8 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-700">
+        <h2 class="about-bracket-title text-xl font-bold text-blue-800 dark:text-blue-200 mb-3">About this Bracket</h2>
+        <div class="about-bracket-content grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
+            <div>
+                <h3 class="about-bracket-header font-semibold text-gray-900 dark:text-white">Format Information:</h3>
+                <ul class="mt-2 space-y-1">
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span><strong>Type:</strong> {% if competition.participant_type == 'CLUBS' %}Club{% else
+                            %}Individual{% endif %}</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span><strong>Format:</strong> {{ competition.format.name }}</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span><strong>Participants:</strong>
+                            {% if competition.participant_type == 'CLUBS' %}
+                            {{ competition.enrolled_clubs.count }} clubs
+                            {% else %}
+                            {{ competition.enrolled_participants.count }} participants
+                            {% endif %}
+                        </span>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="about-bracket-header font-semibold text-gray-900 dark:text-white">How to Use:</h3>
+                <ul class="mt-2 space-y-1">
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>Click "Shuffle" to randomly reorder teams</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>Use drag-and-drop seeding to manually order teams</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>Click "Generate Matches" to create the actual match schedule</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="mr-2">•</span>
+                        <span>Matches will appear in the competition schedule after generation</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Scheduling Section - Hidden by default, shown after matches are generated -->
+    <div id="match-scheduling-section"
+        class="hidden mt-8 bg-gradient-to-br from-indigo-50 via-emerald-50 to-cyan-50 dark:from-indigo-900/20 dark:via-emerald-900/20 dark:to-cyan-900/20 rounded-2xl p-8 border border-indigo-100 dark:border-indigo-800/50 shadow-lg">
+        <div class="flex items-center mb-5">
+            <div class="bg-gradient-to-r from-emerald-500 to-cyan-500 p-3 rounded-xl mr-4">
+                <span class="text-white text-2xl">📅</span>
+            </div>
+            <div>
+                <h2
+                    class="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">
+                    Schedule Matches</h2>
+                <p class="text-emerald-700 dark:text-emerald-300 mt-1">
+                    Assign dates and times to your generated matches below. All matches are currently in draft status.
+                </p>
+            </div>
+        </div>
+
+        <div id="match-scheduling-content" class="space-y-5 mt-6">
+            <!-- Match scheduling form will be populated here via JavaScript -->
+        </div>
+
+        <div class="mt-8 flex flex-wrap justify-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button id="assign-dates-btn"
+                class="assign-dates-btn bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transform transition hover:scale-105 duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                <span class="flex items-center">
+                    <span class="mr-2">✅</span> Assign Dates & Finalize Schedule
+                </span>
+            </button>
+            <button id="cancel-scheduling-btn"
+                class="bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg transform transition hover:scale-105 duration-300">
+                <span class="flex items-center">
+                    <span class="mr-2">🚫</span> Cancel
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Data passed from Django -->
+<script id="teams-data" type="application/json">{{ teams_data_json|safe }}</script>
+<script id="matches-data" type="application/json">{{ matches_data_json|safe }}</script>
+<script id="competition-data" type="application/json">{{ competition.id }}</script>
+
+<!-- Match Details Modal -->
+<div id="match-details-modal"
+    class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+    <div class="relative p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 dark:border-gray-700">
+        <div class="mt-3 text-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">Edit Match Details
+            </h3>
+            <div class="mt-2 px-7 py-3">
+                <form id="match-details-form">
+                    <input type="hidden" id="match-id" name="match_id">
+
+                    <div class="mb-4 text-left">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="match-date">
+                            Date & Time
+                        </label>
+                        <input
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="match-date" type="datetime-local">
+                    </div>
+
+                    <div class="mb-4 text-left">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="match-venue">
+                            Venue
+                        </label>
+                        <select
+                            class="shadow border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="match-venue">
+                            <option value="">Select Venue</option>
+                            {% for venue in venues %}
+                            <option value="{{ venue.id }}">{{ venue.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-4 text-left">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+                            for="match-referee">
+                            Referee
+                        </label>
+                        <select
+                            class="shadow border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="match-referee">
+                            <option value="">Select Referee</option>
+                            {% for referee in referees %}
+                            <option value="{{ referee.id }}">{{ referee.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="items-center px-4 py-3">
+                        <button id="save-match-details" type="submit"
+                            class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                            Save Changes
+                        </button>
+                        <button id="close-match-modal" type="button"
+                            class="mt-3 px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include CSRF token -->
+{% csrf_token %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/bracket_editor.js' %}"></script>
+<script type="module">
+    import { Gracket, generateTournamentWithByes } from 'https://unpkg.com/gracket';
+
+    const bracketElement = document.getElementById('bracket-content');
+    const teamsDataElement = document.getElementById('teams-data');
+    const generateBtn = document.getElementById('generate-match-btn');
+    const statusDiv = document.getElementById('generation-status');
+
+    function getRoundLabels(tournamentData) {
+        const numRounds = tournamentData.length;
+        const standardLabels = {
+            1: 'Final',
+            2: 'Semifinals',
+            4: 'Quarterfinals',
+            8: 'Round of 16',
+            16: 'Round of 32',
+        };
+        const labels = [];
+        if (numRounds > 0) {
+            for (let i = 0; i < numRounds; i++) {
+                const matchesInRound = tournamentData[i].length;
+                labels.push(standardLabels[matchesInRound] || `Round ${i + 1}`);
+            }
+            labels.push('Champion');
+        }
+        return labels;
+    }
+
+    function drawBracket() {
+        console.log("drawBracket called");
+        const bracketElement = document.getElementById('bracket-content');
+
+        if (!bracketElement || !teamsDataElement) {
+            console.error("Bracket element or teams data element not found");
+            return;
+        }
+
+        bracketElement.innerHTML = ''; // Clear before drawing
+
+        try {
+            console.log("Parsing teams data...");
+            const teams = JSON.parse(teamsDataElement.textContent);
+            console.log("Parsed teams:", teams);
+
+            if (!teams || teams.length < 2) {
+                console.warn("Not enough teams:", teams ? teams.length : 0);
+                bracketElement.innerHTML = `<div class="text-center py-8 text-gray-600 dark:text-gray-300">Not enough teams to generate a bracket.</div>`;
+                return;
+            }
+
+            // Prepare tournament data
+            console.log("Generating tournament data...");
+            const tournamentData = generateTournamentWithByes(teams, 'top-seeds');
+            console.log("Raw tournament data:", tournamentData);
+
+            const enhancedTournamentData = enhanceTournamentDataWithTBDLabels(tournamentData);
+            console.log("Enhanced tournament data:", enhancedTournamentData);
+
+            const dynamicLabels = getRoundLabels(enhancedTournamentData);
+
+            const gracketOptions = {
+                src: enhancedTournamentData,
+                byeLabel: 'BYE',
+                roundLabels: dynamicLabels,
+                cornerRadius: 15,
+                canvasLineColor: '#667eea',
+                teamWidth: 160,
+                matchPadding: 20,
+                fontSize: 14,
+            };
+
+            console.log("Initializing Gracket with options:", gracketOptions);
+
+            // Initialize Gracket normally first
+            new Gracket(bracketElement, gracketOptions);
+            console.log("Gracket initialized");
+
+            // Then initialize the custom editor after a delay to ensure Gracket has rendered
+            setTimeout(() => {
+                if (window.BracketTeamEditor) {
+                    // Initialize the editor
+                    window.bracketTeamEditor = new BracketTeamEditor();
+                    window.bracketTeamEditor.initialize();
+                }
+
+                // Initialize match click handlers
+                initMatchClickHandlers();
+            }, 1000); // Wait 1s for Gracket to render completely
+
+        } catch (e) {
+            console.error("Failed to parse bracket data or initialize Gracket:", e);
+            console.error("Teams data content:", teamsDataElement.textContent);
+            bracketElement.innerHTML = `<div class="text-center py-8 text-red-500 dark:text-red-400">Error loading bracket: ${e.message}</div>`;
+        }
+    }
+
+    function initMatchClickHandlers() {
+        const matchesDataElement = document.getElementById('matches-data');
+        if (!matchesDataElement) return;
+
+        let matches = [];
+        try {
+            matches = JSON.parse(matchesDataElement.textContent);
+        } catch (e) {
+            console.error("Error parsing matches data:", e);
+            return;
+        }
+
+        // Add click event listener to the bracket container
+        bracketElement.addEventListener('click', function (e) {
+            // Find the closest match element (g_game)
+            const gameElement = e.target.closest('.g_game');
+            if (!gameElement) return;
+
+            // Prevent interfering with team name editing if in edit mode
+            // Check if we clicked on a team name
+            if (e.target.closest('text') || e.target.closest('tspan')) {
+                // If we are in team edit mode (checked via class on body or similar), don't open match modal
+                // For now, we'll assume if it's a text click, it might be for team editing
+                // But we want to allow match editing too.
+                // Let's check if the click was specifically on the game box background or general area
+                // rather than specifically on a team name text
+            }
+
+            // Try to identify the match from the DOM
+            // Gracket structure: .g_round > .g_game
+            // We can get the round index and game index
+            const roundElement = gameElement.closest('.g_round');
+            if (!roundElement) return;
+
+            // Get all rounds to find index
+            const allRounds = Array.from(bracketElement.querySelectorAll('.g_round'));
+            const roundIndex = allRounds.indexOf(roundElement);
+
+            // Get all games in this round to find index
+            const allGamesInRound = Array.from(roundElement.querySelectorAll('.g_game'));
+            const gameIndex = allGamesInRound.indexOf(gameElement);
+
+            console.log(`Clicked match: Round ${roundIndex}, Game ${gameIndex}`);
+
+            // Find the corresponding match in our data
+            // Note: This mapping depends on Gracket's generation order matching our database/logic order.
+            // We might need a more robust way, but for now let's try to match by round and index.
+            // Since we don't have exact mapping in the frontend, we might need to rely on 
+            // how we generated the data or try to match by team names if available.
+
+            // Better approach: Match by team IDs if possible
+            // Get team names/ids from the DOM
+            // Gracket renders teams in the game.
+
+            // Let's try to find a match that has these teams
+            // This is tricky because TBD/BYE might be involved.
+
+            // Fallback: Use the round and match index if we can correlate them.
+            // In `create_bracket_format_from_ordered_ids`, we generate matches.
+            // The `matches` list from backend should ideally have round/match_num info.
+
+            // Let's try to find a match with the correct round and match number.
+            // Gracket rounds are 0-indexed.
+            // Our DB rounds are 1-indexed.
+            const dbRound = roundIndex + 1;
+
+            // Match number is trickier. Gracket orders them top to bottom.
+            // Our DB match_number might follow the same order if generated sequentially.
+            // Let's try to find a match in this round with the corresponding index (1-based).
+            const dbMatchNum = gameIndex + 1;
+
+            const match = matches.find(m => m.round === dbRound && m.match_num === dbMatchNum);
+
+            if (match) {
+                openMatchModal(match);
+            } else {
+                console.warn("Could not find database match for this bracket position.");
+                // It might be a TBD match that hasn't been created in DB yet?
+                // Or the mapping is off.
+            }
+        });
+    }
+
+    const modal = document.getElementById('match-details-modal');
+    const modalForm = document.getElementById('match-details-form');
+    const closeBtn = document.getElementById('close-match-modal');
+    const saveBtn = document.getElementById('save-match-details');
+
+    function openMatchModal(match) {
+        document.getElementById('match-id').value = match.id;
+
+        // Format date for datetime-local input (YYYY-MM-DDThh:mm)
+        if (match.scheduled_time) {
+            // match.scheduled_time is ISO format from Django
+            const date = new Date(match.scheduled_time);
+            // Adjust to local time for input
+            const localIso = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+            document.getElementById('match-date').value = localIso;
+        } else {
+            document.getElementById('match-date').value = '';
+        }
+
+        document.getElementById('match-venue').value = match.venue_id || '';
+        document.getElementById('match-referee').value = match.referee_id || '';
+
+        modal.classList.remove('hidden');
+    }
+
+    closeBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    // Close on click outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+
+    modalForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const matchId = document.getElementById('match-id').value;
+        const date = document.getElementById('match-date').value;
+        const venueId = document.getElementById('match-venue').value;
+        const refereeId = document.getElementById('match-referee').value;
+
+        const csrfToken = getCookie('csrftoken');
+
+        fetch('/bracket/update-match-details/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                match_id: matchId,
+                scheduled_time: date,
+                venue_id: venueId,
+                referee_id: refereeId
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update local data
+                    const matchesDataElement = document.getElementById('matches-data');
+                    let matches = JSON.parse(matchesDataElement.textContent);
+                    const matchIndex = matches.findIndex(m => m.id == matchId);
+                    if (matchIndex !== -1) {
+                        matches[matchIndex].scheduled_time = date;
+                        matches[matchIndex].venue_id = venueId;
+                        matches[matchIndex].referee_id = refereeId;
+                        matchesDataElement.textContent = JSON.stringify(matches);
+                    }
+
+                    modal.classList.add('hidden');
+
+                    // Show success notification
+                    const statusDiv = document.getElementById('generation-status');
+                    statusDiv.className = 'p-4 rounded-lg bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 fixed top-4 right-4 z-50 shadow-lg';
+                    statusDiv.innerHTML = '<p>✅ Match details updated successfully!</p>';
+                    statusDiv.classList.remove('hidden');
+                    setTimeout(() => statusDiv.classList.add('hidden'), 3000);
+                } else {
+                    alert('Error updating match: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating match details');
+            });
+    });
+
+    // Function to enhance tournament data with descriptive TBD labels
+    function enhanceTournamentDataWithTBDLabels(tournamentData) {
+        if (!Array.isArray(tournamentData)) return tournamentData;
+
+        const enhancedTournamentData = JSON.parse(JSON.stringify(tournamentData)); // Deep copy to avoid mutation
+        const totalRounds = enhancedTournamentData.length;
+
+        enhancedTournamentData.forEach((round, roundIndex) => {
+            if (Array.isArray(round)) {
+                round.forEach((match, matchIndex) => {
+                    if (Array.isArray(match)) {
+                        // Check if this is a final round match (last or second-to-last round)
+                        const isLastRound = roundIndex === totalRounds - 1; // Final
+                        const isPenultimateRound = roundIndex === totalRounds - 2; // Semifinal
+
+                        if (Array.isArray(match[0]) && match[0].name === "TBD") {
+                            if (isLastRound) {
+                                match[0].name = "TBD Final";
+                            } else if (isPenultimateRound) {
+                                match[0].name = "TBD Semifinal";
+                            }
+                        }
+
+                        if (Array.isArray(match[1]) && match[1].name === "TBD") {
+                            if (isLastRound) {
+                                match[1].name = "TBD Final";
+                            } else if (isPenultimateRound) {
+                                match[1].name = "TBD Semifinal";
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        return enhancedTournamentData;
+    }
+
+    // Initial draw
+    drawBracket();
+
+    // Redraw on window resize, with a debounce to prevent excessive re-renders
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(drawBracket, 250);
+    });
+
+    // Generate matches functionality
+    generateBtn.addEventListener('click', function () {
+        const competitionId = {{ competition.id }
+    };
+    // Get CSRF token properly for Django
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]') ?
+        document.querySelector('[name=csrfmiddlewaretoken]').value :
+        getCookie('csrftoken');
+
+    // Show loading state
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = '...', '';
+    statusDiv.className = 'p-4 rounded-lg bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200';
+    statusDiv.innerHTML = '<p>Generating matches. Please wait...</p>';
+    statusDiv.classList.remove('hidden');
+
+    // Make the AJAX request to generate matches
+    fetch(`/bracket/generate-draft-matches/${competitionId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'  // Indicate this is an AJAX request
+        },
+        body: 'csrfmiddlewaretoken=' + encodeURIComponent(csrfToken)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                statusDiv.className = 'p-4 rounded-lg bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
+                statusDiv.innerHTML = '<p>✅ Draft matches generated successfully! Now assign dates to your matches.</p>';
+
+                // Update the status message
+                document.getElementById('status-message').textContent = 'Status: Bracket matches have been generated. You can now schedule match dates and times.';
+
+                // Fetch and display match scheduling form
+                fetchAndDisplayMatchSchedulingForm(competitionId);
+            } else {
+                statusDiv.className = 'p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+                statusDiv.innerHTML = '<p>❌ Error generating matches: ' + (data.error || 'Unknown error') + '</p>';
+                // Re-enable button if there's an error
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '🏆 Generate Matches';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            statusDiv.className = 'p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+            statusDiv.innerHTML = '<p>❌ Error generating matches: ' + error.message + '</p>';
+            // Re-enable button if there's an error
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = '🏆 Generate Matches';
+        });
+    });
+
+    // Helper function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Function to shuffle an array (Fisher-Yates algorithm)
+    function shuffleArray(array) {
+        const newArray = [...array];
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+
+    // Shuffle functionality
+    const shuffleBtn = document.getElementById('shuffle-btn');
+    shuffleBtn.addEventListener('click', function () {
+        if (!teamsDataElement) return;
+
+        try {
+            let teams = JSON.parse(teamsDataElement.textContent);
+
+            if (!teams || teams.length < 2) {
+                statusDiv.className = 'p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+                statusDiv.innerHTML = '<p>❌ Cannot shuffle: Not enough teams.</p>';
+                statusDiv.classList.remove('hidden');
+                return;
+            }
+
+            // Shuffle the teams
+            const shuffledTeams = shuffleArray(teams);
+
+            // Update the teams data element with the shuffled order
+            teamsDataElement.textContent = JSON.stringify(shuffledTeams);
+
+            // Redraw the bracket with the new shuffled order
+            drawBracket();
+
+            // Show status message
+            statusDiv.className = 'p-4 rounded-lg bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
+            statusDiv.innerHTML = '<p>✅ Teams shuffled successfully!</p>';
+            statusDiv.classList.remove('hidden');
+
+            // Hide status after 3 seconds
+            setTimeout(function () {
+                statusDiv.classList.add('hidden');
+            }, 3000);
+
+        } catch (e) {
+            console.error("Error shuffling teams:", e);
+            statusDiv.className = 'p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+            statusDiv.innerHTML = '<p>❌ Error shuffling teams: ' + e.message + '</p>';
+            statusDiv.classList.remove('hidden');
+        }
+    });
+
+
+
+    // Initialize seeding UI
+    function initSeeding() {
+        try {
+            const teamsData = JSON.parse(teamsDataElement.textContent);
+
+            // Check if there are teams to seed
+            if (!teamsData || teamsData.length < 2) {
+                availableTeamsContainer.innerHTML = '<div class="text-center p-4 text-gray-500 dark:text-gray-400">Not enough teams to seed. You need at least 2 teams enrolled in this competition.</div>';
+                seededTeamsContainer.innerHTML = '<div class="text-center p-4 text-gray-500 dark:text-gray-400">No teams available for seeding.</div>';
+                return;
+            }
+
+            currentTeams = [...teamsData];
+            originalTeams = [...teamsData]; // Keep a copy of original order
+
+            // Populate available teams
+            populateAvailableTeams();
+        } catch (e) {
+            console.error("Error initializing seeding:", e);
+            availableTeamsContainer.innerHTML = '<div class="text-center p-4 text-red-500 dark:text-red-400">Error initializing seeding: ' + e.message + '</div>';
+        }
+    }
+
+    function populateAvailableTeams() {
+        availableTeamsContainer.innerHTML = '';
+
+        currentTeams.forEach((team, index) => {
+            const teamElement = document.createElement('div');
+            teamElement.className = 'team-item p-2 mb-1 bg-white dark:bg-gray-700 rounded cursor-move border border-indigo-200 dark:border-indigo-600 shadow-sm flex items-center hover:bg-indigo-50 dark:hover:bg-indigo-900/50 transition-colors';
+            teamElement.draggable = true;
+            teamElement.dataset.teamId = team.id;
+            teamElement.dataset.teamIndex = index;
+
+            teamElement.innerHTML = `
+                <span class="mr-2 font-medium text-indigo-600 dark:text-indigo-300">#${index + 1}</span>
+                <span class="flex-1 text-gray-800 dark:text-gray-200">${team.name}</span>
+            `;
+
+            // Add drag event listeners
+            teamElement.addEventListener('dragstart', handleDragStart);
+            teamElement.addEventListener('dragend', handleDragEnd);
+
+            availableTeamsContainer.appendChild(teamElement);
+        });
+
+        // Make seeded container a drop target
+        seededTeamsContainer.addEventListener('dragover', handleDragOver);
+        seededTeamsContainer.addEventListener('drop', handleDrop);
+    }
+
+
+
+    // Function to fetch and display match scheduling form
+    function fetchAndDisplayMatchSchedulingForm(competitionId) {
+        // Make AJAX request to fetch draft matches and create scheduling form
+        fetch(`/bracket/fetch-draft-matches/${competitionId}/`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Hide the generate button container and show the scheduling section
+                    generateBtn.parentElement.classList.add('hidden');
+
+                    // Show the scheduling section
+                    document.getElementById('match-scheduling-section').classList.remove('hidden');
+
+                    // Populate the scheduling content
+                    const schedulingContent = document.getElementById('match-scheduling-content');
+                    if (data.matches && data.matches.length > 0) {
+                        let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+                        data.matches.forEach((match, index) => {
+                            const date = match.scheduled_time ? new Date(match.scheduled_time).toISOString().split('T')[0] : '';
+                            const time = match.scheduled_time ? new Date(match.scheduled_time).toTimeString().slice(0, 5) : '';
+
+                            html += `
+                        <div class="match-card p-5 bg-white dark:bg-gray-700 rounded-xl border border-gray-300 dark:border-gray-600 shadow-md">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="match-title font-bold text-gray-800 dark:text-gray-200 text-lg">
+                                    Round ${match.round_number}
+                                </h3>
+                                <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-200 rounded-full text-sm font-medium">
+                                    Match #${index + 1}
+                                </span>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1 mr-3">
+                                        <div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg border border-blue-200 dark:border-blue-700">
+                                            <div class="text-sm font-medium text-blue-600 dark:text-blue-300">Home Team</div>
+                                            <div class="font-semibold text-gray-800 dark:text-gray-200 mt-1">${match.home_team_name || 'TBD'}</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-xl font-bold text-gray-500 dark:text-gray-400 mx-2">VS</div>
+                                    <div class="flex-1 ml-3">
+                                        <div class="bg-red-50 dark:bg-red-900/30 p-3 rounded-lg border border-red-200 dark:border-red-700">
+                                            <div class="text-sm font-medium text-red-600 dark:text-red-300">Away Team</div>
+                                            <div class="font-semibold text-gray-800 dark:text-gray-200 mt-1">${match.away_team_name || 'TBD'}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4 pt-2">
+                                    <div class="space-y-1">
+                                        <label class="block text-sm font-medium text-emerald-600 dark:text-emerald-400 mb-1">📅 Date</label>
+                                        <input type="date"
+                                               id="match_date_${match.id}"
+                                               value="${date}"
+                                               class="date-time-input w-full p-3 border border-emerald-200 dark:border-emerald-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="block text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">🕐 Time</label>
+                                        <input type="time"
+                                               id="match_time_${match.id}"
+                                               value="${time}"
+                                               class="date-time-input w-full p-3 border border-blue-200 dark:border-blue-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" value="${match.id}" />
+                        </div>`;
+                        });
+                        html += '</div>';
+                        schedulingContent.innerHTML = html;
+
+                        // Auto-scroll to the scheduling section
+                        setTimeout(() => {
+                            const schedulingSection = document.getElementById('match-scheduling-section');
+                            if (schedulingSection) {
+                                schedulingSection.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'start'
+                                });
+                            }
+                        }, 100);
+                    } else {
+                        schedulingContent.innerHTML = '<div class="text-center py-4 text-gray-600 dark:text-gray-400">No draft matches found.</div>';
+                    }
+                } else {
+                    statusDiv.className = 'p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+                    statusDiv.innerHTML = '<p>❌ Error fetching draft matches: ' + (data.error || 'Unknown error') + '</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching draft matches:', error);
+                statusDiv.className = 'p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+                statusDiv.innerHTML = '<p>❌ Error fetching draft matches: ' + error.message + '</p>';
+            });
+    }
+
+    // Assign dates button functionality
+    document.getElementById('assign-dates-btn').addEventListener('click', function () {
+        const competitionId = {{ competition.id }
+    };
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Disable the button to prevent multiple submissions
+    const assignBtn = this;
+    assignBtn.disabled = true;
+    assignBtn.innerHTML = 'Processing...';
+    statusDiv.className = 'p-4 rounded-lg bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200';
+    statusDiv.innerHTML = '<p>Assigning dates and venues to matches. Please wait...</p>';
+    statusDiv.classList.remove('hidden');
+
+    // Collect date, time, and venue for each match
+    const matchSchedulingContent = document.getElementById('match-scheduling-content');
+    const matchInputs = matchSchedulingContent.querySelectorAll('div > input[type="hidden"]');
+    const matchesData = [];
+
+    matchInputs.forEach(input => {
+        const matchId = input.value;
+        const dateInput = document.getElementById(`match_date_${matchId}`);
+        const timeInput = document.getElementById(`match_time_${matchId}`);
+        const venueSelect = document.getElementById(`match_venue_${matchId}`);  // Get venue selection
+
+        if (dateInput && timeInput) {
+            const dateValue = dateInput.value;
+            const timeValue = timeInput.value;
+            const venueValue = venueSelect ? venueSelect.value : '';  // Get venue value if select exists
+
+            if (dateValue && timeValue) {
+                const matchData = {
+                    id: matchId,
+                    date: dateValue,
+                    time: timeValue
+                };
+
+                // Include venue_id if selected
+                if (venueValue) {
+                    matchData.venue_id = venueValue;
+                }
+
+                matchesData.push(matchData);
+            }
+        }
+    });
+
+    // Send the data to the server
+    fetch(`/bracket/assign-match-dates-inline/${competitionId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ matches: matchesData })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                statusDiv.className = 'p-4 rounded-lg bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
+                statusDiv.innerHTML = '<p>✅ Dates and venues assigned successfully! Schedule finalized.</p>';
+
+                // Hide scheduling section and show generate button again
+                setTimeout(function () {
+                    document.getElementById('match-scheduling-section').classList.add('hidden');
+                    generateBtn.parentElement.classList.remove('hidden');
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = '🏆 Generate Matches';
+
+                    // Reload bracket to show updated matches
+                    drawBracket();
+                }, 2000);
+            } else {
+                statusDiv.className = 'p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+                statusDiv.innerHTML = '<p>❌ Error assigning dates and venues: ' + (data.error || 'Unknown error') + '</p>';
+                assignBtn.disabled = false;
+                assignBtn.innerHTML = '✅ Assign Dates & Finalize Schedule';
+            }
+        })
+        .catch(error => {
+            console.error('Error assigning dates and venues:', error);
+            statusDiv.className = 'p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+            statusDiv.innerHTML = '<p>❌ Error assigning dates and venues: ' + error.message + '</p>';
+            assignBtn.disabled = false;
+            assignBtn.innerHTML = '✅ Assign Dates & Finalize Schedule';
+        });
+    });
+
+    // Cancel scheduling button functionality
+    document.getElementById('cancel-scheduling-btn').addEventListener('click', function () {
+        // Hide scheduling section and show generate button again
+        document.getElementById('match-scheduling-section').classList.add('hidden');
+        generateBtn.parentElement.classList.remove('hidden');
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '🏆 Generate Matches';
+
+        statusDiv.classList.add('hidden');
+    });
+
+    // Perbaikan untuk memastikan bracket dirender ulang setelah shuffle atau seeding
+    // Hanya menambahkan pembaruan ke variabel yang relevan
+
+    // Fungsi tambahan untuk memperbarui bracket rendering
+    function forceBracketUpdate() {
+        setTimeout(() => {
+            drawBracket();
+        }, 50);
+    }
+
+    // Atasi masalah bracket tidak berubah setelah shuffle
+    // Ganti event listener shuffle untuk memastikan bracket selalu diperbarui
+    document.addEventListener('DOMContentLoaded', function () {
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        if (shuffleBtn) {
+            // Hapus semua event listener yang ada untuk shuffle
+            const newShuffleBtn = shuffleBtn.cloneNode(true);
+            shuffleBtn.parentNode.replaceChild(newShuffleBtn, shuffleBtn);
+
+            // Tambahkan event listener baru untuk shuffle
+            newShuffleBtn.addEventListener('click', function () {
+                if (!teamsDataElement) return;
+
+                try {
+                    let teams = JSON.parse(teamsDataElement.textContent);
+
+                    if (!teams || teams.length < 2) {
+                        statusDiv.className = 'p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+                        statusDiv.innerHTML = '<p>❌ Cannot shuffle: Not enough teams.</p>';
+                        statusDiv.classList.remove('hidden');
+                        return;
+                    }
+
+                    // Shuffle the teams
+                    const shuffledTeams = shuffleArray(teams);
+
+                    // Update the teams data element with the shuffled order
+                    teamsDataElement.textContent = JSON.stringify(shuffledTeams);
+
+                    // Update originalTeams and currentTeams to match new order
+                    if (typeof originalTeams !== 'undefined') originalTeams = [...shuffledTeams];
+                    if (typeof currentTeams !== 'undefined') currentTeams = [...shuffledTeams];
+
+                    // Redraw the bracket with the new shuffled order - twice untuk memastikan
+                    drawBracket();
+                    setTimeout(() => {
+                        drawBracket(); // Panggil lagi untuk memastikan update
+                    }, 50);
+
+                    // Show status message
+                    statusDiv.className = 'p-4 rounded-lg bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200';
+                    statusDiv.innerHTML = '<p>✅ Teams shuffled successfully!</p>';
+                    statusDiv.classList.remove('hidden');
+
+                    // Hide status after 3 seconds
+                    setTimeout(function () {
+                        statusDiv.classList.add('hidden');
+                    }, 3000);
+
+                } catch (e) {
+                    console.error("Error shuffling teams:", e);
+                    statusDiv.className = 'p-4 rounded-lg bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200';
+                    statusDiv.innerHTML = '<p>❌ Error shuffling teams: ' + e.message + '</p>';
+                    statusDiv.classList.remove('hidden');
+                }
+            });
+        }
+
+        // Juga pastikan bracket diperbarui setelah seeding
+        const saveSeedingBtn = document.getElementById('save-seeding-btn');
+        if (saveSeedingBtn) {
+            // Tambahkan event listener untuk memperbarui bracket setelah save seeding
+            // Kita tidak bisa mengganti event listener yang lama karena kompleks,
+            // tapi kita bisa menambahkan logika untuk memastikan drawBracket dipanggil
+        }
+    });
+</script>
+{% endblock %}

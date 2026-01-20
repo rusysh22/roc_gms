@@ -1,0 +1,6 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script id="format_map_data" type="application/json">{{ format_map_json|safe }}</script>
+{% endblock %}

@@ -1,0 +1,300 @@
+/* Enhanced CSS to match Gracket demo style - ESPN-inspired design */
+.g_gracket {
+  width: 100%;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  padding: 30px 15px 15px;
+  line-height: 100%;
+  position: relative;
+  overflow-x: auto;
+  font-family: "Inter", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  box-sizing: content-box;
+  min-height: 400px;
+  white-space: nowrap; /* Ensure content stays in a single line for horizontal scrolling */
+}
+
+.g_round {
+  display: inline-block;
+  margin-right: 100px;
+  position: relative;
+  vertical-align: top;
+}
+
+.g_game {
+  position: relative;
+  margin-bottom: 25px;
+  min-width: 200px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.g_game:hover {
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+  transform: translateY(-3px);
+  border-color: #667eea;
+}
+
+.g_gracket h3, .g_gracket h4 {
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.g_team {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  transition: all 0.2s ease;
+  background: linear-gradient(90deg, #ffffff 0%, #fafafa 100%);
+}
+
+.g_team:last-child {
+  border-bottom: none;
+}
+
+.g_team:hover {
+  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  padding-left: 20px;
+  border-left: 4px solid #667eea;
+}
+
+.g_team.winner {
+  background: linear-gradient(90deg, #dcfce7 0%, #bbf7d0 100%) !important;
+  font-weight: 700;
+  border-left: 4px solid #16a34a;
+}
+
+.g_team.winner .g_seed {
+  background-color: #16a34a;
+  color: white;
+}
+
+.g_team.winner h4 {
+  color: #15803d;
+  font-weight: 700;
+}
+
+.g_round:last-child .g_game {
+  margin-bottom: 0;
+}
+
+.g_winner {
+  background: #dcfce7;
+}
+
+.g_current {
+  background: rgba(239, 246, 255, 0.7);
+  border-left: 4px solid #3b82f6;
+}
+
+.g_round_label {
+  position: absolute;
+  top: -35px;
+  left: 0;
+  width: 100%;
+  font-weight: 700;
+  color: #334155;
+  text-align: center;
+  font-size: 18px;
+  padding: 10px 0;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  margin-bottom: 15px;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid #bae6fd;
+}
+
+.g_spacer {
+  width: 100%;
+}
+
+.g_canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  background: transparent;
+}
+
+.g_seed {
+  font-size: 13px;
+  font-weight: 700;
+  background-color: #94a3b8;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 14px;
+  margin-right: 8px;
+  min-width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.g_team_score {
+  font-weight: 700;
+  font-size: 16px;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  padding: 4px 10px;
+  border-radius: 12px;
+  min-width: 32px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.g_team.winner .g_team_score {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: white;
+  font-weight: 800;
+}
+
+.g_bye {
+  background: linear-gradient(90deg, #f8fafc 0%, #e2e8f0 100%) !important;
+  border-left: 4px dashed #94a3b8 !important;
+  opacity: 0.7;
+  font-style: italic;
+  color: #64748b;
+}
+
+.bracket-container {
+  position: relative;
+  width: 100%;
+  min-height: 500px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 15px 0;
+  background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 12px;
+  border: 1px solid #bae6fd;
+}
+
+.my_gracket {
+  position: relative;
+  min-height: 400px;
+  padding-top: 50px;
+  display: inline-block;
+  padding: 25px;
+}
+
+/* Dark mode support */
+.dark .g_gracket {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  color: white;
+}
+
+.dark .g_game {
+  background: #1e293b;
+  border: 1px solid #334155;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.dark .g_game:hover {
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+  border-color: #818cf8;
+}
+
+.dark .g_team {
+  border-bottom: 1px solid #334155;
+  background: linear-gradient(90deg, #1e293b 0%, #334155 100%);
+}
+
+.dark .g_team:hover {
+  background: linear-gradient(90deg, #334155 0%, #475569 100%);
+  border-left: 4px solid #818cf8;
+}
+
+.dark .g_team.winner {
+  background: linear-gradient(90deg, #166534 0%, #15803d 100%) !important;
+}
+
+.dark .g_team.winner .g_seed {
+  background-color: #4ade80;
+}
+
+.dark .g_team.winner h4 {
+  color: #a7f3d0;
+}
+
+.dark .g_round_label {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  color: #e0f2fe;
+  border-color: #38bdf8;
+}
+
+.dark .g_seed {
+  background-color: #64748b;
+}
+
+.dark .g_team_score {
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+}
+
+.dark .g_team.winner .g_team_score {
+  background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+}
+
+.dark .g_bye {
+  background: linear-gradient(90deg, #334155 0%, #475569 100%) !important;
+  border-left-color: #64748b !important;
+  color: #94a3b8;
+}
+
+.dark .bracket-container {
+  background: linear-gradient(180deg, #0c4a6e 0%, #082f49 100%);
+  border-color: #0ea5e9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .g_round {
+    margin-right: 60px;
+    min-width: 160px;
+  }
+  
+  .g_game {
+    min-width: 150px;
+    margin-bottom: 20px;
+  }
+  
+  .g_gracket h3, .g_gracket h4 {
+    font-size: 14px;
+  }
+  
+  .g_team {
+    padding: 10px 12px;
+  }
+  
+  .g_seed {
+    font-size: 11px;
+    min-width: 24px;
+    padding: 2px 6px;
+  }
+  
+  .g_team_score {
+    font-size: 14px;
+    min-width: 28px;
+    padding: 3px 8px;
+  }
+  
+  .g_round_label {
+    top: -30px;
+    font-size: 15px;
+    padding: 8px 0;
+  }
+}

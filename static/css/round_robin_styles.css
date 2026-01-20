@@ -1,0 +1,14 @@
+.mini-standings {
+    transition: all 0.3s ease;
+}
+
+.mini-standings.mini-standings-active {
+    border: 2px solid #3b82f6 !important; /* Tailwind blue-500 */
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2), 0 2px 4px -1px rgba(59, 130, 246, 0.06);
+    transform: translateY(-2px);
+}
+
+.mini-standings.mini-standings-active h4 {
+    color: #2563eb; /* Tailwind blue-600 */
+    font-weight: 600;
+}

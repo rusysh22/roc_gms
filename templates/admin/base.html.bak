@@ -1,0 +1,62 @@
+{% extends 'unfold/layouts/base.html' %}
+
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {% if site_config and site_config.favicon %}
+        <link rel="shortcut icon" type="image/png" href="{{ site_config.favicon.url }}">
+    {% endif %}
+{% endblock %}
+
+{% block footer %}
+    {{ block.super }}
+    {% if site_config and site_config.logo %}
+    <script>
+        // Wait for the page to load, then replace the default logo with the custom one
+        document.addEventListener('DOMContentLoaded', function() {
+            // Small delay to ensure all Unfold JS has run
+            setTimeout(function() {
+                // Look for the admin branding logo elements and replace them
+                const logoSelectors = [
+                    '.sidebar-branding img',
+                    '.unfold-branding img', 
+                    '.app-branding img',
+                    'a[href="/admin/"] img',
+                    '.sidebar a img'
+                ];
+                
+                logoSelectors.forEach(function(selector) {
+                    const logos = document.querySelectorAll(selector);
+                    logos.forEach(function(img) {
+                        // Check if this is a default Django/Unfold icon (usually contains 'icon' or 'generic' in path)
+                        if (img.src.includes('icon') || img.src.includes('generic') || img.src.includes('default')) {
+                            img.src = "{{ site_config.logo.url }}";
+                            img.style.maxHeight = '24px';
+                            img.style.maxWidth = '24px';
+                        }
+                    });
+                });
+                
+                // Update site name too
+                const titleSelectors = [
+                    '.sidebar-branding span',
+                    '.unfold-branding span',
+                    '.app-branding span',
+                    '.sidebar a span'
+                ];
+                
+                titleSelectors.forEach(function(selector) {
+                    const titles = document.querySelectorAll(selector);
+                    titles.forEach(function(span) {
+                        const text = span.textContent.trim();
+                        if (text.includes('Django') || text.includes('Admin') || text === 'GMS Administration') {
+                            span.textContent = "{{ site_config.site_name }}";
+                        }
+                    });
+                });
+            }, 300); // 300ms delay to let Unfold load
+        });
+    </script>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,110 @@
+/* Custom CSS for Competition Admin */
+
+/* Ensure enrolled_participants has the same styling as enrolled_clubs */
+.form-row .field-enrolled_participants .selector,
+.form-row .field-enrolled_clubs .selector {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px; /* Increased width */
+}
+
+.form-row .field-enrolled_participants .selector-available,
+.form-row .field-enrolled_clubs .selector-available {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 300px; /* Increased width */
+    min-height: 250px; /* Increased height */
+    resize: vertical; /* Enable vertical resizing */
+    overflow: auto; /* Required for resize to work */
+}
+
+.form-row .field-enrolled_participants .selector-chosen,
+.form-row .field-enrolled_clubs .selector-chosen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 300px; /* Increased width */
+    min-height: 250px; /* Increased height */
+    resize: vertical; /* Enable vertical resizing */
+    overflow: auto; /* Required for resize to work */
+}
+
+select#id_enrolled_participants_to,
+select#id_enrolled_participants_from,
+select#id_enrolled_clubs_to,
+select#id_enrolled_clubs_from {
+    width: 100% !important;
+    min-width: 200px !important;
+    min-height: 230px !important; /* Increased height */
+    padding: 5px !important;
+    font-size: 13px !important;
+    flex: 1; /* Allow the select to fill available space */
+}
+
+/* Styling for the add/remove buttons */
+.form-row .field-enrolled_participants .selector-add,
+.form-row .field-enrolled_participants .selector-remove,
+.form-row .field-enrolled_clubs .selector-add,
+.form-row .field-enrolled_clubs .selector-remove {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 230px; /* Increased height to match select boxes */
+    justify-content: center;
+}
+
+/* Hidden field styling - explicitly hide form rows */
+.form-row.field-enrolled_participants.hidden-field,
+.form-row.field-enrolled_clubs.hidden-field,
+tr.field-enrolled_participants.hidden-field,
+tr.field-enrolled_clubs.hidden-field,
+div.field-enrolled_participants.hidden-field,
+div.field-enrolled_clubs.hidden-field,
+tr.field-enrolled_participants.d-none,
+tr.field-enrolled_clubs.d-none,
+div.field-enrolled_participants.d-none,
+div.field-enrolled_clubs.d-none {
+    display: none !important;
+}
+
+/* Accessibility improvements for filter_horizontal widgets */
+.selector .selector-available label,
+.selector .selector-chosen label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Ensure proper spacing for accessibility */
+.selector-chosen h2, .selector-available h2 {
+    margin: 0 0 5px 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Improve accessibility for filter_horizontal controls */
+.selector .selector-filter input {
+    width: 100%;
+    padding: 4px 6px;
+}
+
+@media (max-width: 768px) {
+    .form-row .field-enrolled_participants .selector,
+    .form-row .field-enrolled_clubs .selector {
+        flex-direction: column;
+    }
+
+    .form-row .field-enrolled_participants .selector-available,
+    .form-row .field-enrolled_participants .selector-chosen,
+    .form-row .field-enrolled_clubs .selector-available,
+    .form-row .field-enrolled_clubs .selector-chosen {
+        min-width: auto;
+        width: 100%;
+    }
+}

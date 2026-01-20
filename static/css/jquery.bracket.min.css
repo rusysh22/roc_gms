@@ -1,0 +1,22 @@
+.jQBracket { font-family: Arial, sans-serif; }
+.jQBracket .round { float: left; margin-right: 10px; }
+.jQBracket .match { margin-bottom: 4px; position: relative; }
+.jQBracket .team { height: 22px; line-height: 22px; font-size: 12px; width: 140px; background: #fff; border: 1px solid #ccc; margin: 0 auto; text-align: center; color: #333; cursor: default; overflow: hidden; }
+.jQBracket .team a { color: #333; text-decoration: none; }
+.jQBracket .team.winner { background: #f3f3f3; font-weight: bold; }
+.jQBracket .team.loser { background: #f9f9f9; color: #999; }
+.jQBracket .team.na { background: #eee; color: #999; }
+.jQBracket .win { background: #eaf3ff; }
+.jQBracket .lose { background: #ffeaea; }
+.jQBracket .highlight { background-color: #ffffcc !important; }
+.jQBracket .highlightWinner { background-color: #ccffcc !important; }
+.jQBracket .highlightLoser { background-color: #ffcccc !important; }
+.jQBracket .connector { position: absolute; width: 0; height: 0; border: 1px solid transparent; }
+.jQBracket .score { display: inline-block; width: 30px; text-align: center; background: #f9f9f9; border-left: 1px solid #ccc; }
+.jQBracket .editable { background: #e6f7ff; border: 1px solid #0088cc; }
+.jQBracket .tools { position: absolute; top: 0; right: 0; }
+.jQBracket .tools span { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; background: #f9f9f9; border: 1px solid #ccc; margin-left: 2px; cursor: pointer; font-size: 10px; }
+.jQBracket .tools span:hover { background: #eaeaea; }
+.jQBracket .bubble { position: absolute; right: -10px; top: -5px; background: #4CAF50; color: white; border-radius: 10px; width: 20px; height: 20px; line-height: 20px; text-align: center; font-size: 12px; }
+.jQBracket .bubble.third { right: auto; left: -10px; background: #FFC107; }
+.jQBracket .bubble.fourth { right: auto; left: -10px; background: #FF9800; }

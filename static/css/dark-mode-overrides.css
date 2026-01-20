@@ -1,0 +1,267 @@
+/* Additional CSS overrides for dark mode consistency */
+/* This file ensures that all Tailwind dark classes work properly with our new theme system */
+
+/* Ensure text colors follow theme variables */
+.text-gray-900 {
+    color: var(--text-primary);
+}
+
+.text-gray-800 {
+    color: var(--text-primary);
+}
+
+.text-gray-700 {
+    color: var(--text-secondary);
+}
+
+.text-gray-600 {
+    color: var(--text-secondary);
+}
+
+.text-gray-500 {
+    color: var(--text-tertiary);
+}
+
+.text-gray-400 {
+    color: var(--text-tertiary);
+}
+
+.text-gray-300 {
+    color: var(--text-tertiary);
+}
+
+.text-gray-200 {
+    color: var(--text-tertiary);
+}
+
+.text-gray-100 {
+    color: var(--text-secondary);
+}
+
+.text-white {
+    color: var(--text-primary);
+}
+
+.text-black {
+    color: var(--text-primary);
+}
+
+/* Background colors */
+.bg-white {
+    background-color: var(--bg-card);
+}
+
+.bg-gray-50 {
+    background-color: var(--bg-secondary);
+}
+
+.bg-gray-100 {
+    background-color: var(--bg-tertiary);
+}
+
+.bg-gray-200 {
+    background-color: var(--bg-tertiary);
+}
+
+.bg-blue-50 {
+    background-color: rgba(96, 165, 250, 0.1);
+}
+
+.bg-blue-100 {
+    background-color: rgba(96, 165, 250, 0.15);
+}
+
+.bg-blue-900 {
+    background-color: rgba(30, 64, 175, 0.5);
+}
+
+.bg-red-50 {
+    background-color: rgba(248, 113, 113, 0.1);
+}
+
+.bg-green-100 {
+    background-color: rgba(52, 211, 153, 0.15);
+}
+
+.bg-yellow-100 {
+    background-color: rgba(251, 191, 36, 0.15);
+}
+
+.bg-amber-100 {
+    background-color: rgba(251, 191, 36, 0.15);
+}
+
+/* Border colors */
+.border-gray-200 {
+    border-color: var(--border-primary);
+}
+
+.border-gray-300 {
+    border-color: var(--border-secondary);
+}
+
+.border-blue-300 {
+    border-color: rgba(96, 165, 250, 0.4);
+}
+
+.border-red-300 {
+    border-color: rgba(248, 113, 113, 0.4);
+}
+
+/* Hover states */
+.hover\:bg-gray-50:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.hover\:bg-gray-100:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.hover\:text-yellow-300:hover {
+    color: var(--warning);
+}
+
+.hover\:text-blue-800:hover {
+    color: var(--accent-hover);
+}
+
+.hover\:text-yellow-800:hover {
+    color: var(--warning);
+}
+
+/* Special handling for elements that must maintain white text (like in specific contexts) */
+.text-white-force {
+    color: white !important;
+}
+
+/* Badge colors */
+.bg-blue-100 {
+    background-color: rgba(96, 165, 250, 0.15);
+    color: var(--accent-primary);
+}
+
+.text-blue-800 {
+    color: var(--accent-hover);
+}
+
+.text-blue-600 {
+    color: var(--accent-primary);
+}
+
+.text-green-800 {
+    color: var(--success);
+}
+
+.text-green-600 {
+    color: var(--success);
+}
+
+.text-red-600 {
+    color: var(--error);
+}
+
+.bg-blue-900\/30 {
+    background-color: rgba(30, 64, 175, 0.3);
+}
+
+.bg-blue-900\/20 {
+    background-color: rgba(30, 64, 175, 0.2);
+}
+
+/* Button styling */
+.btn-primary, .bg-blue-600 {
+    background-color: var(--accent-primary);
+    color: white;
+}
+
+.btn-primary:hover, .bg-blue-600:hover {
+    background-color: var(--accent-hover);
+}
+
+.dark .btn-primary, .dark .bg-blue-600 {
+    background-color: var(--accent-primary);
+    color: var(--text-primary);
+}
+
+.dark .btn-primary:hover, .dark .bg-blue-600:hover {
+    background-color: var(--accent-hover);
+}
+
+/* Form elements */
+input, select, textarea {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+}
+
+/* SVG icons */
+svg {
+    color: var(--text-secondary);
+}
+
+/* Consistent dark theme handling for all existing templates */
+/* This ensures backward compatibility with existing dark mode classes */
+.dark .bg-white { background-color: var(--bg-card) !important; }
+.dark .bg-gray-50 { background-color: var(--bg-secondary) !important; }
+.dark .bg-gray-100 { background-color: var(--bg-tertiary) !important; }
+.dark .bg-gray-200 { background-color: var(--bg-tertiary) !important; }
+.dark .bg-gray-800 { background-color: var(--bg-tertiary) !important; }
+
+.dark .text-gray-900 { color: var(--text-primary) !important; }
+.dark .text-gray-800 { color: var(--text-primary) !important; }
+.dark .text-gray-700 { color: var(--text-secondary) !important; }
+.dark .text-gray-600 { color: var(--text-secondary) !important; }
+.dark .text-gray-500 { color: var(--text-tertiary) !important; }
+.dark .text-gray-400 { color: var(--text-tertiary) !important; }
+.dark .text-gray-300 { color: var(--text-tertiary) !important; }
+.dark .text-gray-200 { color: var(--text-secondary) !important; }
+.dark .text-gray-100 { color: var(--text-secondary) !important; }
+.dark .text-white { color: var(--text-primary) !important; }
+
+.dark .border-gray-200 { border-color: var(--border-primary) !important; }
+.dark .border-gray-300 { border-color: var(--border-secondary) !important; }
+.dark .border-gray-700 { border-color: var(--border-secondary) !important; }
+
+.dark .hover\:bg-gray-50:hover { background-color: var(--bg-tertiary) !important; }
+.dark .hover\:bg-gray-100:hover { background-color: var(--bg-tertiary) !important; }
+.dark .hover\:bg-gray-700\/50:hover { background-color: rgba(55, 65, 81, 0.5) !important; }
+
+/* Specific overrides for badges and status elements */
+.dark .bg-blue-100 { background-color: var(--bg-tertiary) !important; }
+.dark .bg-blue-900\/30 { background-color: rgba(30, 64, 175, 0.3) !important; }
+.dark .text-blue-800 { color: var(--accent-hover) !important; }
+.dark .text-blue-600 { color: var(--accent-primary) !important; }
+.dark .text-blue-400 { color: var(--accent-primary) !important; }
+.dark .text-blue-300 { color: var(--accent-primary) !important; }
+
+.dark .text-yellow-400 { color: var(--warning) !important; }
+.dark .text-yellow-800 { color: var(--warning) !important; }
+.dark .text-yellow-300 { color: var(--warning) !important; }
+
+.dark .text-gray-400 { color: var(--text-tertiary) !important; }
+.dark .text-gray-500 { color: var(--text-tertiary) !important; }
+.dark .text-gray-300 { color: var(--text-tertiary) !important; }
+
+.dark .text-black { color: var(--text-primary) !important; }
+.dark .dark\:text-black { color: var(--text-primary) !important; }
+.dark .dark\:hover\:text-black:hover { color: var(--text-primary) !important; }
+
+/* Enhanced status badge colors for better contrast */
+.dark .bg-green-500 { background-color: var(--success) !important; }
+.dark .bg-green-100 { background-color: rgba(52, 211, 153, 0.15) !important; }
+.dark .bg-green-900\/30 { background-color: rgba(20, 83, 45, 0.3) !important; }
+.dark .text-green-800 { color: var(--success) !important; }
+.dark .text-green-300 { color: var(--success) !important; }
+
+.dark .bg-blue-500 { background-color: var(--accent-primary) !important; }
+.dark .bg-blue-100 { background-color: rgba(59, 130, 246, 0.15) !important; }
+.dark .bg-blue-900\/30 { background-color: rgba(30, 64, 175, 0.3) !important; }
+.dark .text-blue-800 { color: var(--accent-hover) !important; }
+.dark .text-blue-300 { color: var(--accent-primary) !important; }
+
+/* Button colors */
+.dark .bg-blue-600 { background-color: var(--accent-primary) !important; }
+.dark .bg-blue-700 { background-color: var(--accent-hover) !important; }
+.dark .hover\:bg-blue-700:hover { background-color: var(--accent-hover) !important; }
+.dark .hover\:bg-blue-800:hover { background-color: var(--accent-hover) !important; }
+.dark .text-blue-600 { color: var(--accent-primary) !important; }

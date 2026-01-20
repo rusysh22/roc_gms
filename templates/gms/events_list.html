@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Events - {{ site_config.site_name|default:"Corporate Games Hub" }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-16">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Events
+        </h1>
+        <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Explore our upcoming and ongoing events
+        </p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for event in events %}
+        <div class="premium-card glass-pane rounded-2xl overflow-hidden transform transition-all duration-500 hover:scale-105">
+            <div class="p-6">
+                <h2 class="text-xl font-bold mb-3 gradient-text">{{ event.name }}</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-3">
+                    <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    {{ event.start_date|date:"M d, Y" }} - {{ event.end_date|date:"M d, Y" }}
+                </p>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-4">
+                    Status: <span class="capitalize px-2 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white">{{ event.get_status_display }}</span>
+                </p>
+                <a href="{% url 'gms:event_detail' event.id %}" 
+                   class="w-full text-center px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-gray-200 transition-all duration-300 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-gray-300">
+                    View Details
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <p class="text-gray-500 dark:text-gray-400 text-lg">No events available at the moment.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

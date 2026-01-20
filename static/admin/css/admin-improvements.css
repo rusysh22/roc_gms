@@ -1,0 +1,93 @@
+/* CSS improvements for admin forms and accessibility */
+
+/* Fix for potential label issues */
+.form-group label,
+.fieldset .form-row label {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+/* Ensure proper spacing and accessibility for form elements */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+/* Compatibility fixes for Unfold Admin */
+.unfold-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* Improvements for inline forms */
+.inline-related fieldset {
+    margin-bottom: 1rem;
+}
+
+/* Ensure proper focus for accessibility */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* Specific fix for potential label-for mismatches */
+#customday_set-group label[for],
+#customday_inline-group label[for] {
+    cursor: pointer;
+}
+
+/* Additional styling for the generate schedule button section */
+#competition-generate-section {
+    border: 2px solid #3b82f6 !important;
+    background-color: white !important;
+    color: #1e3a8a !important;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06) !important;
+}
+
+#competition-generate-section h3 {
+    margin-top: 0 !important;
+    margin-bottom: 10px !important;
+    color: #1e40af !important;
+    font-size: 1.2em !important;
+    font-weight: bold !important;
+}
+
+#competition-generate-section p {
+    margin-top: 10px !important;
+    color: #374151 !important;
+    font-size: 0.9em !important;
+}
+
+/* Responsive design fixes */
+@media (max-width: 768px) {
+    #competition-generate-section {
+        margin: 10px 0 !important;
+        padding: 10px !important;
+    }
+}
+
+/* Dark mode compatibility */
+[data-theme="dark"] #competition-generate-section {
+    background-color: #1f2937 !important;
+    border-color: #4f46e5 !important;
+    color: #f9fafb !important;
+}
+
+[data-theme="dark"] #competition-generate-section h3 {
+    color: #93c5fd !important;
+}
+
+/* Ensure button visibility in dark mode */
+[data-theme="dark"] #generate-schedule-btn {
+    background-color: #3b82f6 !important;
+}
+
+[data-theme="dark"] #generate-schedule-btn:hover {
+    background-color: #2563eb !important;
+}

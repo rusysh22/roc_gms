@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bracket: {{ competition.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.0/jquery.bracket.min.css" />
+<link rel="stylesheet" href="{% static 'css/gracket.css' %}" />
+<link rel="stylesheet" href="{% static 'css/bracket.css' %}" />
+<style>
+    /* --- Seeding Section --- */
+    #seeding-section .seeding-container {
+        display: grid;
+        grid-template-columns: 1fr 0.8fr;
+        gap: 2rem;
+    }
+
+    /* Draggable List Panel */
+    #seeding-section #seeding-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        text-align: left;
+    }
+    .seed-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: left;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        background-color: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        cursor: grab;
+        width: 100%;
+    }
+    .dark .seed-item { background-color: #374151; border-color: #4b5563; }
+    .seed-item.sortable-ghost { opacity: 0.4; background: #c7d2fe; }
+    .seed-number { font-weight: 600; color: #4f46e5; margin-right: 1rem; }
+    .dark .seed-number { color: #a5b4fc; }
+    .seed-name { font-weight: 500; color: #111827; }
+    .dark .seed-name { color: #f3f4f6; }
+    .handle { margin-left: 1rem; color: #9ca3af; cursor: move; }
+
+    /* Visual Pairings Panel */
+    #visual-pairings-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .match-pairing-box {
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        background-color: #f8fafc;
+        max-width: 400px;
+    }
+    .dark .match-pairing-box { border-color: #4a5568; background-color: #2d3748; }
+    .match-pairing-header {
+        font-weight: 600;
+        padding: 0.25rem 1rem;
+        background-color: #f1f5f9;
+        border-bottom: 1px solid #cbd5e1;
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+    .dark .match-pairing-header { background-color: #4a5568; border-color: #4a5568; }
+    .match-pairing-body {
+        padding: 0.5rem;
+    }
+    .paired-team {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.25rem;
+    }
+    .paired-team .seed-name { font-weight: 500; }
+    .paired-team .seed-number { font-size: 0.9rem; color: #64748b; }
+    .dark .paired-team .seed-number { color: #94a3b8; }
+    .vs-divider { text-align: center; font-weight: bold; color: #94a3b8; margin: 0.125rem 0; }
+    .bye-box {
+        border: 1px dashed #fbbf24;
+        background-color: #fefce8;
+        color: #b45309;
+    }
+    .dark .bye-box { border-color: #d97706; background-color: #453310; color: #fefce8; }
+
+    /* Bracket container styling */
+    .bracket-container { 
+        overflow-x: auto; 
+        background-color: #1f2937; 
+        padding: 2rem; 
+        border-radius: 0.75rem; 
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ competition.name }}</h1>
+        <p class="text-lg text-gray-600 dark:text-gray-300">Bracket Management</p>
+    </div>
+
+    <div id="status-message" class="mt-4 hidden"></div>
+
+    {% if not competition.matches.exists %}
+    <div id="seeding-section">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Step 1: Atur Urutan Tim (Seeding)</h2>
+                <nav aria-label="Breadcrumb" class="text-sm text-gray-500 dark:text-gray-400">
+                    <ol class="list-none p-0 inline-flex">
+                        <li class="flex items-center font-semibold">
+                            Step 1: Seeding
+                            <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/></svg>
+                        </li>
+                        <li class="text-gray-400 dark:text-gray-500">
+                            Step 2: Bracket
+                        </li>
+                    </ol>
+                </nav>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Seret tim di panel kiri untuk mengatur urutan. Panel kanan akan menampilkan visualisasi pertandingan secara otomatis.</p>
+            </div>
+
+            <div class="seeding-container">
+                <!-- Left Panel: Draggable List -->
+                <div>
+                    <h3 class="font-semibold mb-2">Daftar Tim (Drag & Drop)</h3>
+                    <ul id="seeding-list">
+                        {% for p in participants %}
+                        <li class="seed-item" data-id="{{ p.id }}">
+                            <span class="handle mr-4">☰</span>
+                            <span class="seed-number">#{{ forloop.counter }}</span>
+                            <span class="seed-name">{% if p.full_name %}{{ p.full_name }}{% else %}{{ p.name }}{% endif %}</span>
+                        </li>
+                        {% empty %}
+                        <li class="text-center text-gray-500 py-4">No participants enrolled.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <!-- Right Panel: Visual Pairings -->
+                <div>
+                    <h3 class="font-semibold mb-2">Visualisasi Pertandingan</h3>
+                    <div id="visual-pairings-container">
+                        <!-- Pairings will be rendered here by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-6 text-center">
+            <button id="save-seeding-btn" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                💾 Simpan Urutan & Buat Bracket
+            </button>
+        </div>
+    </div>
+    {% else %}
+    <div id="bracket-section">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Step 2: Bracket</h2>
+                    <nav aria-label="Breadcrumb" class="text-sm text-gray-500 dark:text-gray-400">
+                        <ol class="list-none p-0 inline-flex">
+                            <li class="flex items-center">
+                                <span class="text-gray-400 dark:text-gray-500">Step 1: Seeding</span>
+                                <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"/></svg>
+                            </li>
+                            <li class="font-semibold">
+                                Step 2: Bracket
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <a href="{% url 'gms:reset_bracket' competition.id %}"
+                   onclick="return confirm('Apakah Anda yakin? Ini akan menghapus bracket yang sudah ada dan mengembalikan Anda ke halaman seeding.');"
+                   class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300">
+                    Reset Bracket
+                </a>
+            </div>
+
+            <div class="bracket-container">
+                <div id="bracket-content" data-competition-id="{{ competition.id }}">
+                    <p class="text-white">Bracket visualization will be rendered here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Hidden script tags to safely pass data -->
+<script id="teams-data" type="application/json">{{ teams_data_json|safe }}</script>
+<script id="matches-data" type="application/json">{{ matches_data_json|safe }}</script>
+{% csrf_token %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-bracket/0.11.0/jquery.bracket.min.js"></script>
+<script src="{% static 'js/jquery.gracket.min.js' %}"></script>
+
+<script>
+$(document).ready(function() {
+    const matchesExist = {{ competition.matches.exists|yesno:"true,false" }};
+
+    if (!matchesExist) {
+        const seedingListEl = document.getElementById('seeding-list');
+        const pairingsContainer = $('#visual-pairings-container');
+
+        if (seedingListEl) {
+            function updateVisualPairings() {
+                const items = Array.from(seedingListEl.querySelectorAll('.seed-item'));
+                const teams = items.map((item, index) => ({
+                    id: item.dataset.id,
+                    name: item.querySelector('.seed-name').textContent,
+                    originalIndex: index + 1
+                }));
+
+                pairingsContainer.empty();
+
+                const numTeams = teams.length;
+                if (numTeams === 0) return;
+
+                let matchNumber = 1;
+
+                for (let i = 0; i < numTeams; i += 2) {
+                    const team1 = teams[i];
+                    const team2 = (i + 1 < numTeams) ? teams[i + 1] : null;
+
+                    if (team2) {
+                        // It's a match
+                        const matchBox = `
+                            <div class="match-pairing-box">
+                                <div class="match-pairing-header">Match ${matchNumber}</div>
+                                <div class="match-pairing-body">
+                                    <div class="paired-team">
+                                        <span class="seed-name">${team1.name}</span>
+                                        <span class="seed-number">#${team1.originalIndex}</span>
+                                    </div>
+                                    <div class="vs-divider">vs</div>
+                                    <div class="paired-team">
+                                        <span class="seed-name">${team2.name}</span>
+                                        <span class="seed-number">#${team2.originalIndex}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        pairingsContainer.append(matchBox);
+                        matchNumber++;
+                    } else {
+                        // It's a bye for the last team
+                        const byeBox = `
+                            <div class="match-pairing-box bye-box">
+                                <div class="match-pairing-body">
+                                    <div class="paired-team">
+                                        <span class="seed-name">${team1.name}</span>
+                                        <span class="seed-number">#${team1.originalIndex}</span>
+                                    </div>
+                                    <div class="vs-divider">BYE</div>
+                                </div>
+                            </div>
+                        `;
+                        pairingsContainer.append(byeBox);
+                    }
+                }
+            }
+
+            const sortable = new Sortable(seedingListEl, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onUpdate: function (evt) {
+                    // Re-number the draggable list
+                    $(seedingListEl).children().each(function(index) {
+                        $(this).find('.seed-number').text('#' + (index + 1));
+                    });
+                    // Update the visual pairings on the right
+                    updateVisualPairings();
+                }
+            });
+
+            // Initial render
+            updateVisualPairings();
+
+            $('#save-seeding-btn').on('click', function() {
+                const btn = $(this);
+                btn.prop('disabled', true).text('Saving...');
+                const orderedTeamIds = sortable.toArray();
+                $.ajax({
+                    url: "{% url 'gms:save_seeding_and_generate_matches' competition.id %}",
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ ordered_ids: orderedTeamIds }),
+                    headers: { 'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val() },
+                    success: function(response) {
+                        if (response.success) {
+                            window.location.reload();
+                        } else {
+                            alert('Error: ' + response.error);
+                            btn.prop('disabled', false).text('💾 Simpan Urutan & Buat Bracket');
+                        }
+                    },
+                    error: function() {
+                        alert('An unknown error occurred.');
+                        btn.prop('disabled', false).text('💾 Simpan Urutan & Buat Bracket');
+                    }
+                });
+            });
+        }
+    } else {
+        // Get bracket data from script tags
+        const teamsData = JSON.parse(document.getElementById('teams-data').textContent);
+        const matchesData = JSON.parse(document.getElementById('matches-data').textContent);
+
+        console.log('Teams data:', teamsData);
+        console.log('Matches data:', matchesData);
+
+        // Render bracket using Gracket
+        renderGracket(matchesData, teamsData);
+    }
+
+    function renderGracket(matches, teams) {
+        const bracketContainer = $('#bracket-content');
+
+        if (matches.length === 0) {
+            bracketContainer.html('<p class="text-white">No matches generated yet.</p>');
+            return;
+        }
+
+        // Group matches by round for Gracket format
+        const matchesByRound = {};
+        matches.forEach(match => {
+            const round = match.round_number || 1;
+            if (!matchesByRound[round]) {
+                matchesByRound[round] = [];
+            }
+            matchesByRound[round].push(match);
+        });
+
+        // Sort rounds
+        const rounds = Object.keys(matchesByRound).sort((a, b) => parseInt(a) - parseInt(b));
+
+        // Create the Gracket container and render bracket
+        bracketContainer.empty();
+        const gracketDiv = $('<div id="gracket-view" class="bracket-container-content"></div>');
+        bracketContainer.append(gracketDiv);
+
+        // Create bracket structure for the local Gracket plugin
+        const gracketData = [];
+
+        // Group matches by round
+        const matchesByRoundGrouped = {};
+        matches.forEach(match => {
+            const round = match.round_number || 1;
+            if (!matchesByRoundGrouped[round]) {
+                matchesByRoundGrouped[round] = [];
+            }
+            matchesByRoundGrouped[round].push(match);
+        });
+
+        // Sort rounds and process each round
+        const sortedRounds = Object.keys(matchesByRoundGrouped).sort((a, b) => parseInt(a) - parseInt(b));
+
+        sortedRounds.forEach(roundNumber => {
+            const roundMatches = matchesByRoundGrouped[roundNumber];
+            const roundGames = [];
+
+            // Process each match in this round
+            roundMatches.forEach(match => {
+                // Create teams for this game
+                const team1 = {
+                    name: match.home_team_name || 'TBD',
+                    seed: 0,
+                    score: match.home_score !== null ? match.home_score : 0
+                };
+
+                const team2 = {
+                    name: match.away_team_name || 'TBD',
+                    seed: 0,
+                    score: match.away_score !== null ? match.away_score : 0
+                };
+
+                roundGames.push([team1, team2]);
+            });
+
+            gracketData.push(roundGames);
+        });
+
+        // Create the Gracket container
+        const gracketContainer = $('<div class="my_gracket" style="min-height: 500px;"></div>');
+        gracketDiv.append(gracketContainer);
+
+        try {
+            // Initialize the local Gracket plugin
+            gracketContainer.gracket({
+                src: gracketData,
+                roundLabels: sortedRounds.map((round, index) => {
+                    const totalRounds = sortedRounds.length;
+                    if (totalRounds === 1) return 'Round';
+                    if (round === Math.max(...sortedRounds)) return 'Final';
+                    if (round === Math.max(...sortedRounds) - 1) return 'Semi-Final';
+                    if (round === Math.max(...sortedRounds) - 2) return 'Quarter-Final';
+                    return `Round ${round}`;
+                })
+            });
+        } catch (error) {
+            console.error('Gracket error:', error);
+            gracketDiv.html('<p class="text-white">Error rendering Gracket: ' + error.message + '</p>');
+        }
+    }
+});
+</script>
+{% endblock %}

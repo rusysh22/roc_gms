@@ -1,0 +1,631 @@
+/* Custom styles for the Games Management System */
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --accent-color: #0d9488; /* teal */
+  
+  /* Additional theme variables */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-card: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+  --border-primary: #e5e7eb;
+  --border-secondary: #d1d5db;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --accent-primary: #2563eb;
+  --accent-hover: #1d4ed8;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+}
+
+/* Dark theme variables */
+.dark {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-card: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+  --border-primary: #334155;
+  --border-secondary: #475569;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --accent-primary: #60a5fa;
+  --accent-hover: #93c5fd;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f87171;
+}
+
+/* Custom styles for navigation */
+.nav-link {
+  @apply px-3 py-2 rounded-md text-sm font-medium;
+}
+
+.nav-link:hover {
+  @apply text-gray-900;
+}
+
+.nav-link.active {
+  @apply bg-blue-100 text-blue-700;
+}
+
+/* Custom styles for cards */
+.card {
+  @apply bg-white rounded-xl shadow-md overflow-hidden;
+}
+
+.card-header {
+  @apply px-6 py-4 bg-gray-50 border-b border-gray-200;
+}
+
+.card-body {
+  @apply p-6;
+}
+
+/* Custom styles for tables */
+.table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.table th {
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.table td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-500;
+}
+
+/* Custom styles for buttons */
+.btn-primary {
+  @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50;
+}
+
+/* Custom styles for badges */
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-gold {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-silver {
+  @apply bg-gray-100 text-gray-800;
+}
+
+.badge-bronze {
+  @apply bg-amber-100 text-amber-800;
+}
+
+.badge-status {
+  @apply bg-blue-100 text-blue-800;
+}
+
+/* Custom styles for match cards */
+.match-card {
+  @apply border border-gray-200 rounded-lg p-4 hover:bg-gray-50;
+}
+
+.match-card.scheduled {
+  @apply border-blue-200;
+}
+
+.match-card.completed {
+  @apply border-green-200;
+}
+
+.match-card.postponed {
+  @apply border-yellow-200;
+}
+
+/* Custom styles for standings table */
+.standings-table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.standings-table th {
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-50;
+}
+
+.standings-table td {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    @apply px-4;
+  }
+  
+  .card-body {
+    @apply p-4;
+  }
+  
+  .table {
+    @apply overflow-x-auto;
+  }
+}
+
+/* Custom styles for HTMX indicators */
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator {
+  display: inline;
+}
+
+.htmx-request {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Enhanced dark mode overrides for consistent contrast */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+.text-secondary {
+  color: var(--text-secondary);
+}
+.text-tertiary {
+  color: var(--text-tertiary);
+}
+
+/* Background color utilities */
+.bg-primary {
+  background-color: var(--bg-primary);
+}
+.bg-secondary {
+  background-color: var(--bg-secondary);
+}
+.bg-tertiary {
+  background-color: var(--bg-tertiary);
+}
+.bg-card {
+  background-color: var(--bg-card);
+}
+
+/* Border color utilities */
+.border-primary {
+  border-color: var(--border-primary);
+}
+.border-secondary {
+  border-color: var(--border-secondary);
+}
+
+/* Enhanced dark theme overrides for specific components */
+.dark .bg-white {
+  background-color: var(--bg-card) !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.dark .bg-gray-200 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.dark .bg-blue-50 {
+  background-color: rgba(96, 165, 250, 0.1) !important;
+}
+
+.dark .bg-red-50 {
+  background-color: rgba(248, 113, 113, 0.1) !important;
+}
+
+.dark .bg-green-100 {
+  background-color: rgba(52, 211, 153, 0.15) !important;
+}
+
+.dark .bg-blue-100 {
+  background-color: rgba(96, 165, 250, 0.15) !important;
+}
+
+/* Text color overrides for dark theme */
+.dark .text-gray-900 {
+  color: var(--text-primary) !important;
+}
+
+.dark .text-gray-800 {
+  color: var(--text-primary) !important;
+}
+
+.dark .text-gray-700 {
+  color: var(--text-secondary) !important;
+}
+
+.dark .text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+
+.dark .text-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+
+.dark .text-gray-400 {
+  color: var(--text-tertiary) !important;
+}
+
+.dark .text-gray-300 {
+  color: var(--text-tertiary) !important;
+}
+
+.dark .text-blue-600 {
+  color: var(--accent-primary) !important;
+}
+
+.dark .text-blue-800 {
+  color: var(--accent-hover) !important;
+}
+
+.dark .text-green-800 {
+  color: var(--success) !important;
+}
+
+.dark .text-green-600 {
+  color: var(--success) !important;
+}
+
+.dark .text-red-600 {
+  color: var(--error) !important;
+}
+
+/* Border color overrides for dark theme */
+.dark .border-gray-200 {
+  border-color: var(--border-primary) !important;
+}
+
+.dark .border-gray-300 {
+  border-color: var(--border-secondary) !important;
+}
+
+.dark .border-blue-300 {
+  border-color: rgba(96, 165, 250, 0.4) !important;
+}
+
+.dark .border-red-300 {
+  border-color: rgba(248, 113, 113, 0.4) !important;
+}
+
+/* Hover states for dark theme */
+.dark .hover\:bg-gray-50:hover {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: var(--bg-tertiary) !important;
+}
+
+/* Button styles for dark theme */
+.btn-primary {
+  background-color: var(--accent-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.dark .btn-primary {
+  background-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.dark .btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+}
+
+.dark .btn-secondary {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-secondary);
+}
+
+/* Table styles for dark theme */
+.table th {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-primary);
+}
+
+.table td {
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.dark .table th {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-secondary);
+}
+
+.dark .table td {
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+/* Card styles for dark theme */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+.card-header {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+.card-body {
+  color: var(--text-secondary);
+}
+
+.dark .card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+.dark .card-header {
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-secondary);
+  color: var(--text-primary);
+}
+
+.dark .card-body {
+  color: var(--text-secondary);
+}
+
+/* Badge styles for dark theme */
+.badge {
+  color: white; /* Ensure text is white for better contrast */
+}
+
+.badge-gold {
+  background-color: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+.badge-silver {
+  background-color: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+.badge-bronze {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.badge-status {
+  background-color: rgba(96, 165, 250, 0.15);
+  color: var(--accent-primary);
+}
+
+.dark .badge-gold {
+  background-color: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+.dark .badge-silver {
+  background-color: rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+}
+
+.dark .badge-bronze {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.dark .badge-status {
+  background-color: rgba(96, 165, 250, 0.2);
+  color: var(--accent-hover);
+}
+
+/* Match card styles for dark theme */
+.match-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+.match-card:hover {
+  background-color: var(--bg-secondary);
+}
+
+.dark .match-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+}
+
+.dark .match-card:hover {
+  background-color: var(--bg-tertiary);
+}
+
+/* Standings table styles for dark theme */
+.standings-table th {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.standings-table td {
+  color: var(--text-secondary);
+}
+
+.dark .standings-table th {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.dark .standings-table td {
+  color: var(--text-secondary);
+}
+
+/* Glassmorphism styles with theme support */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text-primary);
+}
+
+.dark .glass {
+  background: rgba(31, 41, 55, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.glass-pane {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  color: var(--text-primary);
+}
+
+.dark .glass-pane {
+  background: rgba(17, 24, 39, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text-primary);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Premium card styles */
+.premium-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text-primary);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dark .premium-card {
+  background: rgba(17, 24, 39, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+/* Header glass effect */
+.header-glass {
+  background: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.dark .header-glass {
+  background: rgba(17, 24, 39, 0.70);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Transparent header */
+.transparent-header {
+  background: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.dark .transparent-header {
+  background: rgba(17, 24, 39, 0.70);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Header glass pane with glassmorphism effect */
+.header-glass-pane {
+  background: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.dark .header-glass-pane {
+  background: rgba(17, 24, 39, 0.70);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Improved contrast for form elements */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+select,
+textarea {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+}
+
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="date"],
+.dark select,
+.dark textarea {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-secondary);
+}
+
+/* Improved contrast for links */
+a {
+  color: var(--accent-primary);
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+.dark a {
+  color: var(--accent-primary);
+}
+
+.dark a:hover {
+  color: var(--accent-hover);
+}
+
+/* Footer styles for dark theme */
+footer {
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+}
+
+.dark footer {
+  background-color: var(--bg-tertiary);
+  border-top: 1px solid var(--border-secondary);
+  color: var(--text-tertiary);
+}

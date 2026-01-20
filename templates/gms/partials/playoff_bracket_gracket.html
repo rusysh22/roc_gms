@@ -1,0 +1,139 @@
+<div id="playoff-bracket-container" class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-800">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Single Elimination Bracket</h2>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300">
+            {{ gracket_data|length }} rounds
+        </span>
+    </div>
+    
+    <!-- Tournament Bracket with jQuery Gracket -->
+    <div id="bracket-viewer-container" class="theme theme-dark overflow-x-auto py-4">
+        <div id="my-gracket" class="my_gracket" style="min-height: 500px;"></div>
+        
+        {% if not gracket_data %}
+        <div class="text-center py-12 w-full">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No bracket structure generated yet</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Generate the bracket structure in the Match Setup panel to see the playoff format.
+            </p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Bracket Legend -->
+    <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+            <div class="flex items-center">
+                <div class="w-3 h-3 rounded bg-indigo-500 mr-2"></div>
+                <span class="text-gray-700 dark:text-gray-300">Team 1</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 rounded bg-indigo-400 mr-2"></div>
+                <span class="text-gray-700 dark:text-gray-300">Team 2</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 rounded bg-emerald-500 mr-2"></div>
+                <span class="text-gray-700 dark:text-gray-300">Winner</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 rounded-full bg-amber-500 mr-2"></div>
+                <span class="text-gray-700 dark:text-gray-300">Current Match</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden script tags to safely pass data -->
+    <script id="gracket-data" type="application/json">{{ gracket_data|safe }}</script>
+    <script id="gracket-round-labels" type="application/json">{{ gracket_round_labels|safe }}</script>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeGracket();
+});
+
+function initializeGracket() {
+    // Small delay to ensure DOM is fully rendered
+    setTimeout(function() {
+        // Check if jQuery and gracket are available
+        if (typeof $ !== 'undefined' && $.fn.gracket) {
+            // Safely get the data from script tags
+            var bracketDataRaw = document.getElementById('gracket-data');
+            var roundLabelsRaw = document.getElementById('gracket-round-labels');
+            
+            if (bracketDataRaw && roundLabelsRaw) {
+                var bracketData = JSON.parse(bracketDataRaw.textContent);
+                var roundLabels = JSON.parse(roundLabelsRaw.textContent);
+                
+                // Only initialize if we have bracket data
+                if (bracketData && bracketData.length > 0) {
+                    // Initialize Gracket with proper settings
+                    $("#my-gracket").gracket({ 
+                        src: bracketData,
+                        roundLabels: roundLabels,
+                        canvasLineColor: '#9ca3af',
+                        canvasLineWidth: 2,
+                        canvasLineCap: "round",
+                        cornerRadius: 10,
+                        canvasLineGap: 12
+                    });
+                    
+                    // Add a subtle animation effect to the bracket
+                    $('#my-gracket').css({
+                        'opacity': '0',
+                        'transform': 'translateY(20px)'
+                    });
+                    
+                    // Animate in the bracket
+                    setTimeout(function() {
+                        $('#my-gracket').animate({opacity: 1}, 300).css({'transform': 'translateY(0)'});
+                        
+                        // Force canvas resize and redraw after animation
+                        setTimeout(function() {
+                            if (typeof $ !== 'undefined' && $.fn.gracket) {
+                                // Get the canvas element and manually resize it
+                                var canvasId = $("#my-gracket").data('gracket').canvasId;
+                                if (canvasId) {
+                                    var canvas = document.getElementById(canvasId);
+                                    if (canvas) {
+                                        // Update canvas size based on container
+                                        var container = $("#my-gracket");
+                                        canvas.height = container.innerHeight();
+                                        canvas.width = container.innerWidth();
+                                        
+                                        // Apply styles to canvas
+                                        $(canvas).css({
+                                            height: container.innerHeight(),
+                                            width: container.innerWidth(),
+                                            zIndex: 1,
+                                            pointerEvents: 'none'
+                                        });
+                                    }
+                                }
+                            }
+                        }, 300);
+                    }, 100);
+                }
+            }
+        }
+    }, 150); // Delay to ensure DOM elements are properly laid out
+}
+
+// Handle dark mode changes and reinitialize if needed
+if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+        // Reinitialize the bracket with the new theme
+        setTimeout(initializeGracket, 50);
+    });
+}
+
+// Also handle HTMX swap events if present
+document.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target.id === 'playoff-bracket-container') {
+        setTimeout(initializeGracket, 300);
+    }
+});
+</script>

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.name }} - {{ site_config.site_name|default:"Corporate Games Hub" }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Event Header -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8 dark:bg-gray-800">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ event.name }}</h1>
+                <div class="mt-2 flex flex-wrap items-center text-gray-600 dark:text-gray-300">
+                    <div class="flex items-center mr-6 mb-2 md:mb-0">
+                        <svg class="w-5 h-5 mr-1 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>{{ event.start_date|date:"M d, Y" }} - {{ event.end_date|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                            {{ event.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800">
+                    Register Team
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-8">
+        <div class="border-b border-gray-200 dark:border-gray-700">
+            <nav class="flex space-x-8">
+                <button hx-get="{% url 'gms:event_overview_partial' event.id %}" 
+                        hx-target="#tab-content" 
+                        hx-swap="innerHTML" 
+                        class="tab-btn border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium dark:text-blue-400">Overview</button>
+                <button hx-get="{% url 'gms:event_schedule_partial' event.id %}" 
+                        hx-target="#tab-content" 
+                        hx-swap="innerHTML" 
+                        class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600">Schedule</button>
+                <button hx-get="{% url 'gms:event_medals_partial' event.id %}" 
+                        hx-target="#tab-content" 
+                        hx-swap="innerHTML" 
+                        class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600">Medals</button>
+                <button hx-get="{% url 'gms:event_announcements_partial' event.id %}" 
+                        hx-target="#tab-content" 
+                        hx-swap="innerHTML" 
+                        class="tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600">Announcements</button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Tab content area -->
+    <div id="tab-content">
+        <!-- Load the overview partial by default -->
+        {% include 'gms/partials/event_overview.html' %}
+    </div>
+</div>
+
+</div>
+{% endblock %}

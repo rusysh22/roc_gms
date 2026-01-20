@@ -1,0 +1,462 @@
+/* Original Gracket CSS - Based on jQuery Gracket plugin styling */
+.g_gracket {
+  width: 9999px;
+  background-color: #fff;
+  padding: 55px 15px 5px;
+  line-height: 100%;
+  position: relative;
+  overflow: visible; /* Changed from hidden to visible to ensure canvas lines are visible */
+  font-family: Arial, sans-serif;
+  box-sizing: content-box;
+  min-height: 500px;
+}
+
+.g_round {
+  float: left;
+  margin-right: 70px;
+  position: relative; /* Added position for canvas to position properly */
+}
+
+.g_game {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.g_gracket h3 {
+  margin: 0;
+  padding: 10px 8px 8px;
+  font-size: 18px;
+  font-weight: normal;
+  color: #fff;
+}
+
+.g_team {
+  background: #3597AE;
+}
+
+.g_team:last-child {
+  background: #FCB821;
+}
+
+.g_round:last-child {
+  margin-right: 20px;
+}
+
+.g_winner {
+  background: #444;
+}
+
+.g_winner .g_team {
+  background: none;
+}
+
+.g_current {
+  cursor: pointer;
+  background: #A0B43C !important;
+}
+
+.g_round_label {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  width: 100%;
+  font-weight: bold;
+  color: #666;
+  text-align: center;
+  font-size: 16px;
+  padding: 8px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transform: translateY(-100%);
+  margin-bottom: 10px;
+}
+
+.g_spacer {
+  width: 100%;
+}
+
+.g_canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  background: transparent; /* Ensure canvas is transparent to not block lines */
+}
+
+.g_seed {
+  font-size: 12px;
+  font-weight: bold;
+  background-color: #94a3b8;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 12px;
+  margin-right: 6px;
+  min-width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Bracket container styling */
+.bracket-container {
+  position: relative;
+  width: 100%;
+  min-height: 500px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 0;
+}
+
+/* Custom styling to enhance the original look */
+.my_gracket {
+  position: relative;
+  min-height: 400px;
+  padding-top: 40px;
+}
+
+/* Dark mode support */
+.dark .g_gracket {
+  background-color: #1e293b;
+  color: white;
+}
+
+.dark .g_team {
+  background: #0ea5e9;
+}
+
+.dark .g_team:last-child {
+  background: #f97316;
+  color: #f8fafc;
+}
+
+.dark .g_round_label {
+  color: #94a3b8;
+}
+
+.dark .g_winner {
+  background: #4b5563;
+}
+
+.dark .g_current {
+  background: #84cc16 !important;
+}
+
+/* Modal Styles */
+.match-detail-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.match-detail-modal-content {
+  background-color: #ffffff;
+  margin: 5% auto;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: modalSlideIn 0.3s ease-out;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.match-detail-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  border-radius: 12px 12px 0 0;
+}
+
+.match-detail-modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.match-detail-modal-close {
+  color: #64748b;
+  font-size: 24px;
+  font-weight: normal;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.match-detail-modal-close:hover {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.match-detail-modal-close::before {
+  content: "×";
+  position: absolute;
+}
+
+.match-detail-modal-body {
+  padding: 24px;
+}
+
+.match-detail-item {
+  display: flex;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.match-detail-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.match-detail-label {
+  font-weight: 600;
+  color: #64748b;
+  min-width: 140px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.match-detail-value {
+  color: #1e293b;
+  flex: 1;
+  word-break: break-word;
+}
+
+.match-detail-winner {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.match-detail-status {
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-completed {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-scheduled {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-upcoming {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.match-detail-vs {
+  text-align: center;
+  font-weight: 600;
+  color: #94a3b8;
+  margin: 10px 0;
+  font-size: 1.1rem;
+}
+
+.match-detail-teams {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.match-detail-team {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid #e2e8f0;
+}
+
+.match-detail-team.winner {
+  background-color: #dcfce7;
+  border-left-color: #16a34a;
+}
+
+.match-detail-team-name {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.match-detail-team-score {
+  font-weight: 700;
+  min-width: 36px;
+  text-align: right;
+  font-size: 1.1rem;
+}
+
+.match-detail-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e2e8f0;
+  text-align: right;
+  background-color: #f8fafc;
+  border-radius: 0 0 12px 12px;
+}
+
+.match-detail-modal-footer button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid #cbd5e1;
+  background-color: #f1f5f9;
+  color: #334155;
+}
+
+.match-detail-modal-footer button:hover {
+  background-color: #e2e8f0;
+}
+
+/* Dark mode support for modals */
+.dark .match-detail-modal-content {
+  background-color: #1e293b;
+  color: white;
+}
+
+.dark .match-detail-modal-header {
+  border-bottom: 1px solid #334155;
+  background-color: #334155;
+}
+
+.dark .match-detail-modal-title {
+  color: #e2e8f0;
+}
+
+.dark .match-detail-label {
+  color: #94a3b8;
+}
+
+.dark .match-detail-value {
+  color: #e2e8f0;
+}
+
+.dark .match-detail-team {
+  background-color: #334155;
+}
+
+.dark .match-detail-team.winner {
+  background-color: #166534;
+  border-left-color: #4ade80;
+}
+
+.dark .match-detail-team-name {
+  color: #e2e8f0;
+}
+
+.dark .match-detail-modal-body {
+  border-bottom: 1px solid #334155;
+}
+
+.dark .match-detail-modal-footer {
+  background-color: #334155;
+  border-top: 1px solid #334155;
+}
+
+.dark .match-detail-modal-footer button {
+  background-color: #334155;
+  border: 1px solid #475569;
+  color: #cbd5e1;
+}
+
+.dark .match-detail-modal-footer button:hover {
+  background-color: #475569;
+}
+
+.dark .match-detail-modal-close {
+  color: #94a3b8;
+}
+
+.dark .match-detail-modal-close:hover {
+  background-color: #334155;
+  color: #e2e8f0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .g_gracket {
+    padding: 20px 10px 5px;
+    min-height: 400px;
+  }
+  
+  .g_round {
+    margin-right: 40px;
+    min-width: 140px;
+  }
+  
+  .g_game {
+    margin-bottom: 12px;
+  }
+  
+  .g_gracket h3 {
+    font-size: 14px;
+    padding: 8px 6px 6px;
+  }
+  
+  .g_round_label {
+    font-size: 14px;
+    top: -5px;
+  }
+  
+  .g_seed {
+    font-size: 10px;
+    min-width: 20px;
+    padding: 2px 4px;
+  }
+  
+  .match-detail-modal-content {
+    margin: 15% auto 5% auto;
+    width: 95%;
+    max-width: 95%;
+  }
+  
+  .match-detail-modal-header {
+    padding: 15px 20px 12px;
+  }
+  
+  .match-detail-modal-body {
+    padding: 16px 20px;
+  }
+}

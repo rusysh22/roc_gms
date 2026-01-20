@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ competition.name }} - {{ site_config.site_name|default:"Corporate Games Hub" }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Competition Header -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8 dark:bg-gray-800">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ competition.name }}</h1>
+                <div class="mt-2 flex flex-wrap items-center text-gray-600 dark:text-gray-300">
+                    <div class="flex items-center mr-6 mb-2 md:mb-0">
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Event:</span>
+                        <a href="{% url 'gms:event_detail' competition.event.id %}" class="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-black">
+                            {{ competition.event.name }}
+                        </a>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Format:</span>
+                        <span class="ml-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                            {{ competition.format.name }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Register Team
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-8">
+        <div class="border-b border-gray-200 dark:border-gray-700">
+            <nav class="flex space-x-8">
+                {% if competition.format.format_type == 'SINGLE_ELIMINATION' %}
+                    <button hx-get="{% url 'gms:competition_bracket_display_partial' competition.id %}" hx-target="#tab-content" hx-swap="innerHTML" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium border-blue-500 text-blue-600 dark:text-blue-400">
+                        Bracket
+                    </button>
+                    <button hx-get="{% url 'gms:competition_schedule_partial' competition.id %}" hx-target="#tab-content" hx-swap="innerHTML" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600">
+                        Schedule
+                    </button>
+                {% else %}
+                    <button hx-get="{% url 'gms:competition_schedule_partial' competition.id %}" hx-target="#tab-content" hx-swap="innerHTML" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium border-blue-500 text-blue-600 dark:text-blue-400">
+                        Schedule
+                    </button>
+                {% endif %}
+                <button hx-get="{% url 'gms:competition_standings_partial' competition.id %}" hx-target="#tab-content" hx-swap="innerHTML" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600">
+                    Standings
+                </button>
+                <button hx-get="{% url 'gms:competition_results_partial' competition.id %}" hx-target="#tab-content" hx-swap="innerHTML" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600">
+                    Results
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column - Tab content -->
+        <div class="lg:col-span-2">
+            <!-- Tab content area -->
+            <div id="tab-content">
+                {% if competition.format.format_type == 'SINGLE_ELIMINATION' %}
+                    {% include 'gms/partials/competition_bracket_display.html' %}
+                {% else %}
+                    {% include 'gms/partials/competition_schedule.html' %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column - Info and Standings (only for non-bracket formats) -->
+        <div class="space-y-8">
+            <!-- Show standings in right column only for league/round-robin, not for bracket formats -->
+            {% if competition.format.format_type != 'SINGLE_ELIMINATION' and competition.format.format_type != 'DOUBLE_ELIMINATION' and competition.format.format_type != 'KNOCKOUT' %}
+            <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-800">
+                <h2 class="text-xl font-bold text-gray-900 mb-6 dark:text-white">Standings</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Pos</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Club</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">P</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">W</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">D</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">L</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                            {% for standing in standings|dictsortreversed:"points" %}
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ forloop.counter }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{{ standing.club.name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ standing.played }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ standing.wins }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ standing.draws }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{{ standing.losses }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-white">{{ standing.points }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                        No standings available yet
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Competition Info -->
+            <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-800">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Competition Info</h2>
+                <div class="grid grid-cols-3 gap-x-4 gap-y-3 text-sm">
+                    <p class="col-span-1 text-gray-500 dark:text-gray-400">Format</p>
+                    <p class="col-span-2 font-medium text-gray-800 dark:text-gray-200">{{ competition.format.name }}</p>
+
+                    <p class="col-span-1 text-gray-500 dark:text-gray-400">Participants</p>
+                    <p class="col-span-2 font-medium text-gray-800 dark:text-gray-200">{{ competition.get_participant_type_display }}</p>
+
+                    {% if competition.participant_type == 'CLUBS' %}
+                        <p class="col-span-1 text-gray-500 dark:text-gray-400">Enrolled</p>
+                        <p class="col-span-2 font-medium text-gray-800 dark:text-gray-200">{{ competition.enrolled_clubs.count }} / {{ competition.number_of_clubs|default:"-" }} clubs</p>
+                    {% else %}
+                        <p class="col-span-1 text-gray-500 dark:text-gray-400">Enrolled</p>
+                        <p class="col-span-2 font-medium text-gray-800 dark:text-gray-200">{{ competition.enrolled_participants.count }} / {{ competition.number_of_participants|default:"-" }} participants</p>
+                    {% endif %}
+
+                    <p class="col-span-1 text-gray-500 dark:text-gray-400">Matches</p>
+                    <p class="col-span-2 font-medium text-gray-800 dark:text-gray-200">{{ competition.matches.count }} scheduled</p>
+
+                    <p class="col-span-1 text-gray-500 dark:text-gray-400">Dates</p>
+                    <p class="col-span-2 font-medium text-gray-800 dark:text-gray-200">
+                        {% if competition.start_date and competition.end_date %}
+                            {{ competition.start_date|date:"M d" }} - {{ competition.end_date|date:"M d, Y" }}
+                        {% elif competition.start_date %}
+                            Starts {{ competition.start_date|date:"M d, Y" }}
+                        {% else %}
+                            TBD
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <!-- Competition Medals -->
+            <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-800">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Medals</h2>
+                    <!-- Only show award button if user is admin or event coordinator -->
+                    {% if user.is_superuser or user in competition.event.coordinators.all %}
+                        <form method="post" action="{% url 'gms:award_competition_medals' competition.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-black">
+                                Award Medals
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+                <div class="space-y-3">
+                    {% for medal in competition_medals %}
+                        <div class="flex items-center p-3 border border-gray-200 rounded-lg dark:border-gray-700 dark:bg-gray-700/50">
+                            <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full {% if medal.medal_type == 'GOLD' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300{% elif medal.medal_type == 'SILVER' %}bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300{% elif medal.medal_type == 'BRONZE' %}bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300{% endif %}">
+                                {% if medal.medal_type == 'GOLD' %}
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                                    </svg>
+                                {% elif medal.medal_type == 'SILVER' %}
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                                    </svg>
+                                {% elif medal.medal_type == 'BRONZE' %}
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                                    </svg>
+                                {% endif %}
+                            </div>
+                            <div class="ml-3">
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ medal.club.name }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ medal.get_medal_type_display }}</div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-4">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No medals awarded yet</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+
+
+            <!-- Enrolled Clubs -->
+            <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-800">
+                <div class="space-y-3 max-h-72 overflow-y-auto">
+                    {% for club in competition.enrolled_clubs.all %}
+                        <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg dark:border-gray-700 dark:bg-gray-700/50">
+                            <div class="flex items-center">
+                                {% if club.logo %}
+                                    <img class="h-8 w-8 rounded-full" src="{{ club.logo.url }}" alt="{{ club.name }}">
+                                {% else %}
+                                    <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center dark:bg-gray-600">
+                                        <span class="text-xs font-medium text-gray-600 dark:text-gray-300">{{ club.name.0|upper }}</span>
+                                    </div>
+                                {% endif %}
+                                <span class="ml-3 text-sm font-medium text-gray-900 dark:text-white">{{ club.name }}</span>
+                            </div>
+                            <a href="{% url 'gms:club_detail' club.id %}" class="text-blue-600 hover:text-blue-800 text-sm dark:text-blue-400 dark:hover:text-black">View</a>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-4">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">No clubs enrolled yet</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

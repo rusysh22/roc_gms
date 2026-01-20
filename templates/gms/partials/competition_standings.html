@@ -1,0 +1,101 @@
+{% comment %} Partial for competition standings - only for league/round-robin formats {% endcomment %}
+{% if competition and competition.format and competition.format.format_type == 'LEAGUE' or competition.format.format_type == 'ROUND_ROBIN' %}
+    {% with standings|dictsortreversed:"points" as sorted_standings %}
+        {% if sorted_standings %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pos</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Club</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">W</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">D</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">L</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for standing in sorted_standings %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ forloop.counter }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ standing.club.name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ standing.played }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ standing.wins }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ standing.draws }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ standing.losses }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{{ standing.points }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <!-- Skeleton display when no standings exist yet -->
+            <div class="text-center py-12">
+                <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900 mb-1">Standings Not Available Yet</h3>
+                <p class="text-sm text-gray-500 mb-4">
+                    Standings will be generated once matches are completed
+                </p>
+                <div class="bg-gray-200 border-2 border-dashed rounded-xl p-8 text-center">
+                    <p class="text-sm text-gray-500">Example Table Structure</p>
+                    <div class="mt-4 text-left">
+                        <div class="grid grid-cols-7 gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <div>Pos</div>
+                            <div>Club</div>
+                            <div>P</div>
+                            <div>W</div>
+                            <div>D</div>
+                            <div>L</div>
+                            <div>Pts</div>
+                        </div>
+                        <div class="mt-2 space-y-2">
+                            <div class="grid grid-cols-7 gap-2 text-sm">
+                                <div class="font-medium text-gray-900">1</div>
+                                <div class="font-medium text-gray-900">TBD</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="font-bold text-gray-900">0</div>
+                            </div>
+                            <div class="grid grid-cols-7 gap-2 text-sm">
+                                <div class="font-medium text-gray-900">2</div>
+                                <div class="font-medium text-gray-900">TBD</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="font-bold text-gray-900">0</div>
+                            </div>
+                            <div class="grid grid-cols-7 gap-2 text-sm">
+                                <div class="font-medium text-gray-900">3</div>
+                                <div class="font-medium text-gray-900">TBD</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="text-gray-500">0</div>
+                                <div class="font-bold text-gray-900">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
+{% else %}
+    <!-- For elimination formats, display bracket info instead -->
+    <div class="text-center py-8">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">Standings not applicable</h3>
+        <p class="mt-1 text-sm text-gray-500">
+            Standings not applicable for elimination formats. 
+            See bracket view for tournament progress.
+        </p>
+    </div>
+{% endif %}

@@ -1,0 +1,935 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Bracket: {{ competition.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/jquery.bracket.min.css' %}" />
+<style>
+    /* --- Seeding Section --- */
+    #seeding-section .seeding-container {
+        display: grid;
+        grid-template-columns: 1fr 0.8fr;
+        gap: 2rem;
+    }
+
+    /* Draggable List Panel */
+    #seeding-section #seeding-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        /* This forces children to fill the width */
+        text-align: left;
+        /* Ensure text alignment */
+    }
+
+    .seed-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        /* Ensure content starts from the left */
+        text-align: left;
+        /* Ensure text alignment */
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        background-color: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        cursor: grab;
+        width: 100%;
+        /* Ensure full width */
+    }
+
+    .dark .seed-item {
+        background-color: #374151;
+        border-color: #4b5563;
+    }
+
+    .seed-item.sortable-ghost {
+        opacity: 0.4;
+        background: #c7d2fe;
+    }
+
+    .seed-number {
+        font-weight: 600;
+        color: #4f46e5;
+        margin-right: 1rem;
+    }
+
+    .dark .seed-number {
+        color: #a5b4fc;
+    }
+
+    .seed-name {
+        font-weight: 500;
+        color: #111827;
+    }
+
+    .dark .seed-name {
+        color: #f3f4f6;
+    }
+
+    .handle {
+        margin-left: 1rem;
+        color: #9ca3af;
+        cursor: move;
+    }
+
+    /* Visual Pairings Panel */
+    #visual-pairings-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .match-pairing-box {
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        background-color: #f8fafc;
+        max-width: 400px;
+        /* Constrain the width of the pairing box */
+        /* margin: 0 auto; /* Center the box within its grid column */
+    }
+
+    .dark .match-pairing-box {
+        border-color: #4a5568;
+        background-color: #2d3748;
+    }
+
+    .match-pairing-header {
+        font-weight: 600;
+        padding: 0.25rem 1rem;
+        /* Reduced padding */
+        background-color: #f1f5f9;
+        border-bottom: 1px solid #cbd5e1;
+        border-radius: 0.5rem 0.5rem 0 0;
+    }
+
+    .dark .match-pairing-header {
+        background-color: #4a5568;
+        border-color: #4a5568;
+    }
+
+    .match-pairing-body {
+        padding: 0.5rem;
+        /* Reduced padding */
+    }
+
+    .paired-team {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.25rem;
+        /* Reduced padding */
+    }
+
+    .paired-team .seed-name {
+        font-weight: 500;
+    }
+
+    .paired-team .seed-number {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+
+    .dark .paired-team .seed-number {
+        color: #94a3b8;
+    }
+
+    .vs-divider {
+        text-align: center;
+        font-weight: bold;
+        color: #94a3b8;
+        margin: 0.125rem 0;
+        /* Reduced margin */
+    }
+
+    .bye-box {
+        border: 1px dashed #fbbf24;
+        background-color: #fefce8;
+        color: #b45309;
+    }
+
+    .dark .bye-box {
+        border-color: #d97706;
+        background-color: #453310;
+        color: #fefce8;
+    }
+
+    /* Bracket container styling */
+    .bracket-container {
+        overflow-x: auto;
+        background-color: #1f2937;
+        padding: 2rem;
+        border-radius: 0.75rem;
+    }
+
+    /* Bracket toggle buttons */
+    .bracket-toggle {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+
+    .bracket-toggle button {
+        padding: 8px 16px;
+        border: 1px solid #d1d5db;
+        background: white;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .bracket-toggle button.active {
+        background: #4F46E5;
+        color: white;
+        border-color: #4F46E5;
+    }
+
+    .dark .bracket-toggle button {
+        background: #374151;
+        border-color: #4b5563;
+        color: white;
+    }
+
+    .dark .bracket-toggle button.active {
+        background: #4F46E5;
+        border-color: #4F46E5;
+    }
+
+    .bracket-view {
+        display: none;
+    }
+
+    .bracket-view.active {
+        display: block;
+    }
+
+    /* --- Enhanced Bracket UI --- */
+    /* Container */
+    .bracket-container {
+        overflow-x: auto;
+        background-color: #f8fafc;
+        /* Light mode bg */
+        padding: 3rem;
+        border-radius: 1rem;
+        box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        border: 1px solid #e2e8f0;
+    }
+
+    .dark .bracket-container {
+        background-color: #111827;
+        /* Dark mode bg */
+        border-color: #374151;
+        box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.2);
+    }
+
+    /* Team Box */
+    .jQBracket .team {
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 0.5rem !important;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+        color: #1e293b !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease;
+    }
+
+    .dark .jQBracket .team {
+        background-color: #1f2937 !important;
+        border-color: #4b5563 !important;
+        color: #f3f4f6 !important;
+    }
+
+    /* Hover Effect */
+    .jQBracket .team:hover {
+        border-color: #6366f1 !important;
+        /* Indigo-500 */
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
+        z-index: 10;
+    }
+
+    /* Score Box */
+    .jQBracket .score {
+        background-color: #f1f5f9 !important;
+        color: #475569 !important;
+        font-weight: 700 !important;
+        border-left: 1px solid #cbd5e1 !important;
+        border-radius: 0 0.5rem 0.5rem 0 !important;
+    }
+
+    .dark .jQBracket .score {
+        background-color: #374151 !important;
+        color: #e5e7eb !important;
+        border-left-color: #4b5563 !important;
+    }
+
+    /* Winner Highlight */
+    .jQBracket .team.winner {
+        background-color: #eff6ff !important;
+        /* Blue-50 */
+        border-color: #3b82f6 !important;
+        /* Blue-500 */
+        color: #1d4ed8 !important;
+        /* Blue-700 */
+    }
+
+    .dark .jQBracket .team.winner {
+        background-color: #1e3a8a !important;
+        /* Blue-900 */
+        border-color: #60a5fa !important;
+        /* Blue-400 */
+        color: #dbeafe !important;
+        /* Blue-100 */
+    }
+
+    .jQBracket .team.winner .score {
+        background-color: #3b82f6 !important;
+        color: #ffffff !important;
+    }
+
+    /* Loser Style */
+    .jQBracket .team.loser {
+        opacity: 0.7;
+    }
+
+    /* Connectors */
+    .jQBracket .connector {
+        border-color: #94a3b8 !important;
+        /* Slate-400 */
+        border-width: 2px !important;
+    }
+
+    .dark .jQBracket .connector {
+        border-color: #4b5563 !important;
+        /* Gray-600 */
+    }
+
+    /* Highlighted Connector (on hover) */
+    .jQBracket .connector.highlight {
+        border-color: #6366f1 !important;
+        /* Indigo-500 */
+    }
+
+    /* Match Container */
+    .jQBracket .match {
+        margin-bottom: 10px !important;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ competition.name }}</h1>
+        <p class="text-lg text-gray-600 dark:text-gray-300">Bracket Management</p>
+    </div>
+
+    <div id="status-message" class="mt-4 hidden"></div>
+    {% csrf_token %}
+
+    {% if not competition.matches.exists %}
+    <div id="seeding-section" data-competition-id="{{ competition.id }}">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Step 1: Set Team Order (Seeding)</h2>
+                <nav aria-label="Breadcrumb" class="text-sm text-gray-500 dark:text-gray-400">
+                    <ol class="list-none p-0 inline-flex">
+                        <li class="flex items-center font-semibold">
+                            Step 1: Seeding
+                            <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 320 512">
+                                <path
+                                    d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z" />
+                            </svg>
+                        </li>
+                        <li class="text-gray-400 dark:text-gray-500">
+                            Step 2: Bracket
+                        </li>
+                    </ol>
+                </nav>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Drag teams in the left panel to set the order. The
+                    right panel will automatically display the match visualization.</p>
+            </div>
+
+            <div class="seeding-container">
+                <!-- Left Panel: Draggable List -->
+                <div>
+                    <h3 class="font-semibold mb-2">Team List (Drag & Drop)</h3>
+                    <ul id="seeding-list">
+                        {% for p in participants %}
+                        <li class="seed-item" data-id="{{ p.id }}">
+                            <span class="handle mr-4">☰</span>
+                            <span class="seed-number">#{{ forloop.counter }}</span>
+                            <span class="seed-name">{% if p.full_name %}{{ p.full_name }}{% else %}{{ p.name }}{% endif
+                                %}</span>
+                        </li>
+                        {% empty %}
+                        <li class="text-center text-gray-500 py-4">No participants enrolled.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <!-- Right Panel: Visual Pairings -->
+                <div>
+                    <h3 class="font-semibold mb-2">Match Visualization</h3>
+                    <div id="visual-pairings-container">
+                        <!-- Pairings will be rendered here by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-6 text-center flex justify-center gap-4">
+            <button id="shuffle-seeding-btn"
+                class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300">
+                🔄 Shuffle Teams
+            </button>
+            <button id="save-seeding-btn"
+                class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                💾 Save Order & Generate Bracket
+            </button>
+            <button id="view-bracket-btn"
+                class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300">
+                📊 View Bracket
+            </button>
+        </div>
+    </div>
+    {% else %}
+    <div id="bracket-section" data-competition-id="{{ competition.id }}">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Step 2: Bracket</h2>
+                    <nav aria-label="Breadcrumb" class="text-sm text-gray-500 dark:text-gray-400">
+                        <ol class="list-none p-0 inline-flex">
+                            <li class="flex items-center">
+                                <span class="text-gray-400 dark:text-gray-500">Step 1: Seeding</span>
+                                <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 320 512">
+                                    <path
+                                        d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z" />
+                                </svg>
+                            </li>
+                            <li class="font-semibold">
+                                Step 2: Bracket
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <a href="{% url 'gms:reset_bracket' competition.id %}"
+                    onclick="return confirm('Apakah Anda yakin? Ini akan menghapus bracket yang sudah ada dan mengembalikan Anda ke halaman seeding.');"
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300">
+                    Reset Bracket
+                </a>
+            </div>
+
+            <!-- Bracket Controls -->
+            <div id="bracket-controls"
+                class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                <div>
+                    <label for="teamWidth" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Team
+                        Width: <span id="teamWidthValue">60</span></label>
+                    <input type="range" id="teamWidth" min="40" max="200" value="60" class="w-full">
+                </div>
+                <div>
+                    <label for="scoreWidth" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Score
+                        Width: <span id="scoreWidthValue">40</span></label>
+                    <input type="range" id="scoreWidth" min="20" max="100" value="40" class="w-full">
+                </div>
+                <div>
+                    <label for="matchMargin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Match
+                        Margin: <span id="matchMarginValue">40</span></label>
+                    <input type="range" id="matchMargin" min="10" max="100" value="40" class="w-full">
+                </div>
+                <div>
+                    <label for="roundMargin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Round
+                        Margin: <span id="roundMarginValue">20</span></label>
+                    <input type="range" id="roundMargin" min="10" max="200" value="20" class="w-full">
+                </div>
+            </div>
+
+            <div class="bracket-container">
+                <!-- New Single Bracket View -->
+                <div id="bracket-content" class="bracket-content"></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script id="jquery-bracket-data" type="application/json">
+{% if jquery_bracket_data %}
+    {{ jquery_bracket_data|safe }}
+{% else %}
+    {
+        "teams": [
+            ["Team A", "Team B"],
+            ["Team C", "Team D"],
+            ["Team E", "Team F"],
+            ["Team G", "Team H"]
+        ],
+        "results": [
+            [[1, 0], [2, 1], [0, 1], [1, 0]],
+            [[1, 0], [1, 0]],
+            [[2, 1]]
+        background-color: #1e3a8a !important;
+        /* Blue-900 */
+        border-color: #60a5fa !important;
+        /* Blue-400 */
+        color: #dbeafe !important;
+        /* Blue-100 */
+    }
+
+    .jQBracket .team.winner .score {
+        background-color: #3b82f6 !important;
+        color: #ffffff !important;
+    }
+
+    /* Loser Style */
+    .jQBracket .team.loser {
+        opacity: 0.7;
+    }
+
+    /* Connectors */
+    .jQBracket .connector {
+        border-color: #94a3b8 !important;
+        /* Slate-400 */
+        border-width: 2px !important;
+    }
+
+    .dark .jQBracket .connector {
+        border-color: #4b5563 !important;
+        /* Gray-600 */
+    }
+
+    /* Highlighted Connector (on hover) */
+    .jQBracket .connector.highlight {
+        border-color: #6366f1 !important;
+        /* Indigo-500 */
+    }
+
+    /* Match Container */
+    .jQBracket .match {
+        margin-bottom: 10px !important;
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ competition.name }}</h1>
+        <p class="text-lg text-gray-600 dark:text-gray-300">Bracket Management</p>
+    </div>
+
+    <div id="status-message" class="mt-4 hidden"></div>
+    {% csrf_token %}
+
+    {% if not competition.matches.exists %}
+    <div id="seeding-section" data-competition-id="{{ competition.id }}">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Step 1: Set Team Order (Seeding)</h2>
+                <nav aria-label="Breadcrumb" class="text-sm text-gray-500 dark:text-gray-400">
+                    <ol class="list-none p-0 inline-flex">
+                        <li class="flex items-center font-semibold">
+                            Step 1: Seeding
+                            <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 320 512">
+                                <path
+                                    d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z" />
+                            </svg>
+                        </li>
+                        <li class="text-gray-400 dark:text-gray-500">
+                            Step 2: Bracket
+                        </li>
+                    </ol>
+                </nav>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Drag teams in the left panel to set the order. The
+                    right panel will automatically display the match visualization.</p>
+            </div>
+
+            <div class="seeding-container">
+                <!-- Left Panel: Draggable List -->
+                <div>
+                    <h3 class="font-semibold mb-2">Team List (Drag & Drop)</h3>
+                    <ul id="seeding-list">
+                        {% for p in participants %}
+                        <li class="seed-item" data-id="{{ p.id }}">
+                            <span class="handle mr-4">☰</span>
+                            <span class="seed-number">#{{ forloop.counter }}</span>
+                            <span class="seed-name">{% if p.full_name %}{{ p.full_name }}{% else %}{{ p.name }}{% endif %}</span>
+                        </li>
+                        {% empty %}
+                        <li class="text-center text-gray-500 py-4">No participants enrolled.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <!-- Right Panel: Visual Pairings -->
+                <div>
+                    <h3 class="font-semibold mb-2">Match Visualization</h3>
+                    <div id="visual-pairings-container">
+                        <!-- Pairings will be rendered here by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mt-6 text-center flex justify-center gap-4">
+            <button id="shuffle-seeding-btn"
+                class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300">
+                🔄 Shuffle Teams
+            </button>
+            <button id="save-seeding-btn"
+                class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                💾 Save Order & Generate Bracket
+            </button>
+            <button id="view-bracket-btn"
+                class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300">
+                📊 View Bracket
+            </button>
+        </div>
+    </div>
+    {% else %}
+    <div id="bracket-section" data-competition-id="{{ competition.id }}">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Step 2: Bracket</h2>
+                    <nav aria-label="Breadcrumb" class="text-sm text-gray-500 dark:text-gray-400">
+                        <ol class="list-none p-0 inline-flex">
+                            <li class="flex items-center">
+                                <span class="text-gray-400 dark:text-gray-500">Step 1: Seeding</span>
+                                <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 320 512">
+                                    <path
+                                        d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z" />
+                                </svg>
+                            </li>
+                            <li class="font-semibold">
+                                Step 2: Bracket
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <a href="{% url 'gms:reset_bracket' competition.id %}"
+                    onclick="return confirm('Apakah Anda yakin? Ini akan menghapus bracket yang sudah ada dan mengembalikan Anda ke halaman seeding.');"
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300">
+                    Reset Bracket
+                </a>
+            </div>
+
+            <!-- Bracket Controls -->
+            <div id="bracket-controls"
+                class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                <div>
+                    <label for="teamWidth" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Team
+                        Width: <span id="teamWidthValue">60</span></label>
+                    <input type="range" id="teamWidth" min="40" max="200" value="60" class="w-full">
+                </div>
+                <div>
+                    <label for="scoreWidth" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Score
+                        Width: <span id="scoreWidthValue">40</span></label>
+                    <input type="range" id="scoreWidth" min="20" max="100" value="40" class="w-full">
+                </div>
+                <div>
+                    <label for="matchMargin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Match
+                        Margin: <span id="matchMarginValue">40</span></label>
+                    <input type="range" id="matchMargin" min="10" max="100" value="40" class="w-full">
+                </div>
+                <div>
+                    <label for="roundMargin" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Round
+                        Margin: <span id="roundMarginValue">20</span></label>
+                    <input type="range" id="roundMargin" min="10" max="200" value="20" class="w-full">
+                </div>
+            </div>
+
+            <div class="bracket-container">
+                <!-- New Single Bracket View -->
+                <div id="bracket-content" class="bracket-content"></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script id="jquery-bracket-data" type="application/json">
+{% if jquery_bracket_data %}
+    {{ jquery_bracket_data|safe }}
+{% else %}
+    {
+        "teams": [
+            ["Team A", "Team B"],
+            ["Team C", "Team D"],
+            ["Team E", "Team F"],
+            ["Team G", "Team H"]
+        ],
+        "results": [
+            [[1, 0], [2, 1], [0, 1], [1, 0]],
+            [[1, 0], [1, 0]],
+            [[2, 1]]
+        ]
+    }
+{% endif %}
+</script>
+
+
+
+{% endblock content %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<script src="{% static 'js/jquery.bracket.min.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        const matchesExist = {{ competition.matches.exists| yesno: "true,false"
+    }};
+
+    if (!matchesExist) {
+        // Seeding logic remains the same
+        const seedingListEl = document.getElementById('seeding-list');
+        const pairingsContainer = $('#visual-pairings-container');
+
+        if (seedingListEl) {
+            function updateVisualPairings() {
+                const items = Array.from(seedingListEl.querySelectorAll('.seed-item'));
+                const teams = items.map((item, index) => ({
+                    id: item.dataset.id,
+                    name: item.querySelector('.seed-name').textContent,
+                    originalIndex: index + 1
+                }));
+
+                pairingsContainer.empty();
+                const numTeams = teams.length;
+                if (numTeams === 0) return;
+
+                let matchNumber = 1;
+                for (let i = 0; i < numTeams; i += 2) {
+                    const team1 = teams[i];
+                    const team2 = (i + 1 < numTeams) ? teams[i + 1] : null;
+
+                    if (team2) {
+                        const matchBox = `
+                                <div class="match-pairing-box">
+                                    <div class="match-pairing-header">Match ${matchNumber}</div>
+                                    <div class="match-pairing-body">
+                                        <div class="paired-team">
+                                            <span class="seed-name">${team1.name}</span>
+                                            <span class="seed-number">#${team1.originalIndex}</span>
+                                        </div>
+                                        <div class="vs-divider">vs</div>
+                                        <div class="paired-team">
+                                            <span class="seed-name">${team2.name}</span>
+                                            <span class="seed-number">#${team2.originalIndex}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        pairingsContainer.append(matchBox);
+                        matchNumber++;
+                    } else {
+                        const byeBox = `
+                                <div class="match-pairing-box bye-box">
+                                    <div class="match-pairing-body">
+                                        <div class="paired-team">
+                                            <span class="seed-name">${team1.name}</span>
+                                            <span class="seed-number">#${team1.originalIndex}</span>
+                                        </div>
+                                        <div class="vs-divider">BYE</div>
+                                    </div>
+                                </div>
+                            `;
+                        pairingsContainer.append(byeBox);
+                    }
+                }
+            }
+
+            // Function to convert ordered IDs to bracket format
+            function convertToBracketFormat(orderedIds, orderedNames) {
+                if (!orderedIds || orderedIds.length === 0) return null;
+
+                // Create teams array from ordered names
+                const teams = [];
+                for (let i = 0; i < orderedIds.length; i += 2) {
+                    if (i + 1 < orderedIds.length) {
+                        teams.push([orderedNames[i], orderedNames[i + 1]]);
+                    } else {
+                        // Odd number of teams - last team gets a bye
+                        teams.push([orderedNames[i], "BYE"]);
+                    }
+                }
+
+                // Calculate number of rounds needed for single elimination
+                const rounds = Math.ceil(Math.log2(teams.length));
+                const results = [];
+
+                // Initialize results structure
+                let matchesInRound = teams.length;
+                for (let i = 0; i < rounds; i++) {
+                    const roundResults = [];
+                    for (let j = 0; j < matchesInRound; j++) {
+                        roundResults.push([null, null]); // [score_team1, score_team2]
+                    }
+                    results.push(roundResults);
+                    matchesInRound = Math.ceil(matchesInRound / 2);
+                }
+
+                return {
+                    teams: teams,
+                    results: results
+                };
+            }
+
+            const sortable = new Sortable(seedingListEl, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onUpdate: function () {
+                    $(seedingListEl).children().each(function (index) {
+                        $(this).find('.seed-number').text('#' + (index + 1));
+                    });
+                    updateVisualPairings();
+                }
+            });
+
+            updateVisualPairings();
+
+            $('#save-seeding-btn').on('click', function () {
+                const btn = $(this);
+                btn.prop('disabled', true).text('Saving...');
+
+                // Get the current ordered team IDs and names
+                const orderedTeamIds = sortable.toArray();
+
+                // Get the corresponding team names
+                const orderedTeamNames = [];
+                $(seedingListEl).children().each(function () {
+                    const teamName = $(this).find('.seed-name').text();
+                    orderedTeamNames.push(teamName);
+                });
+
+                // Convert to bracket format for demonstration
+                const bracketFormat = convertToBracketFormat(orderedTeamIds, orderedTeamNames);
+                console.log('Ordered IDs:', orderedTeamIds);
+                console.log('Ordered Names:', orderedTeamNames);
+                console.log('Bracket Format:', bracketFormat);
+
+                $.ajax({
+                    url: "{% url 'gms:save_seeding_and_generate_matches' competition.id %}",
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ ordered_ids: orderedTeamIds }),
+                    headers: { 'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val() },
+                    success: function (response) {
+                        if (response.success) {
+                            // Update button state
+                            btn.prop('disabled', false).text('✅ Saved! Refreshing...');
+
+                            // Reload the page to show Step 2
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            alert('Error: ' + response.error);
+                            btn.prop('disabled', false).text('💾 Simpan Urutan & Buat Bracket');
+                        }
+                    },
+                    error: function () {
+                        alert('An unknown error occurred.');
+                        btn.prop('disabled', false).text('💾 Simpan Urutan & Buat Bracket');
+                    }
+                });
+            });
+
+            // Add click handler for view bracket button
+            $('#view-bracket-btn').on('click', function () {
+                // Scroll to the bracket section
+                $('html, body').animate({
+                    scrollTop: $('#bracket-section').offset().top - 100
+                }, 500);
+            });
+        }
+    } else {
+        // Simplified bracket initialization for Step 2
+        initializeNewBracket();
+    }
+    });
+
+    function initializeNewBracket() {
+        // Get bracket data from the script tag - this will contain either seeding data or dummy data
+        const bracketDataScript = $('#jquery-bracket-data');
+        let bracketData = null;
+
+        if (bracketDataScript.length > 0) {
+            try {
+                bracketData = JSON.parse(bracketDataScript.text());
+                console.log('Using bracket data from script tag:', bracketData);
+            } catch (e) {
+                console.error('Error parsing bracket data from script tag:', e);
+            }
+        }
+
+        if (bracketData && bracketData.teams && bracketData.teams.length > 0) {
+            // Validate the structure before rendering
+            console.log('Bracket data structure:', {
+                teams: bracketData.teams,
+                results: bracketData.results,
+                teamsLength: bracketData.teams.length,
+                resultsLength: bracketData.results ? bracketData.results.length : 'No results'
+            });
+
+            // Initial render
+            renderjQueryBracket(bracketData);
+
+            // Event listeners for controls
+            $('#teamWidth, #scoreWidth, #matchMargin, #roundMargin').on('input', function () {
+                const targetId = $(this).attr('id') + 'Value';
+                $('#' + targetId).text($(this).val());
+                renderjQueryBracket(bracketData);
+            });
+
+            // Set up responsive resizing
+            let resizeTimer;
+            $(window).resize(function () {
+                console.log('- Results length:', bracketData.results ? bracketData.results.length : 'No results');
+                if (bracketData.results) {
+                    console.log('- Results sample:', bracketData.results.slice(0, 2));
+                }
+
+                // Check if the jquery.bracket plugin exists
+                if (typeof bracketContent.bracket === 'function') {
+                    // Get values from sliders
+                    const teamWidth = parseInt($('#teamWidth').val(), 10);
+                    const scoreWidth = parseInt($('#scoreWidth').val(), 10);
+                    const matchMargin = parseInt($('#matchMargin').val(), 10);
+                    const roundMargin = parseInt($('#roundMargin').val(), 10);
+
+                    bracketContent.empty(); // Clear previous bracket before rendering
+
+                    try {
+                        bracketContent.bracket({
+                            init: bracketData,
+                            skipConsolationRound: {{ competition.has_third_place_match | yesno: "false,true" }},
+                    disableToolbar: false,
+                        save: function() { }, // Required but can be empty
+                    teamWidth: teamWidth,
+                        scoreWidth: scoreWidth,
+                            matchMargin: matchMargin,
+                                roundMargin: roundMargin
+                });
+        } catch (error) {
+            console.error('Error rendering jQuery bracket:', error);
+            // Show more detailed error information
+            bracketContent.html(`<p class="text-white">Error rendering bracket: ${error.message}</p>`);
+        }
+    } else {
+        // If plugin doesn't exist, show error message
+        console.error('jQuery bracket plugin not loaded');
+        bracketContent.html('<p class="text-white">Bracket plugin not loaded.</p>');
+    }
+    }
+</script>
+{% endblock extra_js %}

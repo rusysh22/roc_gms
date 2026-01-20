@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Playoff Management - {{ competition.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/bracket.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/gracket.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Competition Header -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8 dark:bg-gray-800">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Playoff Management</h1>
+                <div class="mt-2 flex flex-wrap items-center text-gray-600 dark:text-gray-300">
+                    <div class="flex items-center mr-6 mb-2 md:mb-0">
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Competition:</span>
+                        <a href="{% url 'gms:competition_detail' competition.id %}" class="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-black">
+                            {{ competition.name }}
+                        </a>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Format:</span>
+                        <span class="ml-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                            {{ competition.format.name }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <a href="{% url 'gms:competition_detail' competition.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to Competition
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Panel - Match Setup -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-800">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Match Setup</h2>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                        Draft
+                    </span>
+                </div>
+                
+                <!-- Match Setup Form -->
+                <form id="match-setup-form" method="post" action="{% url 'gms:manage_playoffs' competition.id %}">
+                    {% csrf_token %}
+                    
+                    <!-- Instructions -->
+                    <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <h3 class="font-medium text-blue-800 dark:text-blue-200 mb-2">Instructions</h3>
+                        <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                            <li>• Set up match pairings by selecting participants for each match</li>
+                            <li>• Empty slots will be treated as BYE (automatic advancement)</li>
+                            <li>• Click "Generate Bracket" to create matches in database when ready</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Tournament Info -->
+                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">Format:</span>
+                                <span class="ml-2 text-gray-900 dark:text-white">{{ competition.format.name }}</span>
+                            </div>
+                            <div>
+                                <span class="font-medium text-gray-700 dark:text-gray-300">Participants:</span>
+                                <span class="ml-2 text-gray-900 dark:text-white">{{ participants.count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enrollable Participants List with Draggable Support -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-medium text-gray-900 dark:text-white">Enrolled Participants</h3>
+                            <div class="flex space-x-2">
+                                <button type="button" id="shuffle-participants" class="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded hover:bg-gray-300 dark:hover:bg-gray-600">
+                                    Shuffle
+                                </button>
+                                <button type="button" id="reset-order" class="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded hover:bg-gray-300 dark:hover:bg-gray-600">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 max-h-60 overflow-y-auto">
+                            <div id="participants-list" class="space-y-2">
+                                {% for participant in participants %}
+                                    <div class="flex items-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded-md cursor-move draggable" draggable="true" data-participant-id="{{ participant.id }}">
+                                        <span class="drag-handle text-gray-500 dark:text-gray-400 mr-2 cursor-move">
+                                            <!-- Drag icon -->
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                            </svg>
+                                        </span>
+                                        <span class="text-xs font-medium bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 seed-number">
+                                            {{ forloop.counter }}
+                                        </span>
+                                        <input type="hidden" name="participant_{{ forloop.counter }}" value="{{ participant.id }}">
+                                        <span class="text-sm text-gray-900 dark:text-white truncate flex-1">
+                                            {% if participant_type == 'CLUBS' %}{{ participant.name }}{% else %}{{ participant.full_name|default:participant.employee_id|default:"No Name" }}{% endif %}
+                                        </span>
+                                    </div>
+                                {% empty %}
+                                    <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0 a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                        </svg>
+                                        <p class="mt-2">No participants enrolled yet.</p>
+                                        <p class="text-xs mt-1">Add participants to the competition first.</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hidden input to store the final order -->
+                    <input type="hidden" name="ordered_participants" id="ordered-participants" value="">
+                    
+
+                    
+                    <div class="flex space-x-4 mt-6">
+                        <button type="submit" name="generate_matches" value="1" 
+                                class="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800">
+                            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Generate Bracket
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Panel - Playoff Bracket -->
+        <div class="lg:col-span-2">
+            {% include 'gms/partials/playoff_bracket_gracket.html' %}
+        </div>
+    </div>
+</div>
+
+<!-- jQuery (required for Gracket) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- HTMX and Alpine.js Scripts -->
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+<!-- Gracket jQuery Plugin -->
+<script src="{% static 'js/jquery.gracket.min.js' %}"></script>
+
+<!-- Bracket Viewer JavaScript -->
+<script src="{% static 'js/bracket-viewer.js' %}"></script>
+
+<script>
+    // HTMX config for better error handling
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add loading indicators for all htmx requests
+        document.body.addEventListener('htmx:beforeSend', function(evt) {
+            // Show loading state
+        });
+        
+        // After HTMX swap, reinitialize any necessary JavaScript
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            // Reinitialize bracket if bracket container was updated
+            if (evt.detail.target.id === 'playoff-bracket-container') {
+                // Small delay to ensure DOM is fully updated
+                setTimeout(() => {
+                    // Reinitialize Gracket with the new data from the updated DOM
+                    var bracketDataRaw = document.getElementById('gracket-data');
+                    var roundLabelsRaw = document.getElementById('gracket-round-labels');
+                    
+                    if (bracketDataRaw && roundLabelsRaw && typeof $ !== 'undefined' && $.fn.gracket) {
+                        try {
+                            var bracketData = JSON.parse(bracketDataRaw.textContent);
+                            var roundLabels = JSON.parse(roundLabelsRaw.textContent);
+                            
+                            // Only initialize if we have bracket data
+                            if (bracketData && bracketData.length > 0) {
+                                // Clear previous gracket if exists
+                                $("#my-gracket").empty();
+                                
+                                $("#my-gracket").gracket({ 
+                                    src: bracketData,
+                                    roundLabels: roundLabels,
+                                    canvasLineColor: '#9ca3af', // Default color
+                                    canvasLineWidth: 2.5
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Error parsing bracket data:', e);
+                            console.log('Bracket data content:', bracketDataRaw.textContent);
+                            console.log('Round labels content:', roundLabelsRaw.textContent);
+                        }
+                    }
+                }, 100);
+            }
+        });
+    });
+</script>
+{% endblock %}

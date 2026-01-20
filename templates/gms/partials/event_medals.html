@@ -1,0 +1,50 @@
+{% comment %} Partial for event medals by Business Unit {% endcomment %}
+<div class="space-y-4">
+    {% for unit_data in medals_by_business_unit %}
+        <div class="flex items-center">
+            <!-- Medal icons -->
+            <div class="flex-shrink-0 w-12 h-12 flex items-center justify-center">
+                {% if unit_data.gold > 0 %}
+                    <span class="mr-1 text-yellow-500 dark:text-yellow-400" title="{{ unit_data.gold }} Gold">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                        </svg>
+                    </span>
+                {% endif %}
+                {% if unit_data.silver > 0 %}
+                    <span class="mr-1 text-gray-300 dark:text-gray-400" title="{{ unit_data.silver }} Silver">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                        </svg>
+                    </span>
+                {% endif %}
+                {% if unit_data.bronze > 0 %}
+                    <span class="text-amber-600 dark:text-amber-500" title="{{ unit_data.bronze }} Bronze">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                        </svg>
+                    </span>
+                {% endif %}
+            </div>
+            <div class="ml-4">
+                <div class="font-medium text-gray-900 dark:text-white">{{ unit_data.business_unit.name }}</div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ unit_data.gold }}G, {{ unit_data.silver }}S, {{ unit_data.bronze }}B = {{ unit_data.total }} Total
+                </div>
+            </div>
+            <div class="ml-auto">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                    {{ unit_data.total }} Medals
+                </span>
+            </div>
+        </div>
+    {% empty %}
+        <div class="text-center py-8">
+            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No medals yet</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">No medals have been awarded for this event yet.</p>
+        </div>
+    {% endfor %}
+</div>
