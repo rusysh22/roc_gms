@@ -1,4 +1,6 @@
 {
+    "framework": null,
+    "outputDirectory": "staticfiles_build",
     "routes": [
         {
             "src": "/static/(.*)",
