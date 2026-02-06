@@ -1,6 +1,7 @@
 # build_files.sh
 echo "Building the project..."
-python -m pip install -r requirements.txt
+# pip install is handled by Vercel automatically
+
 
 echo "Make Migration..."
 python manage.py makemigrations --noinput
