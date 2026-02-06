@@ -1,5 +1,6 @@
 import json
 import math
+import logging
 from datetime import datetime, timedelta, date
 from django.core.exceptions import ValidationError
 
@@ -18,6 +19,8 @@ from django.contrib.auth.decorators import login_required
 from collections import defaultdict
 import calendar
 from .forms import MatchResultFilterForm
+
+logger = logging.getLogger(__name__)
 
 
 def homepage(request):
@@ -519,8 +522,9 @@ def match_results_input(request):
                 
                 except Exception as e:
                     error_count += 1
+                    error_count += 1
                     # Log the error for debugging
-                    print(f"Error saving result for match {match.id}: {str(e)}")
+                    logger.error(f"Error saving result for match {match.id}: {str(e)}")
         
         # Add messages for user feedback
         if success_count > 0:
@@ -732,7 +736,7 @@ def manage_playoffs(request, competition_id):
                 messages.success(request, "Bracket shuffled successfully!")
             except Exception as e:
                 # Log the error for debugging
-                print(f"Error shuffling bracket: {str(e)}")
+                logger.error(f"Error shuffling bracket: {str(e)}")
                 messages.error(request, "Error shuffling bracket. Please try again.")
         
         # Handle setting a winner for a match
@@ -791,11 +795,11 @@ def manage_playoffs(request, competition_id):
                 
             except (Match.DoesNotExist, Club.DoesNotExist, Participant.DoesNotExist) as e:
                 # Log the error for debugging
-                print(f"Error setting match winner: {str(e)}")
+                logger.error(f"Error setting match winner: {str(e)}")
                 messages.error(request, "Error setting match winner: Invalid match or participant.")
             except Exception as e:
                 # Log the error for debugging
-                print(f"Unexpected error setting match winner: {str(e)}")
+                logger.error(f"Unexpected error setting match winner: {str(e)}")
                 messages.error(request, "Error setting match winner. Please try again.")
         
         # Handle generating bracket structure (draft mode)

@@ -32,9 +32,3 @@ class CustomUserAdmin(UserAdmin, ModelAdmin):
 if admin.site.is_registered(User):
     admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
-
-
-# Replace the default User admin
-if admin.site.is_registered(User):
-    admin.site.unregister(User)
-admin.site.register(User, CustomUserAdmin)

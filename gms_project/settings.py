@@ -36,7 +36,10 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
+# Update ALLOWED_HOSTS for Vercel
 ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+if not DEBUG:
+    ALLOWED_HOSTS += ['.vercel.app', '.now.sh']
 
 # CSRF trusted origins for production
 CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS')
@@ -56,12 +59,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',  # Django extensions
     'django_htmx',  # Django HTMX integration
-    # 'solo',  # Django solo for singleton models - commented out due to dependency issues
     'gms',  # Main GMS app
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -94,19 +97,25 @@ WSGI_APPLICATION = 'gms_project.wsgi.application'
 
 
 # Database
+# Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
-        'CONN_MAX_AGE': 60,  # Connection pooling
+if env('DATABASE_URL', default=None):
+    DATABASES = {
+        'default': env.db()
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('DB_NAME'),
+            'USER': env('DB_USER'),
+            'PASSWORD': env('DB_PASSWORD'),
+            'HOST': env('DB_HOST'),
+            'PORT': env('DB_PORT'),
+            'CONN_MAX_AGE': 60,  # Connection pooling
+        }
+    }
 
 
 # Password validation
@@ -160,7 +169,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles_build'
 
 # Additional static files configuration to help with caching issues
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'

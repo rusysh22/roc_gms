@@ -40,12 +40,12 @@ class AuditableModel(TimestampedModel):
 
 class SiteConfiguration(models.Model):
     """Singleton model to hold site-wide settings."""
-    site_name = models.CharField(max_length=100, default='Corporate Games Hub')
+    site_name = models.CharField(max_length=100, default='Rusydani on Cloud Corporate Games Hub')
     logo = models.ImageField(upload_to='site/', null=True, blank=True)
     favicon = models.ImageField(upload_to='site/', null=True, blank=True)
     contact_email = models.EmailField(blank=True)
     contact_phone = models.CharField(max_length=20, blank=True)
-    footer_text = models.CharField(max_length=255, blank=True, default='© 2025 GMS')
+    footer_text = models.CharField(max_length=255, blank=True, default='© 2025 RoC GMS')
     hero_images = models.JSONField(default=list, blank=True, help_text="List of hero image paths for the slider")
     timezone = models.CharField(max_length=50, default='Asia/Jakarta', help_text="Site timezone (e.g. Asia/Jakarta)")
 
@@ -103,8 +103,8 @@ class SiteConfiguration(models.Model):
         obj, created = cls.objects.get_or_create(
             pk=1,
             defaults={
-                'site_name': 'Corporate Games Hub',
-                'footer_text': '© 2025 GMS',
+                'site_name': 'Rusydani on Cloud Corporate Games Hub',
+                'footer_text': '© 2025 Rusydani on Cloud GMS',
                 'timezone': 'Asia/Jakarta'
             }
         )
