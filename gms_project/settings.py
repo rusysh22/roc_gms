@@ -97,10 +97,18 @@ WSGI_APPLICATION = 'gms_project.wsgi.application'
 
 
 # Database
-# Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if env('DATABASE_URL', default=None):
+# Use dummy database during Vercel build (collectstatic doesn't need real DB)
+import sys
+if 'collectstatic' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
+elif env('DATABASE_URL', default=None):
     DATABASES = {
         'default': env.db()
     }
