@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',  # Django extensions
     'django_htmx',  # Django HTMX integration
+    'storages',  # Django Storages (S3/Supabase)
     'gms',  # Main GMS app
 ]
 
@@ -183,8 +184,60 @@ STATIC_ROOT = BASE_DIR / 'staticfiles_build' / 'static'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Media files
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Cloud Storage (Supabase/S3)
+if not DEBUG or env('USE_CLOUD_STORAGE', default=False):
+    # AWS/Supabase S3 Settings
+    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID', default='')
+    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY', default='')
+    AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', default='media')
+    AWS_S3_ENDPOINT_URL = env('AWS_S3_ENDPOINT_URL', default='')
+    AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='ap-southeast-1')
+    
+    # Validation to ensure we don't crash if env vars are missing
+    if AWS_S3_ENDPOINT_URL and AWS_ACCESS_KEY_ID:
+        STORAGES = {
+            "default": {
+                "BACKEND": "storages.backends.s3.S3Storage",
+                "OPTIONS": {
+                    "access_key": AWS_ACCESS_KEY_ID,
+                    "secret_key": AWS_SECRET_ACCESS_KEY,
+                    "bucket_name": AWS_STORAGE_BUCKET_NAME,
+                    "endpoint_url": AWS_S3_ENDPOINT_URL,
+                    "region_name": AWS_S3_REGION_NAME,
+                    "default_acl": "public-read", 
+                    "querystring_auth": False, # Links should be public without signatures
+                    "file_overwrite": False,
+                },
+            },
+            "staticfiles": {
+                "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            },
+        }
+    else:
+        # Fallback if config is missing
+        print("WARNING: Cloud storage enabled but credentials missing. Falling back to filesystem.")
+        STORAGES = {
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+            "staticfiles": {
+                "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            },
+        }
+else:
+    # Local development storage
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

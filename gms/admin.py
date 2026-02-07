@@ -51,6 +51,9 @@ class SiteConfigurationAdmin(ModelAdmin):
         }),
     )
 
+    class Media:
+        js = ('js/admin_upload_limit.js',)
+
     def response_change(self, request, obj):
         # Trigger a cache clear or reload settings when SiteConfiguration is updated
         from django.core.cache import cache

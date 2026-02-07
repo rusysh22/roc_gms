@@ -239,16 +239,23 @@ class SiteConfigurationForm(ModelForm):
         if files and len(files) > 10:
             raise ValidationError('You can upload a maximum of 10 files.')
         
+        # Check total size
+        total_size = sum(file.size for file in files or [])
+        max_total_size = 4 * 1024 * 1024  # 4MB limit for Vercel
+        
+        if total_size > max_total_size:
+            raise ValidationError(f'Total upload size ({total_size / (1024*1024):.2f} MB) exceeds the 4MB limit. Please upload fewer or smaller images.')
+
         # Check each file
         for file in files or []:
             # Check file type (image only)
             if file.content_type and not file.content_type.startswith('image/'):
                 raise ValidationError('Only image files are allowed.')
             
-            # Check file size (max 5MB = 5 * 1024 * 1024 bytes)
-            max_size = 5 * 1024 * 1024  # 5MB in bytes
+            # Check individual file size (max 2MB = 2 * 1024 * 1024 bytes)
+            max_size = 2 * 1024 * 1024  # 2MB in bytes
             if file.size > max_size:
-                raise ValidationError(f'File {file.name} is too large. Maximum file size is 5MB.')
+                raise ValidationError(f'File {file.name} is too large. Maximum individual file size is 2MB.')
         
         return files
 
