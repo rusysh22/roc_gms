@@ -68,6 +68,8 @@ class SiteConfigurationAdmin(ModelAdmin):
         if not obj.hero_images:
             return mark_safe('<p style="color: #666; font-style: italic;">No hero images uploaded yet.</p>')
         
+        from django.core.files.storage import default_storage
+        
         images_html = []
         for idx, img_data in enumerate(obj.hero_images):
             img_path = img_data.get('path', '')
@@ -81,11 +83,17 @@ class SiteConfigurationAdmin(ModelAdmin):
                 if len(display_name) > 20:
                     display_name = display_name[:17] + "..."
                 
+                # Get the full URL from storage backend
+                try:
+                    img_url = default_storage.url(img_path)
+                except Exception:
+                    img_url = f"/media/{img_path}"  # Fallback
+                
                 # Create a div with the image and remove button
                 image_html = f'''
                 <div style="display: inline-block; margin: 5px; position: relative; border: 1px solid #ddd; border-radius: 4px; padding: 5px;">
                     <div style="position: relative;">
-                        <img src="/media/{img_path}" alt="{alt_text}" style="max-width: 150px; max-height: 100px; object-fit: cover;">
+                        <img src="{img_url}" alt="{alt_text}" style="max-width: 150px; max-height: 100px; object-fit: cover;">
                         <button type="button" 
                                 onclick="removeHeroImage({idx})" 
                                 style="position: absolute; top: -8px; right: -8px; width: 20px; height: 20px; border-radius: 50%; background: red; color: white; border: none; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;"

@@ -1,0 +1,12 @@
+--- a/templates/gms/homepage.html
++++ b/templates/gms/homepage.html
+@@ -993,8 +993,7 @@
+             <!-- Current month calendar -->
+             <div id="calendar-container">
+                 {% for month_data in months_data %}
+-                <div class="month-calendar" data-month-index="{{ forloop.counter0 }}" {% if forloop.counter0
+-                    !=current_month_index %}style="display:none;" {% endif %}>
++                <div class="month-calendar" data-month-index="{{ forloop.counter0 }}" {% if forloop.counter0 != current_month_index %}style="display:none;"{% endif %}>
+ 
+                     <!-- Calendar grid -->
+                     <div class="grid grid-cols-7 gap-1 mb-1">
