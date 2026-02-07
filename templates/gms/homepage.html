@@ -47,8 +47,13 @@
     }
 
     @keyframes moveAurora {
-        0% { transform: translate(0, 0); }
-        100% { transform: translate(50%, 50%); }
+        0% {
+            transform: translate(0, 0);
+        }
+
+        100% {
+            transform: translate(50%, 50%);
+        }
     }
 
     .glass-pane {
@@ -58,7 +63,7 @@
         border: 1px solid rgba(255, 255, 255, 0.18);
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
     }
-    
+
     .dark .glass-pane {
         background: rgba(17, 24, 39, 0.15);
         border: 1px solid rgba(255, 255, 255, 0.18);
@@ -74,7 +79,7 @@
         opacity: 1;
         transform: translateY(0);
     }
-    
+
     /* Hero Slider Styles */
     .hero-slider-container {
         position: relative;
@@ -82,7 +87,7 @@
         height: 100vh;
         overflow: hidden;
     }
-    
+
     .hero-slider {
         position: relative;
         width: 100%;
@@ -91,7 +96,7 @@
         align-items: center;
         justify-content: center;
     }
-    
+
     .slide {
         position: absolute;
         top: 0;
@@ -104,84 +109,102 @@
         background-position: center center;
         background-repeat: no-repeat;
     }
-    
+
     .slide.active {
         opacity: 1;
         z-index: 1;
     }
-    
+
     .slide-content {
         position: absolute !important;
         z-index: 20 !important;
-        width: auto !important; /* Let width be flexible */
-        max-width: 500px !important; /* Maximum width for text readability */
+        width: auto !important;
+        /* Let width be flexible */
+        max-width: 500px !important;
+        /* Maximum width for text readability */
         margin: 0 !important;
         padding: 2rem !important;
-        left: 5% !important; /* Position from left edge */
-        top: 50% !important; /* Center vertically */
-        transform: translateY(-50%) !important; /* Center vertically */
-        text-align: left !important; /* Left-aligned text */
+        left: 5% !important;
+        /* Position from left edge */
+        top: 50% !important;
+        /* Center vertically */
+        transform: translateY(-50%) !important;
+        /* Center vertically */
+        text-align: left !important;
+        /* Left-aligned text */
         display: block !important;
     }
-    
 
-    
+
+
     .slide-caption {
         position: absolute;
         bottom: 2rem;
-        left: 2rem; /* Position from left edge */
-        max-width: 500px; /* Adjust width for left alignment */
+        left: 2rem;
+        /* Position from left edge */
+        max-width: 500px;
+        /* Adjust width for left alignment */
         margin: 0;
         padding: 1.25rem;
-        text-align: left; /* Left-aligned text */
+        text-align: left;
+        /* Left-aligned text */
         background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(10px);
         border-radius: 12px;
-        color: #1f2937; /* text-gray-800 */
+        color: #1f2937;
+        /* text-gray-800 */
         z-index: 15;
         font-size: 1.1rem;
     }
-    
+
     .dark .slide-caption {
         background: rgba(0, 0, 0, 0.6);
         color: white;
     }
-    
+
     .premium-card {
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         transform-style: preserve-3d;
         perspective: 1000px;
     }
-    
+
     .premium-card:hover {
         transform: translateY(-8px) scale(1.01);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
     }
-    
+
     .floating-element {
         animation: float 6s ease-in-out infinite;
     }
-    
+
     @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-15px); }
-        100% { transform: translateY(0px); }
+        0% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-15px);
+        }
+
+        100% {
+            transform: translateY(0px);
+        }
     }
-    
+
     .gradient-text {
         background: linear-gradient(135deg, #66b3e0 0%, #4fb8d5 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
-    
+
     .premium-button {
         position: relative;
         overflow: hidden;
         transition: all 0.3s ease;
         font-weight: 600;
     }
-    
+
     .premium-button::before {
         content: '';
         position: absolute;
@@ -192,19 +215,19 @@
         background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
         transition: left 0.5s;
     }
-    
+
     .premium-button:hover::before {
         left: 100%;
     }
-    
+
     .stats-counter {
         font-variant-numeric: tabular-nums;
     }
-    
+
     .luxury-border {
         position: relative;
     }
-    
+
     .luxury-border::before {
         content: '';
         position: absolute;
@@ -215,21 +238,21 @@
         border-radius: inherit;
         padding: 2px;
         background: linear-gradient(45deg, #66b3e0, #4fb8d5, #6ec6e5, #5ab0d0);
-        -webkit-mask: 
-            linear-gradient(#fff 0 0) content-box, 
+        -webkit-mask:
+            linear-gradient(#fff 0 0) content-box,
             linear-gradient(#fff 0 0);
-        mask: 
-            linear-gradient(#fff 0 0) content-box, 
+        mask:
+            linear-gradient(#fff 0 0) content-box,
             linear-gradient(#fff 0 0);
         -webkit-mask-composite: xor;
         mask-composite: exclude;
     }
-    
+
     /* Hero slider with pseudo-element overlay */
     .hero-slider {
         position: relative;
     }
-    
+
     .hero-slider::before {
         content: '';
         position: absolute;
@@ -237,15 +260,15 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(90deg, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.3) 70%);
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.7) 30%, rgba(0, 0, 0, 0.3) 70%);
         z-index: 10;
     }
-    
+
     .slide-content {
         position: relative;
         z-index: 20;
     }
-    
+
     /* Ensure hero section text remains visible on all backgrounds */
     .hero-slider-container h1,
     .hero-slider-container h2,
@@ -254,18 +277,20 @@
     .hero-slider-container a {
         color: white !important;
     }
-    
+
     /* Upcoming event overlay container styling */
     .upcoming-event-overlay {
         position: absolute;
         top: 50%;
-        right: 3rem; /* Increased margin from the edge */
+        right: 3rem;
+        /* Increased margin from the edge */
         transform: translateY(-50%);
-        width: 28rem; /* Increased width for larger container (w-[28rem] = 28rem) */
+        width: 28rem;
+        /* Increased width for larger container (w-[28rem] = 28rem) */
         z-index: 30;
         transition: all 0.5s ease;
     }
-    
+
     @media (max-width: 1024px) {
         .upcoming-event-overlay {
             position: relative;
@@ -274,36 +299,42 @@
             transform: none;
             width: 100%;
             margin: 2rem auto 0;
-            max-width: 26rem; /* Allow it to be as wide as the desktop version on larger mobile screens */
+            max-width: 26rem;
+            /* Allow it to be as wide as the desktop version on larger mobile screens */
         }
     }
-    
+
     @media (max-width: 640px) {
         .upcoming-event-overlay {
-            max-width: 90%; /* Make it smaller on very small screens */
+            max-width: 90%;
+            /* Make it smaller on very small screens */
             width: 90%;
         }
     }
-    
+
     /* Upcoming event overlay text colors */
     .upcoming-event-overlay .event-item h4 {
-        color: #1f2937 !important; /* text-gray-800 */
+        color: #1f2937 !important;
+        /* text-gray-800 */
     }
-    
+
     .upcoming-event-overlay .event-item p,
     .upcoming-event-overlay .event-item span {
-        color: #4b5563 !important; /* text-gray-600 */
+        color: #4b5563 !important;
+        /* text-gray-600 */
     }
-    
+
     .dark .upcoming-event-overlay .event-item h4 {
-        color: #f3f4f6 !important; /* text-gray-100 */
+        color: #f3f4f6 !important;
+        /* text-gray-100 */
     }
-    
+
     .dark .upcoming-event-overlay .event-item p,
     .dark .upcoming-event-overlay .event-item span {
-        color: #9ca3af !important; /* text-gray-400 */
+        color: #9ca3af !important;
+        /* text-gray-400 */
     }
-    
+
     /* Ensure hero section text remains visible on all backgrounds */
     .hero-slider-container h1,
     .hero-slider-container h2,
@@ -312,41 +343,44 @@
     .hero-slider-container a {
         color: white !important;
     }
-    
+
     /* Header overlay effect with glassmorphism */
     header {
         position: fixed !important;
         top: 0;
         left: 0;
         right: 0;
-        z-index: 60 !important;  /* Increased z-index to stay on top */
+        z-index: 60 !important;
+        /* Increased z-index to stay on top */
         margin-top: 0;
         background: rgba(255, 255, 255, 0.70) !important;
         backdrop-filter: blur(10px) !important;
         -webkit-backdrop-filter: blur(10px) !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
-        color: #1f2937 !important; /* text-gray-800 */
+        color: #1f2937 !important;
+        /* text-gray-800 */
     }
-    
+
     header a,
     header span,
     header div {
-        color: #1f2937 !important; /* text-gray-800 */
+        color: #1f2937 !important;
+        /* text-gray-800 */
     }
-    
+
     .dark header {
         background: rgba(17, 24, 39, 0.70) !important;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: white !important;
     }
-    
+
     .dark header a,
     .dark header span,
     .dark header div {
         color: white !important;
     }
-    
+
     /* Ensure hero section takes full height and is behind header */
     .hero-slider-container {
         position: relative;
@@ -355,53 +389,60 @@
         overflow: hidden;
         z-index: 0;
     }
-    
+
     /* Main content should start after hero section */
     main {
         position: relative;
         z-index: 10;
-        padding-top: 0 !important; /* Remove any conflicting padding */
+        padding-top: 0 !important;
+        /* Remove any conflicting padding */
     }
-    
+
     .content-after-hero {
-        padding-top: 5rem; /* Standard padding for content after hero */
+        padding-top: 5rem;
+        /* Standard padding for content after hero */
         position: relative;
         z-index: 20;
     }
-    
 
-    
+
+
     /* Hero container styling */
     .hero-slider-container {
         position: relative;
         height: 100vh;
         width: 100%;
         overflow: hidden;
-        z-index: 40;  /* Ensure it's below header but above other content */
+        z-index: 40;
+        /* Ensure it's below header but above other content */
     }
-    
+
     /* Improved section styling for better spacing and theme consistency */
     .section-content {
         padding-top: 4rem !important;
         padding-bottom: 4rem !important;
     }
-    
+
     /* Glass pane with improved dark/light theme support */
     .glass-pane {
-        background: rgba(255, 255, 255, 0.70) !important; /* Match header opacity */
+        background: rgba(255, 255, 255, 0.70) !important;
+        /* Match header opacity */
         backdrop-filter: blur(10px) !important;
         -webkit-backdrop-filter: blur(10px) !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
-        color: #1f2937 !important; /* text-gray-800 for light theme */
+        color: #1f2937 !important;
+        /* text-gray-800 for light theme */
     }
-    
+
     .dark .glass-pane {
-        background: rgba(30, 41, 59, 0.70) !important; /* Match header opacity */
+        background: rgba(30, 41, 59, 0.70) !important;
+        /* Match header opacity */
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        color: #f3f4f6 !important; /* text-gray-100 for dark theme */
+        color: #f3f4f6 !important;
+        /* text-gray-100 for dark theme */
     }
-    
+
     /* Ensure content within glass panes has proper contrast */
     .glass-pane h3,
     .glass-pane p,
@@ -410,84 +451,93 @@
     .glass-pane span {
         color: inherit !important;
     }
-    
+
     /* Ensure text in white containers has proper contrast */
     .bg-white {
-        color: #1f2937 !important; /* text-gray-800 */
+        color: #1f2937 !important;
+        /* text-gray-800 */
     }
+
     .dark .bg-white {
-        color: #f3f4f6 !important; /* text-gray-100 */
+        color: #f3f4f6 !important;
+        /* text-gray-100 */
     }
-    
+
     /* Content sections with consistent spacing */
     .content-section {
         padding-top: 5rem;
         padding-bottom: 5rem;
     }
-    
+
     .stats-section {
         padding-top: 3rem;
         padding-bottom: 3rem;
     }
-    
+
     .features-section {
         padding-top: 5rem;
         padding-bottom: 5rem;
     }
-    
+
     .events-section {
         padding-top: 5rem;
         padding-bottom: 5rem;
     }
-    
+
     .testimonials-section {
         padding-top: 5rem;
         padding-bottom: 5rem;
     }
-    
+
     .cta-section {
         padding-top: 5rem;
         padding-bottom: 5rem;
     }
-    
+
     /* Theme-consistent text colors */
     .text-primary {
-        color: #1f2937; /* text-gray-800 */
+        color: #1f2937;
+        /* text-gray-800 */
     }
-    
+
     .dark .text-primary {
-        color: #f3f4f6; /* text-gray-100 */
+        color: #f3f4f6;
+        /* text-gray-100 */
     }
-    
+
     .text-secondary {
-        color: #4b5563; /* text-gray-600 */
+        color: #4b5563;
+        /* text-gray-600 */
     }
-    
+
     .dark .text-secondary {
-        color: #9ca3af; /* text-gray-400 */
+        color: #9ca3af;
+        /* text-gray-400 */
     }
-    
+
     /* Improved button styles with theme consistency */
     .premium-button {
         background: #ffffff !important;
         color: #000000 !important;
     }
-    
+
     .dark .premium-button {
         background: rgba(255, 255, 255, 0.1) !important;
         color: #ffffff !important;
     }
-    
+
     /* Ensure text buttons have proper contrast in light theme */
     .premium-button.text-btn {
         background: transparent !important;
-        color: #1f2937 !important; /* text-gray-800 */
+        color: #1f2937 !important;
+        /* text-gray-800 */
     }
-    
+
     .dark .premium-button.text-btn {
-        color: #f3f4f6 !important; /* text-gray-100 */
+        color: #f3f4f6 !important;
+        /* text-gray-100 */
     }
-    
+
     /* Consistent gradient text for all themes */
     .gradient-text {
         background: linear-gradient(135deg, #66b3e0 0%, #4fb8d5 100%) !important;
@@ -495,7 +545,7 @@
         -webkit-text-fill-color: transparent !important;
         background-clip: text !important;
     }
-    
+
     /* Improved card styling */
     .premium-card {
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
@@ -505,15 +555,17 @@
         backdrop-filter: blur(10px) !important;
         -webkit-backdrop-filter: blur(10px) !important;
         border: 1px solid rgba(255, 255, 255, 0.18) !important;
-        color: #1f2937 !important; /* text-gray-800 for light theme */
+        color: #1f2937 !important;
+        /* text-gray-800 for light theme */
     }
-    
+
     .dark .premium-card {
         background: rgba(17, 24, 39, 0.25) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        color: #f3f4f6 !important; /* text-gray-100 for dark theme */
+        color: #f3f4f6 !important;
+        /* text-gray-100 for dark theme */
     }
-    
+
     /* Ensure card content has proper contrast */
     .premium-card h3,
     .premium-card p,
@@ -521,28 +573,30 @@
     .premium-card .text-xs {
         color: inherit !important;
     }
-    
+
     /* Specific rule for Get Started button to ensure black text in light theme */
     #get-started-btn {
-        color: #000000 !important; /* black */
+        color: #000000 !important;
+        /* black */
     }
-    
+
     .dark #get-started-btn {
-        color: #ffffff !important; /* white for dark theme */
+        color: #ffffff !important;
+        /* white for dark theme */
     }
-    
+
     /* Improved section spacings */
     section {
         margin: 0 !important;
         padding: 3rem 0 !important;
     }
-    
+
     /* Consistent font colors across themes for content sections (not hero) */
-    .content-section h1, 
-    .content-section h2, 
-    .content-section h3, 
-    .content-section h4, 
-    .content-section h5, 
+    .content-section h1,
+    .content-section h2,
+    .content-section h3,
+    .content-section h4,
+    .content-section h5,
     .content-section h6,
     .stats-section h1,
     .stats-section h2,
@@ -574,14 +628,15 @@
     .cta-section h4,
     .cta-section h5,
     .cta-section h6 {
-        color: #1f2937 !important; /* text-gray-800 */
+        color: #1f2937 !important;
+        /* text-gray-800 */
     }
-    
-    .dark .content-section h1, 
-    .dark .content-section h2, 
-    .dark .content-section h3, 
-    .dark .content-section h4, 
-    .dark .content-section h5, 
+
+    .dark .content-section h1,
+    .dark .content-section h2,
+    .dark .content-section h3,
+    .dark .content-section h4,
+    .dark .content-section h5,
     .dark .content-section h6,
     .dark .stats-section h1,
     .dark .stats-section h2,
@@ -613,46 +668,60 @@
     .dark .cta-section h4,
     .dark .cta-section h5,
     .dark .cta-section h6 {
-        color: #f3f4f6 !important; /* text-gray-100 */
+        color: #f3f4f6 !important;
+        /* text-gray-100 */
     }
-    
+
     .content-section p,
     .stats-section p,
     .features-section p,
     .events-section p,
     .testimonials-section p,
     .cta-section p {
-        color: #4b5563 !important; /* text-gray-600 */
+        color: #4b5563 !important;
+        /* text-gray-600 */
     }
-    
+
     .dark .content-section p,
     .dark .stats-section p,
     .dark .features-section p,
     .dark .events-section p,
     .dark .testimonials-section p,
     .dark .cta-section p {
-        color: #9ca3af !important; /* text-gray-400 */
+        color: #9ca3af !important;
+        /* text-gray-400 */
     }
-    
+
     /* Enhanced contrast for content sections */
-    .bg-gray-900, .bg-black {
+    .bg-gray-900,
+    .bg-black {
         background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
     }
-    
-    .dark .bg-gray-900, .dark .bg-black {
+
+    .dark .bg-gray-900,
+    .dark .bg-black {
         background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
     }
-    
+
     /* Improved gradient sections */
-    .bg-gradient-to-b, .bg-gradient-to-r {
+    .bg-gradient-to-b,
+    .bg-gradient-to-r {
         background-size: 200% 200% !important;
         animation: gradientShift 8s ease infinite !important;
     }
-    
+
     @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
     }
 </style>
 
@@ -660,30 +729,31 @@
 <div class="hero-slider-container">
     <div class="hero-slider" id="heroSlider">
         {% if site_config.get_active_hero_images %}
-            {% for img in site_config.get_active_hero_images %}
-                <div class="slide {% if forloop.first %}active{% endif %}" 
-                     style="background-image: url('{% if img.path|slice:":5" == "/media" %}{{ img.path }}{% else %}/media/{{ img.path }}{% endif %}');">
-                    {% if img.caption %}
-                        <div class="slide-caption {% if forloop.first %}block{% else %}hidden{% endif %}" data-index="{{ forloop.counter0 }}">
-                            {{ img.caption }}
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        {% else %}
-            <!-- Default slide if no images in configuration -->
-            <div class="slide active" 
-                 style="background: linear-gradient(135deg, #66b3e0 0%, #4fb8d5 100%);">
+        {% for img in site_config.get_active_hero_images %}
+        <div class="slide {% if forloop.first %}active{% endif %}" style="background-image: url('{{ img.url }}');">
+            {% if img.caption %}
+            <div class="slide-caption {% if forloop.first %}block{% else %}hidden{% endif %}"
+                data-index="{{ forloop.counter0 }}">
+                {{ img.caption }}
             </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <!-- Default slide if no images in configuration -->
+        <div class="slide active" style="background: linear-gradient(135deg, #66b3e0 0%, #4fb8d5 100%);">
+        </div>
         {% endif %}
-        
+
         <!-- Content Overlay -->
         <div class="slide-content">
             <div class="flex-1 text-left">
-                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 md:mb-6 animate-fade-in-up text-white">
+                <h1
+                    class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 md:mb-6 animate-fade-in-up text-white">
                     {{ site_config.site_name|default:"Corporate Games Hub" }}
                 </h1>
-                <p class="text-lg md:text-xl lg:text-2xl text-white mb-6 md:mb-10 animate-fade-in-up animation-delay-200">
+                <p
+                    class="text-lg md:text-xl lg:text-2xl text-white mb-6 md:mb-10 animate-fade-in-up animation-delay-200">
                     Experience a seamless, engaging, and powerful platform for all your corporate gaming events.
                 </p>
             </div>
@@ -695,37 +765,44 @@
                 <div class="text-center mb-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">Featured Events</h3>
                 </div>
-                <div class="space-y-4 max-h-[35rem] overflow-y-auto pr-2">  <!-- Increased height to 35rem (560px) -->
+                <div class="space-y-4 max-h-[35rem] overflow-y-auto pr-2"> <!-- Increased height to 35rem (560px) -->
                     {% for event in events|dictsort:"start_date" %}
-                        {% if event.status == 'UPCOMING' or event.status == 'ONGOING' %}
-                    <div class="event-item flex items-start space-x-4 pb-4 border-b border-gray-200 dark:border-gray-600 last:border-0 last:pb-0">
+                    {% if event.status == 'UPCOMING' or event.status == 'ONGOING' %}
+                    <div
+                        class="event-item flex items-start space-x-4 pb-4 border-b border-gray-200 dark:border-gray-600 last:border-0 last:pb-0">
                         {% if event.logo %}
-                            <img src="{{ event.logo.url }}" alt="{{ event.name }}" class="w-12 h-12 object-contain flex-shrink-0 rounded">
+                        <img src="{{ event.logo.url }}" alt="{{ event.name }}"
+                            class="w-12 h-12 object-contain flex-shrink-0 rounded">
                         {% else %}
-                            <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full">
-                                <span class="text-white font-bold text-sm">{{ event.name|first|upper }}</span>
-                            </div>
+                        <div
+                            class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full">
+                            <span class="text-white font-bold text-sm">{{ event.name|first|upper }}</span>
+                        </div>
                         {% endif %}
                         <div class="flex-1 min-w-0">
                             <h4 class="font-bold text-sm text-gray-900 dark:text-white truncate">{{ event.name }}</h4>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ event.start_date|date:"M d, Y" }} - {{ event.end_date|date:"M d, Y" }}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ event.start_date|date:"M d, Y"
+                                }} - {{ event.end_date|date:"M d, Y" }}</p>
                             <div class="flex items-center justify-between">
                                 {% if event.status == 'UPCOMING' %}
-                                    <span class="inline-block text-xs px-3 py-1 rounded-full bg-green-500 text-white font-medium">
-                                        {{ event.get_status_display }}
-                                    </span>
+                                <span
+                                    class="inline-block text-xs px-3 py-1 rounded-full bg-green-500 text-white font-medium">
+                                    {{ event.get_status_display }}
+                                </span>
                                 {% elif event.status == 'ONGOING' %}
-                                    <span class="inline-block text-xs px-3 py-1 rounded-full bg-blue-500 text-white font-medium">
-                                        {{ event.get_status_display }}
-                                    </span>
+                                <span
+                                    class="inline-block text-xs px-3 py-1 rounded-full bg-blue-500 text-white font-medium">
+                                    {{ event.get_status_display }}
+                                </span>
                                 {% endif %}
-                                <a href="{% url 'gms:event_detail' event.id %}" class="text-sm px-3 py-1.5 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition-all duration-300 dark:bg-blue-700 dark:hover:bg-blue-800">
+                                <a href="{% url 'gms:event_detail' event.id %}"
+                                    class="text-sm px-3 py-1.5 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition-all duration-300 dark:bg-blue-700 dark:hover:bg-blue-800">
                                     View Event
                                 </a>
                             </div>
                         </div>
                     </div>
-                        {% endif %}
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -739,15 +816,18 @@
     <div class="container mx-auto px-4 sm:px-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8 text-center">
             <div class="floating-element">
-                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">{{ total_competitions }}</div>
+                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">{{
+                    total_competitions }}</div>
                 <div class="text-gray-400 mt-2 text-sm sm:text-base">Competitions</div>
             </div>
             <div class="floating-element" style="animation-delay: 0.2s;">
-                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">{{ total_clubs }}</div>
+                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">{{
+                    total_clubs }}</div>
                 <div class="text-gray-400 mt-2 text-sm sm:text-base">Clubs</div>
             </div>
             <div class="floating-element" style="animation-delay: 0.4s;">
-                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">{{ total_participants }}</div>
+                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">{{
+                    total_participants }}</div>
                 <div class="text-gray-400 mt-2 text-sm sm:text-base">Participants</div>
             </div>
         </div>
@@ -758,24 +838,30 @@
 <section id="announcements" class="py-16 sm:py-20 bg-gradient-to-b from-gray-900 to-black announcements-section">
     <div class="container mx-auto px-4 sm:px-6">
         <div class="text-center mb-12 sm:mb-16">
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold scroll-animate gradient-text">Latest Announcements</h2>
-            <p class="text-base sm:text-lg text-gray-400 mt-3 sm:mt-4 max-w-xl mx-auto scroll-animate" style="transition-delay: 100ms;">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold scroll-animate gradient-text">Latest Announcements
+            </h2>
+            <p class="text-base sm:text-lg text-gray-400 mt-3 sm:mt-4 max-w-xl mx-auto scroll-animate"
+                style="transition-delay: 100ms;">
                 Stay updated with the latest news and announcements from all events
             </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {% for announcement in recent_announcements %}
-            <div class="premium-card glass-pane rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col transform transition-all duration-500 hover:-translate-y-2 scroll-animate luxury-border">
+            <div
+                class="premium-card glass-pane rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col transform transition-all duration-500 hover:-translate-y-2 scroll-animate luxury-border">
                 <div class="mb-4">
                     {% if announcement.event.logo %}
-                        <img src="{{ announcement.event.logo.url }}" alt="{{ announcement.event.name }}" class="w-16 h-16 object-contain rounded-lg mb-4">
+                    <img src="{{ announcement.event.logo.url }}" alt="{{ announcement.event.name }}"
+                        class="w-16 h-16 object-contain rounded-lg mb-4">
                     {% else %}
-                        <div class="w-16 h-16 flex items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg mb-4">
-                            <span class="text-white font-bold text-xl">{{ announcement.event.name|first|upper }}</span>
-                        </div>
+                    <div
+                        class="w-16 h-16 flex items-center justify-center bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg mb-4">
+                        <span class="text-white font-bold text-xl">{{ announcement.event.name|first|upper }}</span>
+                    </div>
                     {% endif %}
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-cyan-500 text-white mb-3">
+                    <span
+                        class="inline-block px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-cyan-500 text-white mb-3">
                         {{ announcement.event.name }}
                     </span>
                 </div>
@@ -800,156 +886,192 @@
 <section class="py-16 sm:py-20 bg-gradient-to-b from-gray-900 to-black motivation-section">
     <div class="container mx-auto px-4 sm:px-6">
         <div class="text-center mb-12 sm:mb-16">
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold scroll-animate gradient-text">Motivation from Company Leaders</h2>
-            <p class="text-base sm:text-lg text-gray-400 mt-3 sm:mt-4 max-w-xl mx-auto scroll-animate" style="transition-delay: 100ms;">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold scroll-animate gradient-text">Motivation from Company
+                Leaders</h2>
+            <p class="text-base sm:text-lg text-gray-400 mt-3 sm:mt-4 max-w-xl mx-auto scroll-animate"
+                style="transition-delay: 100ms;">
                 Hear inspiring words from our company leaders about the importance of corporate games and events
             </p>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            <div class="glass-pane rounded-xl sm:rounded-2xl p-4 sm:p-6 scroll-animate" style="transition-delay: 200ms;">
+            <div class="glass-pane rounded-xl sm:rounded-2xl p-4 sm:p-6 scroll-animate"
+                style="transition-delay: 200ms;">
                 <div class="flex items-center mb-4">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-lg">CEO</div>
+                    <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-lg">
+                        CEO</div>
                     <div>
                         <h4 class="font-bold text-sm sm:text-base">CEO</h4>
                         <p class="text-xs sm:text-sm text-gray-400">Corporate Leadership</p>
                     </div>
                 </div>
-                <p class="text-gray-300 italic text-sm sm:text-base">"Corporate games bring out the best in our employees. They foster teamwork, healthy competition, and create lasting memories beyond daily work routines."</p>
+                <p class="text-gray-300 italic text-sm sm:text-base">"Corporate games bring out the best in our
+                    employees. They foster teamwork, healthy competition, and create lasting memories beyond daily work
+                    routines."</p>
             </div>
-            
-            <div class="glass-pane rounded-xl sm:rounded-2xl p-4 sm:p-6 scroll-animate" style="transition-delay: 300ms;">
+
+            <div class="glass-pane rounded-xl sm:rounded-2xl p-4 sm:p-6 scroll-animate"
+                style="transition-delay: 300ms;">
                 <div class="flex items-center mb-4">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-lg">HR</div>
+                    <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-lg">
+                        HR</div>
                     <div>
                         <h4 class="font-bold text-sm sm:text-base">HR Director</h4>
                         <p class="text-xs sm:text-sm text-gray-400">Human Resources</p>
                     </div>
                 </div>
-                <p class="text-gray-300 italic text-sm sm:text-base">"These events strengthen our company culture. When employees compete as teams, they build relationships that translate into better collaboration in the workplace."</p>
+                <p class="text-gray-300 italic text-sm sm:text-base">"These events strengthen our company culture. When
+                    employees compete as teams, they build relationships that translate into better collaboration in the
+                    workplace."</p>
             </div>
-            
-            <div class="glass-pane rounded-xl sm:rounded-2xl p-4 sm:p-6 scroll-animate" style="transition-delay: 400ms;">
+
+            <div class="glass-pane rounded-xl sm:rounded-2xl p-4 sm:p-6 scroll-animate"
+                style="transition-delay: 400ms;">
                 <div class="flex items-center mb-4">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-lg">GM</div>
+                    <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3 sm:mr-4 text-sm sm:text-lg">
+                        GM</div>
                     <div>
                         <h4 class="font-bold text-sm sm:text-base">General Manager</h4>
                         <p class="text-xs sm:text-sm text-gray-400">Operations</p>
                     </div>
                 </div>
-                <p class="text-gray-300 italic text-sm sm:text-base">"Corporate games are more than entertainment. They reveal leadership potential, problem-solving skills, and build the resilience we value in our organization."</p>
+                <p class="text-gray-300 italic text-sm sm:text-base">"Corporate games are more than entertainment. They
+                    reveal leadership potential, problem-solving skills, and build the resilience we value in our
+                    organization."</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Match Calendar Section -->
-<section id="calendar" class="py-12 sm:py-16 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 relative overflow-hidden calendar-section">
+<section id="calendar"
+    class="py-12 sm:py-16 bg-gradient-to-r from-blue-900/20 to-cyan-900/20 relative overflow-hidden calendar-section">
     <div class="aurora-background"></div>
     <div class="container mx-auto px-4 sm:px-6 relative z-10">
         <div class="text-center mb-8">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold scroll-animate gradient-text">Upcoming Matches Calendar</h2>
-            <p class="text-base sm:text-lg text-gray-300 max-w-xl sm:max-w-2xl mx-auto scroll-animate" style="transition-delay: 100ms;">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold scroll-animate gradient-text">Upcoming Matches
+                Calendar</h2>
+            <p class="text-base sm:text-lg text-gray-300 max-w-xl sm:max-w-2xl mx-auto scroll-animate"
+                style="transition-delay: 100ms;">
                 View the schedule of upcoming matches across all events and competitions
             </p>
         </div>
-        
+
         <!-- Calendar view -->
         <div class="premium-card glass-pane p-4 rounded-xl">
             <!-- Month navigation with arrow controls -->
             <div class="flex justify-between items-center mb-4">
-                <button id="prev-month" class="px-3 py-1 rounded-l bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                <button id="prev-month"
+                    class="px-3 py-1 rounded-l bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
                     </svg>
                 </button>
-                
+
                 <div class="flex-1 text-center">
                     <h3 class="text-lg font-bold text-white current-month-display">
                         {% if months_data %}
-                            {{ months_data.0.month_name }} {{ months_data.0.year }}
+                        {{ months_data.0.month_name }} {{ months_data.0.year }}
                         {% endif %}
                     </h3>
                 </div>
-                
-                <button id="next-month" class="px-3 py-1 rounded-r bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+
+                <button id="next-month"
+                    class="px-3 py-1 rounded-r bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
                 </button>
             </div>
-            
+
             <!-- Current month calendar -->
             <div id="calendar-container">
                 {% for month_data in months_data %}
-                <div class="month-calendar" data-month-index="{{ forloop.counter0 }}" {% if forloop.counter0 != current_month_index %}style="display:none;"{% endif %}>
-                    
+                <div class="month-calendar" data-month-index="{{ forloop.counter0 }}" {% if forloop.counter0
+                    !=current_month_index %}style="display:none;" {% endif %}>
+
                     <!-- Calendar grid -->
                     <div class="grid grid-cols-7 gap-1 mb-1">
                         {% for day in "0123456"|make_list %}
-                            {% if forloop.counter0 == 0 %}
-                                <div class="text-center text-xs font-medium text-gray-400 py-1">Sun</div>
-                            {% elif forloop.counter0 == 1 %}
-                                <div class="text-center text-xs font-medium text-gray-400 py-1">Mon</div>
-                            {% elif forloop.counter0 == 2 %}
-                                <div class="text-center text-xs font-medium text-gray-400 py-1">Tue</div>
-                            {% elif forloop.counter0 == 3 %}
-                                <div class="text-center text-xs font-medium text-gray-400 py-1">Wed</div>
-                            {% elif forloop.counter0 == 4 %}
-                                <div class="text-center text-xs font-medium text-gray-400 py-1">Thu</div>
-                            {% elif forloop.counter0 == 5 %}
-                                <div class="text-center text-xs font-medium text-gray-400 py-1">Fri</div>
-                            {% elif forloop.counter0 == 6 %}
-                                <div class="text-center text-xs font-medium text-gray-400 py-1">Sat</div>
-                            {% endif %}
+                        {% if forloop.counter0 == 0 %}
+                        <div class="text-center text-xs font-medium text-gray-400 py-1">Sun</div>
+                        {% elif forloop.counter0 == 1 %}
+                        <div class="text-center text-xs font-medium text-gray-400 py-1">Mon</div>
+                        {% elif forloop.counter0 == 2 %}
+                        <div class="text-center text-xs font-medium text-gray-400 py-1">Tue</div>
+                        {% elif forloop.counter0 == 3 %}
+                        <div class="text-center text-xs font-medium text-gray-400 py-1">Wed</div>
+                        {% elif forloop.counter0 == 4 %}
+                        <div class="text-center text-xs font-medium text-gray-400 py-1">Thu</div>
+                        {% elif forloop.counter0 == 5 %}
+                        <div class="text-center text-xs font-medium text-gray-400 py-1">Fri</div>
+                        {% elif forloop.counter0 == 6 %}
+                        <div class="text-center text-xs font-medium text-gray-400 py-1">Sat</div>
+                        {% endif %}
                         {% endfor %}
                     </div>
-                    
+
                     <div class="grid grid-cols-7 gap-1">
                         {% for week in month_data.weeks %}
-                            {% for day_info in week %}
-                                <div class="min-h-20 p-2 border rounded {% if day_info.is_today %}bg-blue-100 border-blue-500 dark:bg-blue-500/20 dark:border-blue-500{% else %}bg-white dark:bg-gray-800/30 border-gray-300 dark:border-gray-700{% endif %} hover:shadow-lg hover:z-10 transition-all duration-200 relative">
-                                    {% if day_info.day != 0 %}
-                                        <div class="text-right mb-1">
-                                            <span class="text-sm font-medium {% if day_info.is_today %}text-blue-600 dark:text-blue-400{% else %}text-gray-900 dark:text-gray-300{% endif %}">{{ day_info.day }}</span>
-                                        </div>
-                                        
-                                        {% if day_info.matches %}
-                                            <div class="space-y-0.5 max-h-16 overflow-y-auto text-xs">
-                                                {% for match in day_info.matches|slice:":2" %}  <!-- Show max 2 matches per day to save space -->
-                                                    <div class="truncate" title="{{ match.home_team.name }} vs {{ match.away_team.name }} - {{ match.scheduled_time|time:'H:i' }}">
-                                                        <div class="text-xs text-blue-600 dark:text-blue-300 truncate">
-                                                            {{ match.scheduled_time|time:"H:i" }}
-                                                        </div>
-                                                        <div class="text-xs text-gray-800 dark:text-gray-300 truncate flex items-center">
-                                                            {% if match.home_team.logo %}
-                                                                <img src="{{ match.home_team.logo.url }}" alt="{{ match.home_team.name }}" class="w-3 h-3 object-contain inline mr-1">
-                                                            {% else %}
-                                                                <span class="inline-block w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mr-1"></span>
-                                                            {% endif %}
-                                                            <span class="truncate">{{ match.home_team.name|truncatechars:6 }}</span> 
-                                                            <span class="text-gray-500 dark:text-gray-400">vs</span> 
-                                                            <span class="truncate">{{ match.away_team.name|truncatechars:6 }}</span>
-                                                            {% if match.away_team.logo %}
-                                                                <img src="{{ match.away_team.logo.url }}" alt="{{ match.away_team.name }}" class="w-3 h-3 object-contain inline ml-1">
-                                                            {% else %}
-                                                                <span class="inline-block w-3 h-3 bg-gradient-to-r from-green-500 to-teal-500 rounded-full ml-1"></span>
-                                                            {% endif %}
-                                                        </div>
-                                                    </div>
-                                                {% endfor %}
-                                                {% if day_info.matches|length > 2 %}
-                                                    <div class="text-xs text-gray-600 dark:text-gray-500 text-center">+{{ day_info.matches|length|add:"-2" }}</div>
-                                                {% endif %}
-                                            </div>
+                        {% for day_info in week %}
+                        <div
+                            class="min-h-20 p-2 border rounded {% if day_info.is_today %}bg-blue-100 border-blue-500 dark:bg-blue-500/20 dark:border-blue-500{% else %}bg-white dark:bg-gray-800/30 border-gray-300 dark:border-gray-700{% endif %} hover:shadow-lg hover:z-10 transition-all duration-200 relative">
+                            {% if day_info.day != 0 %}
+                            <div class="text-right mb-1">
+                                <span
+                                    class="text-sm font-medium {% if day_info.is_today %}text-blue-600 dark:text-blue-400{% else %}text-gray-900 dark:text-gray-300{% endif %}">{{
+                                    day_info.day }}</span>
+                            </div>
+
+                            {% if day_info.matches %}
+                            <div class="space-y-0.5 max-h-16 overflow-y-auto text-xs">
+                                {% for match in day_info.matches|slice:":2" %}
+                                <!-- Show max 2 matches per day to save space -->
+                                <div class="truncate"
+                                    title="{{ match.home_team.name }} vs {{ match.away_team.name }} - {{ match.scheduled_time|time:'H:i' }}">
+                                    <div class="text-xs text-blue-600 dark:text-blue-300 truncate">
+                                        {{ match.scheduled_time|time:"H:i" }}
+                                    </div>
+                                    <div class="text-xs text-gray-800 dark:text-gray-300 truncate flex items-center">
+                                        {% if match.home_team.logo %}
+                                        <img src="{{ match.home_team.logo.url }}" alt="{{ match.home_team.name }}"
+                                            class="w-3 h-3 object-contain inline mr-1">
                                         {% else %}
-                                            <div class="text-gray-400 dark:text-gray-600 text-xs text-center py-3">-</div>
+                                        <span
+                                            class="inline-block w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full mr-1"></span>
                                         {% endif %}
-                                    {% else %}
-                                        <div class="text-transparent">0</div>
-                                    {% endif %}
+                                        <span class="truncate">{{ match.home_team.name|truncatechars:6 }}</span>
+                                        <span class="text-gray-500 dark:text-gray-400">vs</span>
+                                        <span class="truncate">{{ match.away_team.name|truncatechars:6 }}</span>
+                                        {% if match.away_team.logo %}
+                                        <img src="{{ match.away_team.logo.url }}" alt="{{ match.away_team.name }}"
+                                            class="w-3 h-3 object-contain inline ml-1">
+                                        {% else %}
+                                        <span
+                                            class="inline-block w-3 h-3 bg-gradient-to-r from-green-500 to-teal-500 rounded-full ml-1"></span>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            {% endfor %}
+                                {% endfor %}
+                                {% if day_info.matches|length > 2 %}
+                                <div class="text-xs text-gray-600 dark:text-gray-500 text-center">+{{
+                                    day_info.matches|length|add:"-2" }}</div>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <div class="text-gray-400 dark:text-gray-600 text-xs text-center py-3">-</div>
+                            {% endif %}
+                            {% else %}
+                            <div class="text-transparent">0</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
                         {% endfor %}
                     </div>
                 </div>
@@ -957,208 +1079,208 @@
             </div>
         </div>
     </div>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Month navigation functionality
             const monthCalendars = document.querySelectorAll('.month-calendar');
             const prevButton = document.getElementById('prev-month');
             const nextButton = document.getElementById('next-month');
             const monthDisplay = document.querySelector('.current-month-display');
             let currentMonthIndex = 0;
-            
+
             // Array of month names and years for display
             const monthData = [
                 {% for month_data in months_data %}
-                    {month_name: "{{ month_data.month_name }}", year: "{{ month_data.year }}"}{% if not forloop.last %},{% endif %}
-                {% endfor %}
+                    { month_name: "{{ month_data.month_name }}", year: "{{ month_data.year }}" }{% if not forloop.last %}, {% endif %}
+        {% endfor %}
             ];
-            
-            function showMonth(index) {
-                // Hide all calendars
-                monthCalendars.forEach(calendar => {
-                    calendar.style.display = 'none';
-                });
-                
-                // Show current calendar
-                if (monthCalendars[index]) {
-                    monthCalendars[index].style.display = 'block';
-                    
-                    // Update month display
-                    if (monthData && monthData[index]) {
-                        monthDisplay.textContent = monthData[index].month_name + ' ' + monthData[index].year;
-                    }
-                }
-                
-                // Update button states
-                prevButton.disabled = (index <= 0);
-                nextButton.disabled = (index >= monthCalendars.length - 1);
-                
-                // Update button visual state for disabled
-                if (index <= 0) {
-                    prevButton.classList.add('opacity-50', 'cursor-not-allowed');
-                    prevButton.classList.remove('hover:bg-gray-300', 'dark:hover:bg-gray-600');
-                } else {
-                    prevButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                    prevButton.classList.add('hover:bg-gray-300', 'dark:hover:bg-gray-600');
-                }
-                
-                if (index >= monthCalendars.length - 1) {
-                    nextButton.classList.add('opacity-50', 'cursor-not-allowed');
-                    nextButton.classList.remove('hover:bg-gray-300', 'dark:hover:bg-gray-600');
-                } else {
-                    nextButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                    nextButton.classList.add('hover:bg-gray-300', 'dark:hover:bg-gray-600');
+
+        function showMonth(index) {
+            // Hide all calendars
+            monthCalendars.forEach(calendar => {
+                calendar.style.display = 'none';
+            });
+
+            // Show current calendar
+            if (monthCalendars[index]) {
+                monthCalendars[index].style.display = 'block';
+
+                // Update month display
+                if (monthData && monthData[index]) {
+                    monthDisplay.textContent = monthData[index].month_name + ' ' + monthData[index].year;
                 }
             }
-            
-            // Show initial month
-            showMonth(currentMonthIndex);
-            
-            // Next button event
-            nextButton.addEventListener('click', function() {
-                if (currentMonthIndex < monthCalendars.length - 1) {
-                    currentMonthIndex++;
-                    showMonth(currentMonthIndex);
-                }
-            });
-            
-            // Previous button event  
-            prevButton.addEventListener('click', function() {
-                if (currentMonthIndex > 0) {
-                    currentMonthIndex--;
-                    showMonth(currentMonthIndex);
-                }
-            });
+
+            // Update button states
+            prevButton.disabled = (index <= 0);
+            nextButton.disabled = (index >= monthCalendars.length - 1);
+
+            // Update button visual state for disabled
+            if (index <= 0) {
+                prevButton.classList.add('opacity-50', 'cursor-not-allowed');
+                prevButton.classList.remove('hover:bg-gray-300', 'dark:hover:bg-gray-600');
+            } else {
+                prevButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                prevButton.classList.add('hover:bg-gray-300', 'dark:hover:bg-gray-600');
+            }
+
+            if (index >= monthCalendars.length - 1) {
+                nextButton.classList.add('opacity-50', 'cursor-not-allowed');
+                nextButton.classList.remove('hover:bg-gray-300', 'dark:hover:bg-gray-600');
+            } else {
+                nextButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                nextButton.classList.add('hover:bg-gray-300', 'dark:hover:bg-gray-600');
+            }
+        }
+
+        // Show initial month
+        showMonth(currentMonthIndex);
+
+        // Next button event
+        nextButton.addEventListener('click', function () {
+            if (currentMonthIndex < monthCalendars.length - 1) {
+                currentMonthIndex++;
+                showMonth(currentMonthIndex);
+            }
+        });
+
+        // Previous button event  
+        prevButton.addEventListener('click', function () {
+            if (currentMonthIndex > 0) {
+                currentMonthIndex--;
+                showMonth(currentMonthIndex);
+            }
+        });
         });
     </script>
 </section>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Hero Slider Functionality - Auto sliding only
-    const slider = document.getElementById('heroSlider');
-    const slides = document.querySelectorAll('.slide');
-    const dots = document.querySelectorAll('.slide-dot');
-    const captions = document.querySelectorAll('.slide-caption');
-    
-    let currentSlide = 0;
-    let slideInterval;
-    
-    function showSlide(n) {
-        // Hide all slides and captions
-        slides.forEach(slide => slide.classList.remove('active'));
-        if (dots.length > 0) {
-            dots.forEach(dot => dot.classList.remove('active'));
-        }
-        captions.forEach(caption => caption.classList.add('hidden'));
-        
-        // Calculate new slide index
-        currentSlide = (n + slides.length) % slides.length;
-        
-        // Show the selected slide
-        if (slides[currentSlide]) {
-            slides[currentSlide].classList.add('active');
-        }
-        
-        // Update active dot if dots exist
-        if (dots.length > 0 && dots[currentSlide]) {
-            dots[currentSlide].classList.add('active');
-        }
-        
-        // Show corresponding caption
-        if (captions[currentSlide]) {
-            captions[currentSlide].classList.remove('hidden');
-        }
-    }
-    
-    function nextSlide() {
-        showSlide(currentSlide + 1);
-    }
-    
-    // Start automatic slideshow
-    function startSlideShow() {
-        slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
-    }
-    
-    // Stop automatic slideshow (on hover)
-    function stopSlideShow() {
-        clearInterval(slideInterval);
-    }
-    
-    // Initialize the slider
-    showSlide(currentSlide);
-    startSlideShow();
-    
-    // Add mouse events to pause/resume slideshow
-    if (slider) {
-        slider.addEventListener('mouseenter', stopSlideShow);
-        slider.addEventListener('mouseleave', startSlideShow);
-    }
-    
-    // Scroll animations
-    const animatedElements = document.querySelectorAll('.scroll-animate');
+    document.addEventListener('DOMContentLoaded', function () {
+        // Hero Slider Functionality - Auto sliding only
+        const slider = document.getElementById('heroSlider');
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.slide-dot');
+        const captions = document.querySelectorAll('.slide-caption');
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
+        let currentSlide = 0;
+        let slideInterval;
+
+        function showSlide(n) {
+            // Hide all slides and captions
+            slides.forEach(slide => slide.classList.remove('active'));
+            if (dots.length > 0) {
+                dots.forEach(dot => dot.classList.remove('active'));
             }
-        });
-    }, {
-        threshold: 0.1
-    });
+            captions.forEach(caption => caption.classList.add('hidden'));
 
-    animatedElements.forEach(el => {
-        observer.observe(el);
-    });
-    
-    // Stats counter animation
-    const counters = document.querySelectorAll('.stats-counter');
-    const observer2 = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const target = entry.target;
-                const text = target.textContent;
-                const isNumeric = /\d/.test(text);
-                
-                if (isNumeric) {
-                    const finalValue = text.replace(/[^\d]/g, '');
-                    let current = 0;
-                    const increment = finalValue / 100;
-                    const duration = 2000;
-                    const stepTime = duration / (finalValue / increment);
-                    
-                    const timer = setInterval(() => {
-                        current += increment;
-                        if (current >= finalValue) {
-                            target.textContent = text.replace(/\d+/, finalValue);
-                            clearInterval(timer);
-                        } else {
-                            target.textContent = text.replace(/\d+/, Math.floor(current));
-                        }
-                    }, stepTime);
+            // Calculate new slide index
+            currentSlide = (n + slides.length) % slides.length;
+
+            // Show the selected slide
+            if (slides[currentSlide]) {
+                slides[currentSlide].classList.add('active');
+            }
+
+            // Update active dot if dots exist
+            if (dots.length > 0 && dots[currentSlide]) {
+                dots[currentSlide].classList.add('active');
+            }
+
+            // Show corresponding caption
+            if (captions[currentSlide]) {
+                captions[currentSlide].classList.remove('hidden');
+            }
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        // Start automatic slideshow
+        function startSlideShow() {
+            slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+        }
+
+        // Stop automatic slideshow (on hover)
+        function stopSlideShow() {
+            clearInterval(slideInterval);
+        }
+
+        // Initialize the slider
+        showSlide(currentSlide);
+        startSlideShow();
+
+        // Add mouse events to pause/resume slideshow
+        if (slider) {
+            slider.addEventListener('mouseenter', stopSlideShow);
+            slider.addEventListener('mouseleave', startSlideShow);
+        }
+
+        // Scroll animations
+        const animatedElements = document.querySelectorAll('.scroll-animate');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
                 }
-                observer2.unobserve(target);
-            }
+            });
+        }, {
+            threshold: 0.1
         });
-    }, {
-        threshold: 0.5
-    });
 
-    counters.forEach(counter => {
-        observer2.observe(counter);
-    });
-    
-    
-    // Prevent auto-scrolling on page load by clearing any existing hash
-    if(window.location.hash && window.location.hash !== '#') {
-        // Remove the hash from the URL without scrolling
-        history.replaceState(null, null, window.location.pathname + window.location.search);
-    }
+        animatedElements.forEach(el => {
+            observer.observe(el);
+        });
 
-});
+        // Stats counter animation
+        const counters = document.querySelectorAll('.stats-counter');
+        const observer2 = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = entry.target;
+                    const text = target.textContent;
+                    const isNumeric = /\d/.test(text);
+
+                    if (isNumeric) {
+                        const finalValue = text.replace(/[^\d]/g, '');
+                        let current = 0;
+                        const increment = finalValue / 100;
+                        const duration = 2000;
+                        const stepTime = duration / (finalValue / increment);
+
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= finalValue) {
+                                target.textContent = text.replace(/\d+/, finalValue);
+                                clearInterval(timer);
+                            } else {
+                                target.textContent = text.replace(/\d+/, Math.floor(current));
+                            }
+                        }, stepTime);
+                    }
+                    observer2.unobserve(target);
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+
+        counters.forEach(counter => {
+            observer2.observe(counter);
+        });
+
+
+        // Prevent auto-scrolling on page load by clearing any existing hash
+        if (window.location.hash && window.location.hash !== '#') {
+            // Remove the hash from the URL without scrolling
+            history.replaceState(null, null, window.location.pathname + window.location.search);
+        }
+
+    });
 </script>
 
 {% endblock %}

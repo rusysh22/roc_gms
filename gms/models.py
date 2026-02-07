@@ -78,7 +78,20 @@ class SiteConfiguration(models.Model):
         """Get only active hero images, ordered by their order field."""
         if not self.hero_images:
             return []
-        return sorted([img for img in self.hero_images], key=lambda x: x.get('order', 0))
+        
+        from django.core.files.storage import default_storage
+        images = sorted([img for img in self.hero_images], key=lambda x: x.get('order', 0))
+        
+        # Add full URL to each image for template usage
+        for img in images:
+            if 'path' in img:
+                try:
+                    img['url'] = default_storage.url(img['path'])
+                except Exception:
+                    # Fallback if storage fails or path is invalid
+                    img['url'] = f"/media/{img['path']}"
+                    
+        return images
 
     def get_favicon_html(self):
         """Return HTML tag for favicon if available."""
