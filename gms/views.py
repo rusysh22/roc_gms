@@ -571,6 +571,10 @@ def _get_calendar_data(today, matches_by_date):
     
     # Generate calendar for each month and collect data
     months_data = []
+    
+    # Set calendar to start weeks on Sunday to match template headers
+    calendar.setfirstweekday(calendar.SUNDAY)
+    
     for year, month in sorted_months[:3]:  # Show max 3 months
         cal = calendar.monthcalendar(year, month)
         
