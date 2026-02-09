@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
+from django.core.cache import cache
 import json
 import datetime
 from datetime import datetime, time, timedelta
@@ -109,6 +110,8 @@ class SiteConfiguration(models.Model):
         if not self.pk and SiteConfiguration.objects.exists():
             raise ValueError("Only one SiteConfiguration instance is allowed")
         super().save(*args, **kwargs)
+        # Clear cache to ensure changes are reflected immediately
+        cache.delete('site_config_context')
 
     @classmethod
     def get_solo(cls):

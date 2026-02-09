@@ -208,8 +208,8 @@ if not DEBUG or env('USE_CLOUD_STORAGE', default=False):
                     "bucket_name": AWS_STORAGE_BUCKET_NAME,
                     "endpoint_url": AWS_S3_ENDPOINT_URL,
                     "region_name": AWS_S3_REGION_NAME,
-                    "default_acl": "public-read", 
-                    "querystring_auth": False, # Links should be public without signatures
+                    "default_acl": "public-read",
+                    "querystring_auth": True,  # Enable signed URLs to access private bucket files
                     "file_overwrite": False,
                 },
             },

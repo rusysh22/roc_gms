@@ -14,7 +14,14 @@
     height: 100%;
     overflow: hidden;
     z-index: -1;
+    background-color: #f9fafb;
+    /* Light gray background for light mode */
+    opacity: 0.5;
+}
+
+.dark .aurora-background {
     background-color: #000;
+    opacity: 1;
 }
 
 .aurora-background::before,
