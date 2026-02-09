@@ -215,13 +215,14 @@ class SiteConfigurationForm(ModelForm):
         required=False,
         widget=MultipleFileInput(attrs={
             'accept': 'image/*',
+            'id': 'id_hero_images_upload',
         }),
         help_text="Upload multiple images for the hero slider (max 10 files, max 5MB each, images only). Hold Ctrl/Cmd to select multiple files."
     )
     hero_images_to_remove = forms.CharField(
         required=False,
-        widget=forms.HiddenInput(attrs={'id': 'id_hero_images_to_remove', 'style': 'display: none;'}),
-        help_text="Indexes of images to remove (comma separated)"
+        label='',  # Suppress label for hidden field
+        widget=forms.HiddenInput(attrs={'id': 'id_hero_images_to_remove'}),
     )
     timezone = forms.ChoiceField(
         choices=TIMEZONE_CHOICES,

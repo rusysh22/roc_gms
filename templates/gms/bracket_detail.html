@@ -367,8 +367,7 @@
                         <li class="seed-item" data-id="{{ p.id }}">
                             <span class="handle mr-4">☰</span>
                             <span class="seed-number">#{{ forloop.counter }}</span>
-                            <span class="seed-name">{% if p.full_name %}{{ p.full_name }}{% else %}{{ p.name }}{% endif
-                                %}</span>
+                            <span class="seed-name">{% if p.full_name %}{{ p.full_name }}{% else %}{{ p.name }}{% endif %}</span>
                         </li>
                         {% empty %}
                         <li class="text-center text-gray-500 py-4">No participants enrolled.</li>
@@ -686,8 +685,7 @@
 <script src="{% static 'js/jquery.bracket.min.js' %}"></script>
 <script>
     $(document).ready(function () {
-        const matchesExist = {{ competition.matches.exists| yesno: "true,false"
-    }};
+        const matchesExist = {{ competition.matches.exists| yesno: "true,false" }};
 
     if (!matchesExist) {
         // Seeding logic remains the same

@@ -1,0 +1,722 @@
+/* Homepage specific styles extracted from homepage.html */
+
+:root {
+    --aurora-speed: 8s;
+    --slide-transition: opacity 1.2s ease-in-out;
+}
+
+
+.aurora-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+    background-color: #000;
+}
+
+.aurora-background::before,
+.aurora-background::after {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    border-radius: 50%;
+    opacity: 0.3;
+    filter: blur(100px);
+    will-change: transform;
+}
+
+.aurora-background::before {
+    background: radial-gradient(circle at 50% 50%, #2a8ac5, transparent 70%);
+    top: -50%;
+    left: -50%;
+    animation: moveAurora var(--aurora-speed) linear infinite alternate;
+}
+
+.aurora-background::after {
+    background: radial-gradient(circle at 50% 50%, #4fb8d5, transparent 70%);
+    bottom: -50%;
+    right: -50%;
+    animation: moveAurora var(--aurora-speed) linear infinite alternate-reverse;
+}
+
+@keyframes moveAurora {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(50%, 50%);
+    }
+}
+
+.glass-pane {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+.dark .glass-pane {
+    background: rgba(17, 24, 39, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.scroll-animate.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Hero Slider Styles */
+.hero-slider-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.hero-slider {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: var(--slide-transition);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.slide.active {
+    opacity: 1;
+    z-index: 1;
+}
+
+.slide-content {
+    position: absolute !important;
+    z-index: 20 !important;
+    width: auto !important;
+    /* Let width be flexible */
+    max-width: 500px !important;
+    /* Maximum width for text readability */
+    margin: 0 !important;
+    padding: 2rem !important;
+    left: 5% !important;
+    /* Position from left edge */
+    top: 50% !important;
+    /* Center vertically */
+    transform: translateY(-50%) !important;
+    /* Center vertically */
+    text-align: left !important;
+    /* Left-aligned text */
+    display: block !important;
+}
+
+
+
+.slide-caption {
+    position: absolute;
+    bottom: 2rem;
+    left: 2rem;
+    /* Position from left edge */
+    max-width: 500px;
+    /* Adjust width for left alignment */
+    margin: 0;
+    padding: 1.25rem;
+    text-align: left;
+    /* Left-aligned text */
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    color: #1f2937;
+    /* text-gray-800 */
+    z-index: 15;
+    font-size: 1.1rem;
+}
+
+.dark .slide-caption {
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+}
+
+.premium-card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.premium-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+}
+
+.floating-element {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #66b3e0 0%, #4fb8d5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.premium-button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.premium-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.premium-button:hover::before {
+    left: 100%;
+}
+
+.stats-counter {
+    font-variant-numeric: tabular-nums;
+}
+
+.luxury-border {
+    position: relative;
+}
+
+.luxury-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(45deg, #66b3e0, #4fb8d5, #6ec6e5, #5ab0d0);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+/* Hero slider with pseudo-element overlay */
+.hero-slider {
+    position: relative;
+}
+
+.hero-slider::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.7) 30%, rgba(0, 0, 0, 0.3) 70%);
+    z-index: 10;
+}
+
+.slide-content {
+    position: relative;
+    z-index: 20;
+}
+
+/* Ensure hero section text remains visible on all backgrounds */
+.hero-slider-container h1,
+.hero-slider-container h2,
+.hero-slider-container h3,
+.hero-slider-container p,
+.hero-slider-container a {
+    color: white !important;
+}
+
+/* Upcoming event overlay container styling */
+.upcoming-event-overlay {
+    position: absolute;
+    top: 50%;
+    right: 3rem;
+    /* Increased margin from the edge */
+    transform: translateY(-50%);
+    width: 28rem;
+    /* Increased width for larger container (w-[28rem] = 28rem) */
+    z-index: 30;
+    transition: all 0.5s ease;
+}
+
+@media (max-width: 1024px) {
+    .upcoming-event-overlay {
+        position: relative;
+        top: auto;
+        right: auto;
+        transform: none;
+        width: 100%;
+        margin: 2rem auto 0;
+        max-width: 26rem;
+        /* Allow it to be as wide as the desktop version on larger mobile screens */
+    }
+}
+
+@media (max-width: 640px) {
+    .upcoming-event-overlay {
+        max-width: 90%;
+        /* Make it smaller on very small screens */
+        width: 90%;
+    }
+}
+
+/* Upcoming event overlay text colors */
+.upcoming-event-overlay .event-item h4 {
+    color: #1f2937 !important;
+    /* text-gray-800 */
+}
+
+.upcoming-event-overlay .event-item p,
+.upcoming-event-overlay .event-item span {
+    color: #4b5563 !important;
+    /* text-gray-600 */
+}
+
+.dark .upcoming-event-overlay .event-item h4 {
+    color: #f3f4f6 !important;
+    /* text-gray-100 */
+}
+
+.dark .upcoming-event-overlay .event-item p,
+.dark .upcoming-event-overlay .event-item span {
+    color: #9ca3af !important;
+    /* text-gray-400 */
+}
+
+/* Ensure hero section text remains visible on all backgrounds */
+.hero-slider-container h1,
+.hero-slider-container h2,
+.hero-slider-container h3,
+.hero-slider-container p,
+.hero-slider-container a {
+    color: white !important;
+}
+
+/* Header overlay effect with glassmorphism */
+header {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 60 !important;
+    /* Increased z-index to stay on top */
+    margin-top: 0;
+    background: rgba(255, 255, 255, 0.70) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+    color: #1f2937 !important;
+    /* text-gray-800 */
+}
+
+header a,
+header span,
+header div {
+    color: #1f2937 !important;
+    /* text-gray-800 */
+}
+
+.dark header {
+    background: rgba(17, 24, 39, 0.70) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+}
+
+.dark header a,
+.dark header span,
+.dark header div {
+    color: white !important;
+}
+
+/* Ensure hero section takes full height and is behind header */
+.hero-slider-container {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    z-index: 0;
+}
+
+/* Main content should start after hero section */
+main {
+    position: relative;
+    z-index: 10;
+    padding-top: 0 !important;
+    /* Remove any conflicting padding */
+}
+
+.content-after-hero {
+    padding-top: 5rem;
+    /* Standard padding for content after hero */
+    position: relative;
+    z-index: 20;
+}
+
+
+
+/* Hero container styling */
+.hero-slider-container {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    z-index: 40;
+    /* Ensure it's below header but above other content */
+}
+
+/* Improved section styling for better spacing and theme consistency */
+.section-content {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+}
+
+/* Glass pane with improved dark/light theme support */
+.glass-pane {
+    background: rgba(255, 255, 255, 0.70) !important;
+    /* Match header opacity */
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
+    color: #1f2937 !important;
+    /* text-gray-800 for light theme */
+}
+
+.dark .glass-pane {
+    background: rgba(30, 41, 59, 0.70) !important;
+    /* Match header opacity */
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #f3f4f6 !important;
+    /* text-gray-100 for dark theme */
+}
+
+/* Ensure content within glass panes has proper contrast */
+.glass-pane h3,
+.glass-pane p,
+.glass-pane .text-sm,
+.glass-pane .text-xs,
+.glass-pane span {
+    color: inherit !important;
+}
+
+/* Ensure text in white containers has proper contrast */
+.bg-white {
+    color: #1f2937 !important;
+    /* text-gray-800 */
+}
+
+.dark .bg-white {
+    color: #f3f4f6 !important;
+    /* text-gray-100 */
+}
+
+/* Content sections with consistent spacing */
+.content-section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.stats-section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+.features-section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.events-section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.testimonials-section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.cta-section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+/* Theme-consistent text colors */
+.text-primary {
+    color: #1f2937;
+    /* text-gray-800 */
+}
+
+.dark .text-primary {
+    color: #f3f4f6;
+    /* text-gray-100 */
+}
+
+.text-secondary {
+    color: #4b5563;
+    /* text-gray-600 */
+}
+
+.dark .text-secondary {
+    color: #9ca3af;
+    /* text-gray-400 */
+}
+
+/* Improved button styles with theme consistency */
+.premium-button {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+.dark .premium-button {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+/* Ensure text buttons have proper contrast in light theme */
+.premium-button.text-btn {
+    background: transparent !important;
+    color: #1f2937 !important;
+    /* text-gray-800 */
+}
+
+.dark .premium-button.text-btn {
+    color: #f3f4f6 !important;
+    /* text-gray-100 */
+}
+
+/* Consistent gradient text for all themes */
+.gradient-text {
+    background: linear-gradient(135deg, #66b3e0 0%, #4fb8d5 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+/* Improved card styling */
+.premium-card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    transform-style: preserve-3d !important;
+    perspective: 1000px !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    color: #1f2937 !important;
+    /* text-gray-800 for light theme */
+}
+
+.dark .premium-card {
+    background: rgba(17, 24, 39, 0.25) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #f3f4f6 !important;
+    /* text-gray-100 for dark theme */
+}
+
+/* Ensure card content has proper contrast */
+.premium-card h3,
+.premium-card p,
+.premium-card .text-sm,
+.premium-card .text-xs {
+    color: inherit !important;
+}
+
+/* Specific rule for Get Started button to ensure black text in light theme */
+#get-started-btn {
+    color: #000000 !important;
+    /* black */
+}
+
+.dark #get-started-btn {
+    color: #ffffff !important;
+    /* white for dark theme */
+}
+
+/* Improved section spacings */
+section {
+    margin: 0 !important;
+    padding: 3rem 0 !important;
+}
+
+/* Consistent font colors across themes for content sections (not hero) */
+.content-section h1,
+.content-section h2,
+.content-section h3,
+.content-section h4,
+.content-section h5,
+.content-section h6,
+.stats-section h1,
+.stats-section h2,
+.stats-section h3,
+.stats-section h4,
+.stats-section h5,
+.stats-section h6,
+.features-section h1,
+.features-section h2,
+.features-section h3,
+.features-section h4,
+.features-section h5,
+.features-section h6,
+.events-section h1,
+.events-section h2,
+.events-section h3,
+.events-section h4,
+.events-section h5,
+.events-section h6,
+.testimonials-section h1,
+.testimonials-section h2,
+.testimonials-section h3,
+.testimonials-section h4,
+.testimonials-section h5,
+.testimonials-section h6,
+.cta-section h1,
+.cta-section h2,
+.cta-section h3,
+.cta-section h4,
+.cta-section h5,
+.cta-section h6 {
+    color: #1f2937 !important;
+    /* text-gray-800 */
+}
+
+.dark .content-section h1,
+.dark .content-section h2,
+.dark .content-section h3,
+.dark .content-section h4,
+.dark .content-section h5,
+.dark .content-section h6,
+.dark .stats-section h1,
+.dark .stats-section h2,
+.dark .stats-section h3,
+.dark .stats-section h4,
+.dark .stats-section h5,
+.dark .stats-section h6,
+.dark .features-section h1,
+.dark .features-section h2,
+.dark .features-section h3,
+.dark .features-section h4,
+.dark .features-section h5,
+.dark .features-section h6,
+.dark .events-section h1,
+.dark .events-section h2,
+.dark .events-section h3,
+.dark .events-section h4,
+.dark .events-section h5,
+.dark .events-section h6,
+.dark .testimonials-section h1,
+.dark .testimonials-section h2,
+.dark .testimonials-section h3,
+.dark .testimonials-section h4,
+.dark .testimonials-section h5,
+.dark .testimonials-section h6,
+.dark .cta-section h1,
+.dark .cta-section h2,
+.dark .cta-section h3,
+.dark .cta-section h4,
+.dark .cta-section h5,
+.dark .cta-section h6 {
+    color: #f3f4f6 !important;
+    /* text-gray-100 */
+}
+
+.content-section p,
+.stats-section p,
+.features-section p,
+.events-section p,
+.testimonials-section p,
+.cta-section p {
+    color: #4b5563 !important;
+    /* text-gray-600 */
+}
+
+.dark .content-section p,
+.dark .stats-section p,
+.dark .features-section p,
+.dark .events-section p,
+.dark .testimonials-section p,
+.dark .cta-section p {
+    color: #9ca3af !important;
+    /* text-gray-400 */
+}
+
+/* Enhanced contrast for content sections */
+.bg-gray-900,
+.bg-black {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+.dark .bg-gray-900,
+.dark .bg-black {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+/* Improved gradient sections */
+.bg-gradient-to-b,
+.bg-gradient-to-r {
+    background-size: 200% 200% !important;
+    animation: gradientShift 8s ease infinite !important;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}

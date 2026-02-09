@@ -1,729 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Home - {{ site_config.site_name|default:"Corporate Games Hub" }}{% endblock %}
 
 {% block content %}
-<style>
-    :root {
-        --aurora-speed: 8s;
-        --slide-transition: opacity 1.2s ease-in-out;
-    }
-
-    .aurora-background {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        z-index: -1;
-        background-color: #000;
-    }
-
-    .aurora-background::before,
-    .aurora-background::after {
-        content: '';
-        position: absolute;
-        width: 200%;
-        height: 200%;
-        border-radius: 50%;
-        opacity: 0.3;
-        filter: blur(100px);
-        will-change: transform;
-    }
-
-    .aurora-background::before {
-        background: radial-gradient(circle at 50% 50%, #2a8ac5, transparent 70%);
-        top: -50%;
-        left: -50%;
-        animation: moveAurora var(--aurora-speed) linear infinite alternate;
-    }
-
-    .aurora-background::after {
-        background: radial-gradient(circle at 50% 50%, #4fb8d5, transparent 70%);
-        bottom: -50%;
-        right: -50%;
-        animation: moveAurora var(--aurora-speed) linear infinite alternate-reverse;
-    }
-
-    @keyframes moveAurora {
-        0% {
-            transform: translate(0, 0);
-        }
-
-        100% {
-            transform: translate(50%, 50%);
-        }
-    }
-
-    .glass-pane {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-    }
-
-    .dark .glass-pane {
-        background: rgba(17, 24, 39, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-
-    .scroll-animate {
-        opacity: 0;
-        transform: translateY(30px);
-        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-    }
-
-    .scroll-animate.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    /* Hero Slider Styles */
-    .hero-slider-container {
-        position: relative;
-        width: 100%;
-        height: 100vh;
-        overflow: hidden;
-    }
-
-    .hero-slider {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .slide {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 0;
-        transition: var(--slide-transition);
-        background-size: cover;
-        background-position: center center;
-        background-repeat: no-repeat;
-    }
-
-    .slide.active {
-        opacity: 1;
-        z-index: 1;
-    }
-
-    .slide-content {
-        position: absolute !important;
-        z-index: 20 !important;
-        width: auto !important;
-        /* Let width be flexible */
-        max-width: 500px !important;
-        /* Maximum width for text readability */
-        margin: 0 !important;
-        padding: 2rem !important;
-        left: 5% !important;
-        /* Position from left edge */
-        top: 50% !important;
-        /* Center vertically */
-        transform: translateY(-50%) !important;
-        /* Center vertically */
-        text-align: left !important;
-        /* Left-aligned text */
-        display: block !important;
-    }
-
-
-
-    .slide-caption {
-        position: absolute;
-        bottom: 2rem;
-        left: 2rem;
-        /* Position from left edge */
-        max-width: 500px;
-        /* Adjust width for left alignment */
-        margin: 0;
-        padding: 1.25rem;
-        text-align: left;
-        /* Left-aligned text */
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px);
-        border-radius: 12px;
-        color: #1f2937;
-        /* text-gray-800 */
-        z-index: 15;
-        font-size: 1.1rem;
-    }
-
-    .dark .slide-caption {
-        background: rgba(0, 0, 0, 0.6);
-        color: white;
-    }
-
-    .premium-card {
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        transform-style: preserve-3d;
-        perspective: 1000px;
-    }
-
-    .premium-card:hover {
-        transform: translateY(-8px) scale(1.01);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
-    }
-
-    .floating-element {
-        animation: float 6s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0% {
-            transform: translateY(0px);
-        }
-
-        50% {
-            transform: translateY(-15px);
-        }
-
-        100% {
-            transform: translateY(0px);
-        }
-    }
-
-    .gradient-text {
-        background: linear-gradient(135deg, #66b3e0 0%, #4fb8d5 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .premium-button {
-        position: relative;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        font-weight: 600;
-    }
-
-    .premium-button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-    }
-
-    .premium-button:hover::before {
-        left: 100%;
-    }
-
-    .stats-counter {
-        font-variant-numeric: tabular-nums;
-    }
-
-    .luxury-border {
-        position: relative;
-    }
-
-    .luxury-border::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border-radius: inherit;
-        padding: 2px;
-        background: linear-gradient(45deg, #66b3e0, #4fb8d5, #6ec6e5, #5ab0d0);
-        -webkit-mask:
-            linear-gradient(#fff 0 0) content-box,
-            linear-gradient(#fff 0 0);
-        mask:
-            linear-gradient(#fff 0 0) content-box,
-            linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-    }
-
-    /* Hero slider with pseudo-element overlay */
-    .hero-slider {
-        position: relative;
-    }
-
-    .hero-slider::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(90deg, rgba(0, 0, 0, 0.7) 30%, rgba(0, 0, 0, 0.3) 70%);
-        z-index: 10;
-    }
-
-    .slide-content {
-        position: relative;
-        z-index: 20;
-    }
-
-    /* Ensure hero section text remains visible on all backgrounds */
-    .hero-slider-container h1,
-    .hero-slider-container h2,
-    .hero-slider-container h3,
-    .hero-slider-container p,
-    .hero-slider-container a {
-        color: white !important;
-    }
-
-    /* Upcoming event overlay container styling */
-    .upcoming-event-overlay {
-        position: absolute;
-        top: 50%;
-        right: 3rem;
-        /* Increased margin from the edge */
-        transform: translateY(-50%);
-        width: 28rem;
-        /* Increased width for larger container (w-[28rem] = 28rem) */
-        z-index: 30;
-        transition: all 0.5s ease;
-    }
-
-    @media (max-width: 1024px) {
-        .upcoming-event-overlay {
-            position: relative;
-            top: auto;
-            right: auto;
-            transform: none;
-            width: 100%;
-            margin: 2rem auto 0;
-            max-width: 26rem;
-            /* Allow it to be as wide as the desktop version on larger mobile screens */
-        }
-    }
-
-    @media (max-width: 640px) {
-        .upcoming-event-overlay {
-            max-width: 90%;
-            /* Make it smaller on very small screens */
-            width: 90%;
-        }
-    }
-
-    /* Upcoming event overlay text colors */
-    .upcoming-event-overlay .event-item h4 {
-        color: #1f2937 !important;
-        /* text-gray-800 */
-    }
-
-    .upcoming-event-overlay .event-item p,
-    .upcoming-event-overlay .event-item span {
-        color: #4b5563 !important;
-        /* text-gray-600 */
-    }
-
-    .dark .upcoming-event-overlay .event-item h4 {
-        color: #f3f4f6 !important;
-        /* text-gray-100 */
-    }
-
-    .dark .upcoming-event-overlay .event-item p,
-    .dark .upcoming-event-overlay .event-item span {
-        color: #9ca3af !important;
-        /* text-gray-400 */
-    }
-
-    /* Ensure hero section text remains visible on all backgrounds */
-    .hero-slider-container h1,
-    .hero-slider-container h2,
-    .hero-slider-container h3,
-    .hero-slider-container p,
-    .hero-slider-container a {
-        color: white !important;
-    }
-
-    /* Header overlay effect with glassmorphism */
-    header {
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 60 !important;
-        /* Increased z-index to stay on top */
-        margin-top: 0;
-        background: rgba(255, 255, 255, 0.70) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
-        color: #1f2937 !important;
-        /* text-gray-800 */
-    }
-
-    header a,
-    header span,
-    header div {
-        color: #1f2937 !important;
-        /* text-gray-800 */
-    }
-
-    .dark header {
-        background: rgba(17, 24, 39, 0.70) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-        color: white !important;
-    }
-
-    .dark header a,
-    .dark header span,
-    .dark header div {
-        color: white !important;
-    }
-
-    /* Ensure hero section takes full height and is behind header */
-    .hero-slider-container {
-        position: relative;
-        height: 100vh;
-        width: 100%;
-        overflow: hidden;
-        z-index: 0;
-    }
-
-    /* Main content should start after hero section */
-    main {
-        position: relative;
-        z-index: 10;
-        padding-top: 0 !important;
-        /* Remove any conflicting padding */
-    }
-
-    .content-after-hero {
-        padding-top: 5rem;
-        /* Standard padding for content after hero */
-        position: relative;
-        z-index: 20;
-    }
-
-
-
-    /* Hero container styling */
-    .hero-slider-container {
-        position: relative;
-        height: 100vh;
-        width: 100%;
-        overflow: hidden;
-        z-index: 40;
-        /* Ensure it's below header but above other content */
-    }
-
-    /* Improved section styling for better spacing and theme consistency */
-    .section-content {
-        padding-top: 4rem !important;
-        padding-bottom: 4rem !important;
-    }
-
-    /* Glass pane with improved dark/light theme support */
-    .glass-pane {
-        background: rgba(255, 255, 255, 0.70) !important;
-        /* Match header opacity */
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
-        color: #1f2937 !important;
-        /* text-gray-800 for light theme */
-    }
-
-    .dark .glass-pane {
-        background: rgba(30, 41, 59, 0.70) !important;
-        /* Match header opacity */
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        color: #f3f4f6 !important;
-        /* text-gray-100 for dark theme */
-    }
-
-    /* Ensure content within glass panes has proper contrast */
-    .glass-pane h3,
-    .glass-pane p,
-    .glass-pane .text-sm,
-    .glass-pane .text-xs,
-    .glass-pane span {
-        color: inherit !important;
-    }
-
-    /* Ensure text in white containers has proper contrast */
-    .bg-white {
-        color: #1f2937 !important;
-        /* text-gray-800 */
-    }
-
-    .dark .bg-white {
-        color: #f3f4f6 !important;
-        /* text-gray-100 */
-    }
-
-    /* Content sections with consistent spacing */
-    .content-section {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
-    }
-
-    .stats-section {
-        padding-top: 3rem;
-        padding-bottom: 3rem;
-    }
-
-    .features-section {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
-    }
-
-    .events-section {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
-    }
-
-    .testimonials-section {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
-    }
-
-    .cta-section {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
-    }
-
-    /* Theme-consistent text colors */
-    .text-primary {
-        color: #1f2937;
-        /* text-gray-800 */
-    }
-
-    .dark .text-primary {
-        color: #f3f4f6;
-        /* text-gray-100 */
-    }
-
-    .text-secondary {
-        color: #4b5563;
-        /* text-gray-600 */
-    }
-
-    .dark .text-secondary {
-        color: #9ca3af;
-        /* text-gray-400 */
-    }
-
-    /* Improved button styles with theme consistency */
-    .premium-button {
-        background: #ffffff !important;
-        color: #000000 !important;
-    }
-
-    .dark .premium-button {
-        background: rgba(255, 255, 255, 0.1) !important;
-        color: #ffffff !important;
-    }
-
-    /* Ensure text buttons have proper contrast in light theme */
-    .premium-button.text-btn {
-        background: transparent !important;
-        color: #1f2937 !important;
-        /* text-gray-800 */
-    }
-
-    .dark .premium-button.text-btn {
-        color: #f3f4f6 !important;
-        /* text-gray-100 */
-    }
-
-    /* Consistent gradient text for all themes */
-    .gradient-text {
-        background: linear-gradient(135deg, #66b3e0 0%, #4fb8d5 100%) !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-        background-clip: text !important;
-    }
-
-    /* Improved card styling */
-    .premium-card {
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-        transform-style: preserve-3d !important;
-        perspective: 1000px !important;
-        background: rgba(255, 255, 255, 0.1) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.18) !important;
-        color: #1f2937 !important;
-        /* text-gray-800 for light theme */
-    }
-
-    .dark .premium-card {
-        background: rgba(17, 24, 39, 0.25) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        color: #f3f4f6 !important;
-        /* text-gray-100 for dark theme */
-    }
-
-    /* Ensure card content has proper contrast */
-    .premium-card h3,
-    .premium-card p,
-    .premium-card .text-sm,
-    .premium-card .text-xs {
-        color: inherit !important;
-    }
-
-    /* Specific rule for Get Started button to ensure black text in light theme */
-    #get-started-btn {
-        color: #000000 !important;
-        /* black */
-    }
-
-    .dark #get-started-btn {
-        color: #ffffff !important;
-        /* white for dark theme */
-    }
-
-    /* Improved section spacings */
-    section {
-        margin: 0 !important;
-        padding: 3rem 0 !important;
-    }
-
-    /* Consistent font colors across themes for content sections (not hero) */
-    .content-section h1,
-    .content-section h2,
-    .content-section h3,
-    .content-section h4,
-    .content-section h5,
-    .content-section h6,
-    .stats-section h1,
-    .stats-section h2,
-    .stats-section h3,
-    .stats-section h4,
-    .stats-section h5,
-    .stats-section h6,
-    .features-section h1,
-    .features-section h2,
-    .features-section h3,
-    .features-section h4,
-    .features-section h5,
-    .features-section h6,
-    .events-section h1,
-    .events-section h2,
-    .events-section h3,
-    .events-section h4,
-    .events-section h5,
-    .events-section h6,
-    .testimonials-section h1,
-    .testimonials-section h2,
-    .testimonials-section h3,
-    .testimonials-section h4,
-    .testimonials-section h5,
-    .testimonials-section h6,
-    .cta-section h1,
-    .cta-section h2,
-    .cta-section h3,
-    .cta-section h4,
-    .cta-section h5,
-    .cta-section h6 {
-        color: #1f2937 !important;
-        /* text-gray-800 */
-    }
-
-    .dark .content-section h1,
-    .dark .content-section h2,
-    .dark .content-section h3,
-    .dark .content-section h4,
-    .dark .content-section h5,
-    .dark .content-section h6,
-    .dark .stats-section h1,
-    .dark .stats-section h2,
-    .dark .stats-section h3,
-    .dark .stats-section h4,
-    .dark .stats-section h5,
-    .dark .stats-section h6,
-    .dark .features-section h1,
-    .dark .features-section h2,
-    .dark .features-section h3,
-    .dark .features-section h4,
-    .dark .features-section h5,
-    .dark .features-section h6,
-    .dark .events-section h1,
-    .dark .events-section h2,
-    .dark .events-section h3,
-    .dark .events-section h4,
-    .dark .events-section h5,
-    .dark .events-section h6,
-    .dark .testimonials-section h1,
-    .dark .testimonials-section h2,
-    .dark .testimonials-section h3,
-    .dark .testimonials-section h4,
-    .dark .testimonials-section h5,
-    .dark .testimonials-section h6,
-    .dark .cta-section h1,
-    .dark .cta-section h2,
-    .dark .cta-section h3,
-    .dark .cta-section h4,
-    .dark .cta-section h5,
-    .dark .cta-section h6 {
-        color: #f3f4f6 !important;
-        /* text-gray-100 */
-    }
-
-    .content-section p,
-    .stats-section p,
-    .features-section p,
-    .events-section p,
-    .testimonials-section p,
-    .cta-section p {
-        color: #4b5563 !important;
-        /* text-gray-600 */
-    }
-
-    .dark .content-section p,
-    .dark .stats-section p,
-    .dark .features-section p,
-    .dark .events-section p,
-    .dark .testimonials-section p,
-    .dark .cta-section p {
-        color: #9ca3af !important;
-        /* text-gray-400 */
-    }
-
-    /* Enhanced contrast for content sections */
-    .bg-gray-900,
-    .bg-black {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
-    }
-
-    .dark .bg-gray-900,
-    .dark .bg-black {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
-    }
-
-    /* Improved gradient sections */
-    .bg-gradient-to-b,
-    .bg-gradient-to-r {
-        background-size: 200% 200% !important;
-        animation: gradientShift 8s ease infinite !important;
-    }
-
-    @keyframes gradientShift {
-        0% {
-            background-position: 0% 50%;
-        }
-
-        50% {
-            background-position: 100% 50%;
-        }
-
-        100% {
-            background-position: 0% 50%;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/homepage.css' %}">
 
 <!-- Hero Slider Section -->
 <div class="hero-slider-container">
@@ -731,17 +12,13 @@
         {% if site_config.get_active_hero_images %}
         {% for img in site_config.get_active_hero_images %}
         <div class="slide {% if forloop.first %}active{% endif %}" style="background-image: url('{{ img.url }}');">
-            {% if img.caption %}
-            <div class="slide-caption {% if forloop.first %}block{% else %}hidden{% endif %}"
-                data-index="{{ forloop.counter0 }}">
-                {{ img.caption }}
-            </div>
-            {% endif %}
+            <!-- Debug info: {{ img }} -->
         </div>
         {% endfor %}
         {% else %}
-        <!-- Default slide if no images in configuration -->
-        <div class="slide active" style="background: linear-gradient(135deg, #66b3e0 0%, #4fb8d5 100%);">
+        <!-- Default slide if no images -->
+        <div class="slide active" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+            <!-- Fallback background -->
         </div>
         {% endif %}
 
@@ -765,7 +42,8 @@
                 <div class="text-center mb-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">Featured Events</h3>
                 </div>
-                <div class="space-y-4 max-h-[35rem] overflow-y-auto pr-2"> <!-- Increased height to 35rem (560px) -->
+                <div class="space-y-4 max-h-[35rem] overflow-y-auto pr-2">
+                    <!-- Increased height to 35rem (560px) -->
                     {% for event in events|dictsort:"start_date" %}
                     {% if event.status == 'UPCOMING' or event.status == 'ONGOING' %}
                     <div
@@ -781,8 +59,7 @@
                         {% endif %}
                         <div class="flex-1 min-w-0">
                             <h4 class="font-bold text-sm text-gray-900 dark:text-white truncate">{{ event.name }}</h4>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ event.start_date|date:"M d, Y"
-                                }} - {{ event.end_date|date:"M d, Y" }}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ event.start_date|date:"M d, Y" }} - {{ event.end_date|date:"M d, Y" }}</p>
                             <div class="flex items-center justify-between">
                                 {% if event.status == 'UPCOMING' %}
                                 <span
@@ -816,18 +93,18 @@
     <div class="container mx-auto px-4 sm:px-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8 text-center">
             <div class="floating-element">
-                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">{{
-                    total_competitions }}</div>
+                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">
+                    {{ total_competitions }}</div>
                 <div class="text-gray-400 mt-2 text-sm sm:text-base">Competitions</div>
             </div>
             <div class="floating-element" style="animation-delay: 0.2s;">
-                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">{{
-                    total_clubs }}</div>
+                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">
+                    {{ total_clubs }}</div>
                 <div class="text-gray-400 mt-2 text-sm sm:text-base">Clubs</div>
             </div>
             <div class="floating-element" style="animation-delay: 0.4s;">
-                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">{{
-                    total_participants }}</div>
+                <div class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold gradient-text stats-counter">
+                    {{ total_participants }}</div>
                 <div class="text-gray-400 mt-2 text-sm sm:text-base">Participants</div>
             </div>
         </div>
@@ -838,7 +115,8 @@
 <section id="announcements" class="py-16 sm:py-20 bg-gradient-to-b from-gray-900 to-black announcements-section">
     <div class="container mx-auto px-4 sm:px-6">
         <div class="text-center mb-12 sm:mb-16">
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold scroll-animate gradient-text">Latest Announcements
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold scroll-animate gradient-text">Latest
+                Announcements
             </h2>
             <p class="text-base sm:text-lg text-gray-400 mt-3 sm:mt-4 max-w-xl mx-auto scroll-animate"
                 style="transition-delay: 100ms;">
@@ -886,7 +164,8 @@
 <section class="py-16 sm:py-20 bg-gradient-to-b from-gray-900 to-black motivation-section">
     <div class="container mx-auto px-4 sm:px-6">
         <div class="text-center mb-12 sm:mb-16">
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold scroll-animate gradient-text">Motivation from Company
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold scroll-animate gradient-text">Motivation from
+                Company
                 Leaders</h2>
             <p class="text-base sm:text-lg text-gray-400 mt-3 sm:mt-4 max-w-xl mx-auto scroll-animate"
                 style="transition-delay: 100ms;">
@@ -907,7 +186,8 @@
                     </div>
                 </div>
                 <p class="text-gray-300 italic text-sm sm:text-base">"Corporate games bring out the best in our
-                    employees. They foster teamwork, healthy competition, and create lasting memories beyond daily work
+                    employees. They foster teamwork, healthy competition, and create lasting memories beyond
+                    daily work
                     routines."</p>
             </div>
 
@@ -922,8 +202,10 @@
                         <p class="text-xs sm:text-sm text-gray-400">Human Resources</p>
                     </div>
                 </div>
-                <p class="text-gray-300 italic text-sm sm:text-base">"These events strengthen our company culture. When
-                    employees compete as teams, they build relationships that translate into better collaboration in the
+                <p class="text-gray-300 italic text-sm sm:text-base">"These events strengthen our company
+                    culture. When
+                    employees compete as teams, they build relationships that translate into better
+                    collaboration in the
                     workplace."</p>
             </div>
 
@@ -938,8 +220,10 @@
                         <p class="text-xs sm:text-sm text-gray-400">Operations</p>
                     </div>
                 </div>
-                <p class="text-gray-300 italic text-sm sm:text-base">"Corporate games are more than entertainment. They
-                    reveal leadership potential, problem-solving skills, and build the resilience we value in our
+                <p class="text-gray-300 italic text-sm sm:text-base">"Corporate games are more than
+                    entertainment. They
+                    reveal leadership potential, problem-solving skills, and build the resilience we value in
+                    our
                     organization."</p>
             </div>
         </div>
@@ -985,7 +269,8 @@
                     class="px-3 py-1 rounded-r bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                        </path>
                     </svg>
                 </button>
             </div>
@@ -994,7 +279,6 @@
             <div id="calendar-container">
                 {% for month_data in months_data %}
                 <div class="month-calendar" data-month-index="{{ forloop.counter0 }}" {% if forloop.counter0 != current_month_index %}style="display:none;"{% endif %}>
-
                     <!-- Calendar grid -->
                     <div class="grid grid-cols-7 gap-1 mb-1">
                         {% for day in "0123456"|make_list %}
@@ -1024,8 +308,7 @@
                             {% if day_info.day != 0 %}
                             <div class="text-right mb-1">
                                 <span
-                                    class="text-sm font-medium {% if day_info.is_today %}text-blue-600 dark:text-blue-400{% else %}text-gray-900 dark:text-gray-300{% endif %}">{{
-                                    day_info.day }}</span>
+                                    class="text-sm font-medium {% if day_info.is_today %}text-blue-600 dark:text-blue-400{% else %}text-gray-900 dark:text-gray-300{% endif %}">{{ day_info.day }}</span>
                             </div>
 
                             {% if day_info.matches %}
@@ -1059,8 +342,7 @@
                                 </div>
                                 {% endfor %}
                                 {% if day_info.matches|length > 2 %}
-                                <div class="text-xs text-gray-600 dark:text-gray-500 text-center">+{{
-                                    day_info.matches|length|add:"-2" }}</div>
+                                <div class="text-xs text-gray-600 dark:text-gray-500 text-center">+{{ day_info.matches|length|add:"-2" }}</div>
                                 {% endif %}
                             </div>
                             {% else %}
@@ -1078,208 +360,17 @@
             </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Month navigation functionality
-            const monthCalendars = document.querySelectorAll('.month-calendar');
-            const prevButton = document.getElementById('prev-month');
-            const nextButton = document.getElementById('next-month');
-            const monthDisplay = document.querySelector('.current-month-display');
-            let currentMonthIndex = 0;
-
-            // Array of month names and years for display
-            const monthData = [
-                {% for month_data in months_data %}
-                    { month_name: "{{ month_data.month_name }}", year: "{{ month_data.year }}" }{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-            ];
-
-        function showMonth(index) {
-            // Hide all calendars
-            monthCalendars.forEach(calendar => {
-                calendar.style.display = 'none';
-            });
-
-            // Show current calendar
-            if (monthCalendars[index]) {
-                monthCalendars[index].style.display = 'block';
-
-                // Update month display
-                if (monthData && monthData[index]) {
-                    monthDisplay.textContent = monthData[index].month_name + ' ' + monthData[index].year;
-                }
-            }
-
-            // Update button states
-            prevButton.disabled = (index <= 0);
-            nextButton.disabled = (index >= monthCalendars.length - 1);
-
-            // Update button visual state for disabled
-            if (index <= 0) {
-                prevButton.classList.add('opacity-50', 'cursor-not-allowed');
-                prevButton.classList.remove('hover:bg-gray-300', 'dark:hover:bg-gray-600');
-            } else {
-                prevButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                prevButton.classList.add('hover:bg-gray-300', 'dark:hover:bg-gray-600');
-            }
-
-            if (index >= monthCalendars.length - 1) {
-                nextButton.classList.add('opacity-50', 'cursor-not-allowed');
-                nextButton.classList.remove('hover:bg-gray-300', 'dark:hover:bg-gray-600');
-            } else {
-                nextButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                nextButton.classList.add('hover:bg-gray-300', 'dark:hover:bg-gray-600');
-            }
-        }
-
-        // Show initial month
-        showMonth(currentMonthIndex);
-
-        // Next button event
-        nextButton.addEventListener('click', function () {
-            if (currentMonthIndex < monthCalendars.length - 1) {
-                currentMonthIndex++;
-                showMonth(currentMonthIndex);
-            }
-        });
-
-        // Previous button event  
-        prevButton.addEventListener('click', function () {
-            if (currentMonthIndex > 0) {
-                currentMonthIndex--;
-                showMonth(currentMonthIndex);
-            }
-        });
-        });
-    </script>
 </section>
 
+<!-- Pass JSON data to JS -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Hero Slider Functionality - Auto sliding only
-        const slider = document.getElementById('heroSlider');
-        const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.slide-dot');
-        const captions = document.querySelectorAll('.slide-caption');
-
-        let currentSlide = 0;
-        let slideInterval;
-
-        function showSlide(n) {
-            // Hide all slides and captions
-            slides.forEach(slide => slide.classList.remove('active'));
-            if (dots.length > 0) {
-                dots.forEach(dot => dot.classList.remove('active'));
-            }
-            captions.forEach(caption => caption.classList.add('hidden'));
-
-            // Calculate new slide index
-            currentSlide = (n + slides.length) % slides.length;
-
-            // Show the selected slide
-            if (slides[currentSlide]) {
-                slides[currentSlide].classList.add('active');
-            }
-
-            // Update active dot if dots exist
-            if (dots.length > 0 && dots[currentSlide]) {
-                dots[currentSlide].classList.add('active');
-            }
-
-            // Show corresponding caption
-            if (captions[currentSlide]) {
-                captions[currentSlide].classList.remove('hidden');
-            }
-        }
-
-        function nextSlide() {
-            showSlide(currentSlide + 1);
-        }
-
-        // Start automatic slideshow
-        function startSlideShow() {
-            slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
-        }
-
-        // Stop automatic slideshow (on hover)
-        function stopSlideShow() {
-            clearInterval(slideInterval);
-        }
-
-        // Initialize the slider
-        showSlide(currentSlide);
-        startSlideShow();
-
-        // Add mouse events to pause/resume slideshow
-        if (slider) {
-            slider.addEventListener('mouseenter', stopSlideShow);
-            slider.addEventListener('mouseleave', startSlideShow);
-        }
-
-        // Scroll animations
-        const animatedElements = document.querySelectorAll('.scroll-animate');
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, {
-            threshold: 0.1
-        });
-
-        animatedElements.forEach(el => {
-            observer.observe(el);
-        });
-
-        // Stats counter animation
-        const counters = document.querySelectorAll('.stats-counter');
-        const observer2 = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const target = entry.target;
-                    const text = target.textContent;
-                    const isNumeric = /\d/.test(text);
-
-                    if (isNumeric) {
-                        const finalValue = text.replace(/[^\d]/g, '');
-                        let current = 0;
-                        const increment = finalValue / 100;
-                        const duration = 2000;
-                        const stepTime = duration / (finalValue / increment);
-
-                        const timer = setInterval(() => {
-                            current += increment;
-                            if (current >= finalValue) {
-                                target.textContent = text.replace(/\d+/, finalValue);
-                                clearInterval(timer);
-                            } else {
-                                target.textContent = text.replace(/\d+/, Math.floor(current));
-                            }
-                        }, stepTime);
-                    }
-                    observer2.unobserve(target);
-                }
-            });
-        }, {
-            threshold: 0.5
-        });
-
-        counters.forEach(counter => {
-            observer2.observe(counter);
-        });
-
-
-        // Prevent auto-scrolling on page load by clearing any existing hash
-        if (window.location.hash && window.location.hash !== '#') {
-            // Remove the hash from the URL without scrolling
-            history.replaceState(null, null, window.location.pathname + window.location.search);
-        }
-
-    });
+    window.homepageMonthData = [
+        {% for month_data in months_data %}
+    { month_name: "{{ month_data.month_name }}", year: "{{ month_data.year }}" } {% if not forloop.last %}, {% endif %}
+    {% endfor %}
+    ];
 </script>
+
+<script src="{% static 'js/homepage.js' %}"></script>
 
 {% endblock %}

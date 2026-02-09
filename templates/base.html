@@ -348,8 +348,7 @@
                         <img src="{{ site_config.logo.url }}" class="h-6 md:h-8 rounded-full"
                             alt="{{ site_config.site_name }}" />
                     </div>
-                    <span class="self-center text-base md:text-xl font-bold text-white">{{
-                        site_config.site_name|default:"Corporate Games Hub" }}</span>
+                    <span class="self-center text-base md:text-xl font-bold text-white">{{ site_config.site_name|default:"Corporate Games Hub" }}</span>
                     {% else %}
                     <div class="flex items-center">
                         <div class="w-2 h-2 md:w-3 md:h-3 bg-yellow-400 rounded-full mr-1 animate-pulse"></div>
@@ -359,8 +358,7 @@
                         <div
                             class="w-2 h-2 md:w-3 md:h-3 bg-red-400 rounded-full mr-1 animate-pulse animation-delay-1000">
                         </div>
-                        <span class="self-center text-base md:text-xl font-bold text-white ml-1 md:ml-2">{{
-                            site_config.site_name|default:"Corporate Games Hub" }}</span>
+                        <span class="self-center text-base md:text-xl font-bold text-white ml-1 md:ml-2">{{ site_config.site_name|default:"Corporate Games Hub" }}</span>
                     </div>
                     {% endif %}
                 </a>
